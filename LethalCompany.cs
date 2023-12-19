@@ -43,7 +43,8 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Ultra Jump", "jumpultra") { Category = "Player", Duration = 15},
                 new Effect("High Jump", "jumphigh") { Category = "Player", Duration = 30},
                 new Effect("Low Jump", "jumplow") { Category = "Player", Duration = 30},
-                new Effect("Night Vision", "nightvision") { Category = "Player", Duration = 30},
+                //new Effect("Night Vision", "nightvision") { Category = "Player", Duration = 30},
+                new Effect("Revive Dead Players", "revive") { Category = "Player"},
 
                 new Effect("Spawn Centipede", "spawn_pede") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bunker Spider", "spawn_spider") { Category = "Spawn Enemies"},
