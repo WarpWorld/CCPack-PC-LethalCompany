@@ -20,6 +20,7 @@ namespace CrowdControl.Games.Packs.LethalCompany {
         public override EffectList Effects => new List<Effect>
         {
                 new Effect("Kill Player", "kill") { Category = "Health"},
+                new Effect("Kill Crewmate", "killcrew") { Category = "Health"},
                 new Effect("Damage Player", "damage") { Category = "Health"},
                 new Effect("Heal Player", "heal") { Category = "Health"},
 
@@ -131,7 +132,11 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Reset Quota Progress", "giveprofit_-100") { Category = "Scrap/Money"},
 
                 new Effect("Return to Ship", "toship") { Category = "Player"},
+                new Effect("Return Crewmate to Ship", "crewship") { Category = "Player"},
+                new Effect("Teleport to Crewmate", "tocrew") { Category = "Player"},
+                new Effect("Teleport Crewmate Here", "crewto") { Category = "Player"},
                 new Effect("Spawn Dead Body", "body") { Category = "Player"},
+                new Effect("Spawn Dead Crewmate", "crewbody") { Category = "Player"},
 
                 new Effect("Play Bird Screech", "screech") { Category = "Sound"},
                 //new Effect("Play Blob Sound", "blob") { Category = "Sound"},
