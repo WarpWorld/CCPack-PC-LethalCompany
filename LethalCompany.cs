@@ -33,6 +33,7 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("No Stamina", "nostam") { Category = "Stamina", Duration = 30},
                 new Effect("Infinite Stamina", "infstam") { Category = "Stamina", Duration = 30},
 
+                new Effect("High Pitched Voices", "highpitch") { Category = "Sound", Duration = 30},
 
                 //new Effect("Launch Player", "launch") { Category = "Player"},
 
@@ -62,6 +63,20 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Spawn Ghost Girl", "spawn_girl") { Category = "Spawn Enemies"},
                 //new Effect("Spawn Cobwebs", "webs") { Category = "Spawn Enemies"},
 
+                new Effect("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
+                new Effect("Spawn Bunker Spider at Crewmate", "cspawn_spider") { Category = "Spawn Enemies"},
+                new Effect("Spawn Hoarding Bug at Crewmate", "cspawn_hoard") { Category = "Spawn Enemies"},
+                new Effect("Spawn Bracken at Crewmate", "cspawn_flower") { Category = "Spawn Enemies"},
+                new Effect("Spawn Crawler at Crewmate", "cspawn_crawl") { Category = "Spawn Enemies"},
+                new Effect("Spawn Blob at Crewmate", "cspawn_blob") { Category = "Spawn Enemies"},
+                new Effect("Spawn Coil-Head at Crewmate", "cspawn_coil") { Category = "Spawn Enemies"},
+                new Effect("Spawn Puffer at Crewmate", "cspawn_puff") { Category = "Spawn Enemies"},
+                new Effect("Spawn Eyeless Dog at Crewmate", "cspawn_dog") { Category = "Spawn Enemies"},
+                new Effect("Spawn Forest Giant at Crewmate", "cspawn_giant") { Category = "Spawn Enemies"},
+                new Effect("Spawn Earth Leviathan at Crewmate", "cspawn_levi") { Category = "Spawn Enemies"},
+                new Effect("Spawn Baboon Hawk at Crewmate", "cspawn_hawk") { Category = "Spawn Enemies"},
+                new Effect("Spawn Ghost Girl at Crewmate", "cspawn_girl") { Category = "Spawn Enemies"},
+
                 new Effect("Give Walkie-Talkie", "give_0") { Category = "Items"},
                 new Effect("Give Flashlight", "give_1") { Category = "Items"},
                 new Effect("Give Shovel", "give_2") { Category = "Items"},
@@ -74,6 +89,19 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Give Jet Pack", "give_9") { Category = "Items"},
                 new Effect("Give Extension Ladder", "give_10") { Category = "Items"},
                 new Effect("Give Radar Booster", "give_11") { Category = "Items"},
+
+                new Effect("Give Crewmate Walkie-Talkie", "cgive_0") { Category = "Items"},
+                new Effect("Give Crewmate Flashlight", "cgive_1") { Category = "Items"},
+                new Effect("Give Crewmate Shovel", "cgive_2") { Category = "Items"},
+                new Effect("Give Crewmate Lockpicker", "cgive_3") { Category = "Items"},
+                new Effect("Give Crewmate Pro Flashlight", "cgive_4") { Category = "Items"},
+                new Effect("Give Crewmate Stun Grenade", "cgive_5") { Category = "Items"},
+                new Effect("Give Crewmate Boom Box", "cgive_6") { Category = "Items"},
+                new Effect("Give Crewmate Inhaler", "cgive_7") { Category = "Items"},
+                new Effect("Give Crewmate Stun Gun", "cgive_8") { Category = "Items"},
+                new Effect("Give Crewmate Jet Pack", "cgive_9") { Category = "Items"},
+                new Effect("Give Crewmate Extension Ladder", "cgive_10") { Category = "Items"},
+                new Effect("Give Crewmate Radar Booster", "cgive_11") { Category = "Items"},
 
                 new Effect("Charge Item Battery", "charge") { Category = "Items"},
                 new Effect("Drain Item Battery", "uncharge") { Category = "Items"},
@@ -99,6 +127,7 @@ namespace CrowdControl.Games.Packs.LethalCompany {
 
                 new Effect("Take Held Item", "takeitem") { Category = "Items"},
                 new Effect("Drop Held Item", "dropitem") { Category = "Items"},
+                new Effect("Take Crewmate Held Item", "takecrewitem") { Category = "Items"},
 
                 new Effect("Weather - Clear", "weather_-1") { Category = "Weather"},
                 new Effect("Weather - Cloudy", "weather_0") { Category = "Weather"},
