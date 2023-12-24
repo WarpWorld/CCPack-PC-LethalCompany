@@ -34,6 +34,7 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Infinite Stamina", "infstam") { Category = "Stamina", Duration = 30},
 
                 new Effect("High Pitched Voices", "highpitch") { Category = "Sound", Duration = 30},
+                new Effect("Low Pitched Voices", "lowpitch") { Category = "Sound", Duration = 30},
 
                 //new Effect("Launch Player", "launch") { Category = "Player"},
 
