@@ -64,6 +64,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Spawn Baboon Hawk", "spawn_hawk") { Category = "Spawn Enemies"},
                 new Effect("Spawn Ghost Girl", "spawn_girl") { Category = "Spawn Enemies"},
                 //new Effect("Spawn Cobwebs", "webs") { Category = "Spawn Enemies"},
+                new Effect("Spawn Mimic", "spawn_mimic") { Category = "Spawn Enemies"},
 
                 new Effect("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bunker Spider at Crewmate", "cspawn_spider") { Category = "Spawn Enemies"},
@@ -78,6 +79,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Spawn Earth Leviathan at Crewmate", "cspawn_levi") { Category = "Spawn Enemies"},
                 new Effect("Spawn Baboon Hawk at Crewmate", "cspawn_hawk") { Category = "Spawn Enemies"},
                 new Effect("Spawn Ghost Girl at Crewmate", "cspawn_girl") { Category = "Spawn Enemies"},
+                new Effect("Spawn Mimic at Crewmate", "cspawn_mimic") { Category = "Spawn Enemies"},
 
                 new Effect("Give Walkie-Talkie", "give_0") { Category = "Items"},
                 new Effect("Give Flashlight", "give_1") { Category = "Items"},
