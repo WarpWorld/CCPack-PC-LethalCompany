@@ -1,9 +1,10 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using CrowdControl.Common;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 
-namespace CrowdControl.Games.Packs.LethalCompany {
+namespace CrowdControl.Games.Packs.LethalCompany
+{
 
     public class LethalCompany : SimpleTCPPack
     {
@@ -90,6 +91,8 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Give Jet Pack", "give_9") { Category = "Items"},
                 new Effect("Give Extension Ladder", "give_10") { Category = "Items"},
                 new Effect("Give Radar Booster", "give_11") { Category = "Items"},
+                new Effect("Give Tragedy Mask", "givem_tragedymask") { Category = "Items"},
+                new Effect("Give Comedy Mask", "givem_comedymask") { Category = "Items"},
 
                 new Effect("Give Crewmate Walkie-Talkie", "cgive_0") { Category = "Items"},
                 new Effect("Give Crewmate Flashlight", "cgive_1") { Category = "Items"},
@@ -103,9 +106,12 @@ namespace CrowdControl.Games.Packs.LethalCompany {
                 new Effect("Give Crewmate Jet Pack", "cgive_9") { Category = "Items"},
                 new Effect("Give Crewmate Extension Ladder", "cgive_10") { Category = "Items"},
                 new Effect("Give Crewmate Radar Booster", "cgive_11") { Category = "Items"},
+                new Effect("Give Crewmate Tragedy Mask", "cgivem_tragedymask") { Category = "Items"},
+                new Effect("Give Crewmate Comedy Mask", "cgivem_comedymask") { Category = "Items"},
 
                 new Effect("Charge Item Battery", "charge") { Category = "Items"},
                 new Effect("Drain Item Battery", "uncharge") { Category = "Items"},
+
 
                 new Effect("Turn Breakers On", "breakerson"),
                 new Effect("Turn Breakers Off", "breakersoff"),
