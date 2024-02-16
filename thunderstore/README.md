@@ -6,8 +6,14 @@ If you have any questions or need help with this setup, please head over to our 
 
 
 ### Effect List
-Effect List can be found here: https://crowdcontrol.live/game/LethalCompany/?pack=LethalCompany
+Effect List can be found here: https://crowdcontrol.live/game/LethalCompany/
 
 
 ### Setup
-Our setup guide can be found here: https://crowdcontrol.live/guides/lethalcompany/
+Our Lethal Company setup guide can be found here: https://crowdcontrol.live/guides/lethalcompany/
+
+### Note
+
+If you plan to play with others, **everyone needs this mod installed**!
+
+Compatibility with other mods is limited. Some effects may not work or the game may become less stable. Try creating a new profile and gp from there!
