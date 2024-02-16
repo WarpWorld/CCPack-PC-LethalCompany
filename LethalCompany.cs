@@ -23,7 +23,9 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Kill Player", "kill") { Category = "Health"},
                 new Effect("Kill Crewmate", "killcrew") { Category = "Health"},
                 new Effect("Damage Player", "damage") { Category = "Health"},
+                new Effect("Damage Crewmate", "damagecrew") { Category = "Health"},
                 new Effect("Heal Player", "heal") { Category = "Health"},
+                new Effect("Heal Crewmate", "healcrew") { Category = "Health"},
 
                 new Effect("OHKO", "ohko") { Category = "Health", Duration = 30},
                 new Effect("Invincible", "invul") { Category = "Health", Duration = 30},
@@ -51,6 +53,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Revive Dead Players", "revive") { Category = "Player"},
 
                 new Effect("Spawn Centipede", "spawn_pede") { Category = "Spawn Enemies"},
+                new Effect("Spawn Nutcracker", "spawn_cracker") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bunker Spider", "spawn_spider") { Category = "Spawn Enemies"},
                 new Effect("Spawn Hoarding Bug", "spawn_hoard") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bracken", "spawn_flower") { Category = "Spawn Enemies"},
@@ -67,6 +70,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Spawn Mimic", "spawn_mimic") { Category = "Spawn Enemies"},
 
                 new Effect("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
+                new Effect("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bunker Spider at Crewmate", "cspawn_spider") { Category = "Spawn Enemies"},
                 new Effect("Spawn Hoarding Bug at Crewmate", "cspawn_hoard") { Category = "Spawn Enemies"},
                 new Effect("Spawn Bracken at Crewmate", "cspawn_flower") { Category = "Spawn Enemies"},
