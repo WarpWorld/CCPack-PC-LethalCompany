@@ -1,13 +1,21 @@
+**1.1.3** :
+
+```
+removed logging text to console
+Added nutcracker spawn
+Added crew health effects
+```
+
 **1.1.2** :
 
-``
+```
 Rework of effect targeting. All effects that would target the host, now target the player they were sent to. Effect descriptions and names have been update to show this.
 Added new effect Spawn Mimic
 Added new effect Give Tragedy Mask
 Added new effect Give Comedy Mask
 Added versioning in more places
 Changed the default Crowd Control communication port to disable older versions of our mod
-``
+```
 
 **1.1.1** :
 
