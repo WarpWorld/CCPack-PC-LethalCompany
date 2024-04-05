@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.5.0";
+        private const string modVersion = "1.1.6.0";
 
-        public static string tsVersion = "1.1.5";
+        public static string tsVersion = "1.1.6";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -161,7 +161,7 @@ namespace LethalCompanyTestMod
             isHost = RoundManager.Instance.NetworkManager.IsHost;
 
             verwait = 30;
-            
+
 
 
 
@@ -171,7 +171,7 @@ namespace LethalCompanyTestMod
                 Description = "Checks crowd control version.",
                 DisplayTextSupplier = OnCCVersion
             });
-            
+
         }
 
         [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
@@ -256,7 +256,7 @@ namespace LethalCompanyTestMod
         static void roundUpdate()
         {
             if (CrowdDelegates.givedelay > 0) CrowdDelegates.givedelay--;
-            if(verwait > 0)verwait--;
+            if (verwait > 0) verwait--;
 
             if (ActionQueue.Count > 0)
             {
@@ -264,7 +264,7 @@ namespace LethalCompanyTestMod
                 action.Invoke();
             }
 
-            lock(BuffThread.threads)
+            lock (BuffThread.threads)
             {
                 foreach (var thread in BuffThread.threads)
                 {
@@ -274,7 +274,7 @@ namespace LethalCompanyTestMod
             }
 
         }
-        
+
         static IEnumerator getVersions()
         {
             version.Clear();
@@ -312,8 +312,8 @@ namespace LethalCompanyTestMod
 
                 if (chatMessage.ToLower() == "/ccversion" && isHost)
                 {
-                    if(verwait==0)
-                    __instance.StartCoroutine(getVersions());
+                    if (verwait == 0)
+                        __instance.StartCoroutine(getVersions());
 
                     return false;
                 }
@@ -668,7 +668,7 @@ namespace LethalCompanyTestMod
                                 id = -1;
                             }
 
-                            
+
 
                             Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
                             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
@@ -1071,8 +1071,8 @@ namespace LethalCompanyTestMod
                                     {
                                         if (RoundManager.Instance.currentLevel.randomWeathers[i].weatherType == RoundManager.Instance.currentLevel.currentWeather)
                                         {
-                                            TimeOfDay.Instance.currentWeatherVariable = (float) RoundManager.Instance.currentLevel.randomWeathers[i].weatherVariable;
-                                            TimeOfDay.Instance.currentWeatherVariable2 = (float) RoundManager.Instance.currentLevel.randomWeathers[i].weatherVariable2;
+                                            TimeOfDay.Instance.currentWeatherVariable = (float)RoundManager.Instance.currentLevel.randomWeathers[i].weatherVariable;
+                                            TimeOfDay.Instance.currentWeatherVariable2 = (float)RoundManager.Instance.currentLevel.randomWeathers[i].weatherVariable2;
                                         }
                                     }
                                 }
@@ -1084,7 +1084,8 @@ namespace LethalCompanyTestMod
                         }
                         break;
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 TestMod.mls.LogError(ex.ToString());
             }
@@ -1192,5 +1193,5 @@ namespace LethalCompanyTestMod
 
 
     }
-        
+
 }

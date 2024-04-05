@@ -2805,8 +2805,12 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
             }
 
-            if (enteredText[1] == "landmine") found = true;
-
+            if (enteredText[1] == "landmine")
+            {
+                if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
+                found = true;
+            }
+              
 
             
 
@@ -2998,9 +3002,13 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
                 bool found = false;
 
-                if (enteredText[1] == "landmine") found = true;
-               
-                if(!found)
+                if (enteredText[1] == "landmine")
+                {
+                    if (player.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
+                    found = true;
+                }
+
+                if (!found)
                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
 

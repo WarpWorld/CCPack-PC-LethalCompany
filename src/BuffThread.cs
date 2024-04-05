@@ -51,7 +51,7 @@ namespace ControlValley
                 case BuffType.DRUNK:
                     {
                         var playerRef = StartOfRound.Instance.localPlayerController;
-                        float calculatedDrunkness = Math.Min(duration * 10f, 1200f)
+                        float calculatedDrunkness = Math.Min(duration * 10f, 1200f);
                         playerRef.drunkness = calculatedDrunkness;
                         playerRef.drunknessSpeed = 1f;
                         playerRef.drunknessInertia = 20f;
