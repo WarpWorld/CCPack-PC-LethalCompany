@@ -2597,7 +2597,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
 
-        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
+        public static CrowdResponse FastMove_ORG(ControlClient client, CrowdRequest req)
         {
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
@@ -2607,9 +2607,24 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
+
             new Thread(new BuffThread(req.GetReqID(), BuffType.FAST_MOVE, dur * 1000).Run).Start();
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
+
+
+        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.DRUNK, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
 
         public static CrowdResponse SlowMove(ControlClient client, CrowdRequest req)
         {
@@ -2634,6 +2649,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
 
             new Thread(new BuffThread(req.GetReqID(), BuffType.FREEZE, dur * 1000).Run).Start();
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
@@ -2790,6 +2806,9 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
             }
 
             if (enteredText[1] == "landmine") found = true;
+
+
+            
 
                 if (!found)
             foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)

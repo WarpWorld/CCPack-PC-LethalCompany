@@ -23,6 +23,7 @@ namespace ControlValley
         NIGHT_VISION,
         HIGH_PITCH,
         LOW_PITCH,
+        DRUNK,
     }
     public class Buff
     {
@@ -43,10 +44,19 @@ namespace ControlValley
             }
         }
 
-        public void addBuff()
+        public void addBuff(int duration)
         {
             switch (type)
             {
+                case BuffType.DRUNK:
+                    {
+                        var playerRef = StartOfRound.Instance.localPlayerController;
+                        float calculatedDrunkness = Math.Min(duration * 10f, 1200f)
+                        playerRef.drunkness = calculatedDrunkness;
+                        playerRef.drunknessSpeed = 1f;
+                        playerRef.drunknessInertia = 20f;
+                        break;
+                    }
                 case BuffType.LOW_PITCH:
                     {
                         TestMod.ActionQueue.Enqueue(() =>
@@ -119,6 +129,14 @@ namespace ControlValley
         {
             switch (type)
             {
+                case BuffType.DRUNK:
+                    {
+                        var playerRef = StartOfRound.Instance.localPlayerController;
+                        playerRef.drunkness = 0f;
+                        playerRef.drunknessSpeed = 0f;
+                        playerRef.drunknessInertia = 0f;
+                        break;
+                    }
                 case BuffType.HIGH_PITCH:
                 case BuffType.LOW_PITCH:
                     {
@@ -356,7 +374,7 @@ namespace ControlValley
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             
-            buff.addBuff();
+            buff.addBuff(duration);
 
             try
             {

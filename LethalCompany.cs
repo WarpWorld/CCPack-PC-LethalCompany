@@ -46,6 +46,8 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new Effect("Slow Player", "slow") { Category = "Player", Duration = 30},
                 new Effect("Freeze Player", "freeze") { Category = "Player", Duration = 5},
 
+                new Effect("Drunk Player", "drunk") { Category = "Player", Duration = 10, Inmutable = true, Price = 500, Description = "Gives the player a drunk effect."},
+
                 new Effect("Ultra Jump", "jumpultra") { Category = "Player", Duration = 15},
                 new Effect("High Jump", "jumphigh") { Category = "Player", Duration = 30},
                 new Effect("Low Jump", "jumplow") { Category = "Player", Duration = 30},
