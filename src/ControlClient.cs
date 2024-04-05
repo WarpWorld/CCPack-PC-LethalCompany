@@ -76,6 +76,8 @@ namespace ControlValley
                 {"slow", CrowdDelegates.SlowMove},
                 {"hyper", CrowdDelegates.HyperMove},
                 {"freeze", CrowdDelegates.Freeze},
+                {"drunk", CrowdDelegates.Drunk},
+
 
                 {"jumpultra", CrowdDelegates.UltraJump},
                 {"jumphigh", CrowdDelegates.HighJump},

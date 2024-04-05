@@ -2597,7 +2597,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
 
-        public static CrowdResponse FastMove_ORG(ControlClient client, CrowdRequest req)
+        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
         {
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
@@ -2613,9 +2613,9 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
         }
 
 
-        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
+        public static CrowdResponse Drunk(ControlClient client, CrowdRequest req)
         {
-            int dur = 30;
+            int dur = 10;
             if (req.duration > 0) dur = req.duration / 1000;
 
             if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
