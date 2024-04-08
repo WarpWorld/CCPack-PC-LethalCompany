@@ -1,3 +1,25 @@
+**1.1.7** :
+
+```
+Fixed Landmine effects to spawn outside the ship 
+Added Drunk effect
+```
+
+**1.1.5** :
+
+```
+Fixed mimic spawns
+Fixed nutcracker issue
+Added landmine spawns
+```
+
+**1.1.4** :
+
+```
+Giant/leviathan no longer spawn inside
+Enemy spawns delay on modded moons that don't contain that enemy
+```
+
 **1.1.3** :
 
 ```
