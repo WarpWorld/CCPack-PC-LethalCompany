@@ -2814,7 +2814,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
             
 
-                if (!found)
+            if (!found)
             foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
             {
   
@@ -2843,7 +2843,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
                 if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                 {
                     found = true;
-                    if (enteredText[1] == "giant" || enteredText[1] == "levi")
+                    if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
                     {
                         try
                         {
@@ -2909,9 +2909,6 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
                         return;
                     }
-
-
-
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
 
@@ -2931,7 +2928,6 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
                     }
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                     {
-
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
                             try
@@ -3035,7 +3031,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
                     if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                     {
                         found = true;
-                        if (enteredText[1] == "giant" || enteredText[1] == "levi")
+                        if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
                         {
                             try
                             {

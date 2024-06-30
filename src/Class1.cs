@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.6.0";
+        private const string modVersion = "1.1.7.0";
 
-        public static string tsVersion = "1.1.6";
+        public static string tsVersion = "1.1.7";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -611,7 +611,7 @@ namespace LethalCompanyTestMod
                             if (dist.magnitude < 6.0f) pos = test;
 
 
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.EulerAngles(-90, 0, 0), TestMod.currentStart.propsContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), TestMod.currentStart.propsContainer);
 
                             break;
                         }
@@ -913,7 +913,7 @@ namespace LethalCompanyTestMod
                             foreach (var player in StartOfRound.Instance.allPlayerScripts)
                             {
                                 if (player != null && player.isActiveAndEnabled && !player.isPlayerDead && (int)player.playerClientId == cur && player.isPlayerControlled)
-                                    player.KillPlayer(player.transform.up * 100.0f, true, CauseOfDeath.Gravity, 0);
+                                    player.KillPlayer(player.transform.up * 100.0f, true, CauseOfDeath.Gravity, 2);
                             }
                         }
                         break;
