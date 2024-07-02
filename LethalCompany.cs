@@ -59,7 +59,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Bracken", "spawn_flower") { Category = "Spawn Enemies"},
                 new("Spawn Crawler", "spawn_crawl") { Category = "Spawn Enemies"},
                 new("Spawn Blob", "spawn_blob") { Category = "Spawn Enemies"},
-                new("Spawn Coil-Head", "spawn_coil") { Category = "Spawn Enemies"},
+                new("Spawn Coil-Head", "spawn_spring") { Category = "Spawn Enemies"},
                 new("Spawn Puffer", "spawn_puff") { Category = "Spawn Enemies"},
                 new("Spawn Eyeless Dog", "spawn_dog") { Category = "Spawn Enemies"},
                 new("Spawn Forest Giant", "spawn_giant") { Category = "Spawn Enemies"},
@@ -70,6 +70,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Mimic", "spawn_mimic") { Category = "Spawn Enemies"},
                 new("Spawn Landmine", "spawn_landmine") { Category = "Spawn Enemies"},
                 new("Spawn Old Bird", "spawn_radmech") { Category = "Spawn Enemies"},
+                new("Spawn Kidnapper Fox", "spawn_bushwolf"){Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
@@ -105,6 +106,8 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Comedy Mask", "givem_comedymask") { Category = "Items"},
                 new("Give Spray Paint", "give_12"){ Category = "Items"},
                 new("Give Weed Killer", "give_13"){ Category = "Items"},
+                new("Give Shotgun", "give_18"){ Category = "Items"},
+                new("Give Shotgun Ammo", "give_19"){ Category = "Items"},
 
                 new("Give Crewmate Walkie-Talkie", "cgive_0") { Category = "Items"},
                 new("Give Crewmate Flashlight", "cgive_1") { Category = "Items"},

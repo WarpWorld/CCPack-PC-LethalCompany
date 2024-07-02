@@ -7,6 +7,7 @@ using Steamworks.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Xml.Linq;
@@ -26,326 +27,7 @@ namespace ControlValley
         public static uint msgid = 0;
 
         public static uint givedelay = 0;
-        public static CrowdResponse HealFull(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-
-            try
-            {
-                NetworkManager networkManager = StartOfRound.Instance.NetworkManager;
-                if (networkManager == null || !networkManager.IsListening)
-                {
-                    status = CrowdResponse.Status.STATUS_RETRY;
-                } else {
-                    TestMod.test = true;
-
-                    //StartOfRound.Instance.ChangeLevel(6);
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-           
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Kill(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            try
-            {
-                var playerRef = StartOfRound.Instance.localPlayerController;
-
-                if (playerRef.health <= 0 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        if (TestMod.isHost)
-                        {
-                            playerRef.KillPlayer(playerRef.transform.up * 100.0f);
-                        }
-                        else
-                        {
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_kill_{(int)playerRef.playerClientId}</size>");
-                        }
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse KillCrewmate(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach(PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if(list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0,list.Count)];
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_kill_{(int)player.playerClientId}</size>");
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Damage(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            try
-            {
-                var playerRef = StartOfRound.Instance.localPlayerController;
-
-                if (playerRef.health <= 20 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        int dmg = 25;
-                        if (playerRef.health < 25) dmg = playerRef.health - 1;
-                        playerRef.DamagePlayer(dmg);
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-    public static CrowdResponse DamageCrew(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && player.health >=20 && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_damage_{(int)player.playerClientId}</size>");
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Heal(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            try
-            {
-
-                var playerRef = StartOfRound.Instance.localPlayerController;
-
-                if (playerRef.health >= 100 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        playerRef.health = Mathf.Clamp(playerRef.health + 25, 0, 100);
-
-                        if (playerRef.health >= 20)
-                        {
-                            playerRef.MakeCriticallyInjured(false);
-                        }
-
-                        HUDManager.Instance.UpdateHealthUI(playerRef.health, true);
-                    });
-
-
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-
-        public static CrowdResponse HealCrew(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && player.health < 100 && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_heal_{(int)player.playerClientId}</size>");
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Launch(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            try
-            {
-                var playerRef = StartOfRound.Instance.localPlayerController;
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                		int layerMask = ~LayerMask.GetMask(new string[]
-		                {
-			                "Room"
-		                });
-		                layerMask = ~LayerMask.GetMask(new string[]
-		                {
-			                "Colliders"
-		                });
-
-                        var pos = playerRef.transform.position - playerRef.transform.up * 5.0f;
-
-                        var array = Physics.OverlapSphere(pos, 10f, layerMask);
-                        for (int j = 0; j < array.Length; j++)
-                        {
-                            Rigidbody component2 = array[j].GetComponent<Rigidbody>();
-                            if (component2 != null)
-                            {
-                                component2.AddExplosionForce(70f, pos, 10f);
-                            }
-                        }
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-
+        #region Items
         public static CrowdResponse TakeItem(ControlClient client, CrowdRequest req)
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
@@ -454,7 +136,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
-                else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge==0) status = CrowdResponse.Status.STATUS_RETRY;
+                else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge == 0) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     TestMod.ActionQueue.Enqueue(() =>
@@ -492,6 +174,1575 @@ namespace ControlValley
                     {
                         playerRef.currentlyHeldObjectServer.insertedBattery.charge = 1.0f;
                         playerRef.currentlyHeldObjectServer.SyncBatteryServerRpc((int)playerRef.currentlyHeldObjectServer.insertedBattery.charge);
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse GiveItem(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            int give = 0;
+
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 2)
+            {
+                give = int.Parse(enteredText[1]);
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+
+
+            try
+            {
+                var playerRef = StartOfRound.Instance.localPlayerController;
+                var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
+
+
+
+                if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                }
+
+                if (!TestMod.isHost)
+                {
+                    givedelay = 20;
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        msgid++;
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)playerRef.playerClientId}_{msgid}</size>");
+                    });
+                    return new CrowdResponse(req.GetReqID(), status, message);
+                }
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    givedelay = 20;
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<NetworkObject>().Spawn(false);
+
+                        var grab = gameObject.GetComponent<GrabbableObject>();
+
+                        setProperty(playerRef, "currentlyGrabbingObject", grab);
+                        setProperty(playerRef, "grabInvalidated", false);
+
+
+                        NetworkObject networkObject = grab.NetworkObject;
+                        if (networkObject == null || !networkObject.IsSpawned)
+                        {
+                            return;
+                        }
+                        grab.InteractItem();
+
+
+                        playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
+                        playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
+                        playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
+                        playerRef.playerBodyAnimator.ResetTrigger("Throw");
+
+                        callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
+
+                        playerRef.isGrabbingObjectAnimation = true;
+                        playerRef.cursorIcon.enabled = false;
+                        playerRef.cursorTip.text = "";
+                        playerRef.twoHanded = grab.itemProperties.twoHanded;
+                        playerRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
+                        if (grab.itemProperties.grabAnimationTime > 0f)
+                        {
+                            playerRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
+                        }
+                        else
+                        {
+                            playerRef.grabObjectAnimationTime = 0.4f;
+                        }
+
+                        callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
+
+                        Coroutine goc = (Coroutine)getProperty(playerRef, "grabObjectCoroutine");
+
+                        if (goc != null)
+                        {
+                            ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
+                        }
+
+                        setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            try
+            {
+                string[] enteredText = req.code.Split('_');
+                if (enteredText.Length == 2)
+                {
+
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
+                var playerRef = StartOfRound.Instance.localPlayerController;
+                var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
+
+                GameObject prefab = null;
+                if (enteredText[1] == "59") enteredText[1] = "shotgun";
+                if (enteredText[1] == "3") enteredText[1] = "lockpicker";
+                foreach (var level in StartOfRound.Instance.levels)
+                {
+                    if (prefab == null)
+                        foreach (var spawn in level.spawnableScrap)
+                        {
+                            if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
+                        }
+                }
+
+
+                if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0 || prefab == null)
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                }
+
+                if (!TestMod.isHost)
+                {
+                    givedelay = 20;
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        msgid++;
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)playerRef.playerClientId}_{msgid}</size>");
+                    });
+                    return new CrowdResponse(req.GetReqID(), status, message);
+                }
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    givedelay = 20;
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<NetworkObject>().Spawn(false);
+
+                        var grab = gameObject.GetComponent<GrabbableObject>();
+
+                        setProperty(playerRef, "currentlyGrabbingObject", grab);
+                        setProperty(playerRef, "grabInvalidated", false);
+
+
+                        NetworkObject networkObject = grab.NetworkObject;
+                        if (networkObject == null || !networkObject.IsSpawned)
+                        {
+                            return;
+                        }
+                        grab.InteractItem();
+
+
+                        playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
+                        playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
+                        playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
+                        playerRef.playerBodyAnimator.ResetTrigger("Throw");
+
+                        callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
+
+                        playerRef.isGrabbingObjectAnimation = true;
+                        playerRef.cursorIcon.enabled = false;
+                        playerRef.cursorTip.text = "";
+                        playerRef.twoHanded = grab.itemProperties.twoHanded;
+                        playerRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
+                        if (grab.itemProperties.grabAnimationTime > 0f)
+                        {
+                            playerRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
+                        }
+                        else
+                        {
+                            playerRef.grabObjectAnimationTime = 0.4f;
+                        }
+
+                        callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
+
+                        Coroutine goc = (Coroutine)getProperty(playerRef, "grabObjectCoroutine");
+
+                        if (goc != null)
+                        {
+                            ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
+                        }
+
+                        setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse GiveCrewItem(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            int give = 0;
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 2)
+            {
+                give = int.Parse(enteredText[1]);
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled && !playerRef.isGrabbingObjectAnimation)
+                {
+                    list.Add(player);
+                }
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+
+            try
+            {
+                PlayerControllerB player;
+
+                player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (!TestMod.isHost)
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        msgid++;
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)player.playerClientId}_{msgid}</size>");
+                    });
+                    return new CrowdResponse(req.GetReqID(), status, message);
+                }
+
+                var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
+
+                if (player.inSpecialInteractAnimation || slot == -1)
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                }
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<NetworkObject>().Spawn(false);
+
+                        msgid++;
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_give_{give}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse GiveCrewSpecial(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+
+            GameObject prefab = null;
+
+            foreach (var level in StartOfRound.Instance.levels)
+            {
+                if (prefab == null)
+                    foreach (var spawn in level.spawnableScrap)
+                    {
+                        if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
+                    }
+            }
+
+            if (prefab == null)
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled && !playerRef.isGrabbingObjectAnimation)
+                {
+                    list.Add(player);
+                }
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+
+            try
+            {
+                PlayerControllerB player;
+
+                player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (!TestMod.isHost)
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        msgid++;
+                        if (player.IsHost)
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_-1_{msgid}</size>");
+                        else
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)player.playerClientId}_{msgid}</size>");
+                    });
+                    return new CrowdResponse(req.GetReqID(), status, message);
+                }
+
+                var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
+
+                if (player.inSpecialInteractAnimation || slot == -1)
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                }
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<NetworkObject>().Spawn(false);
+
+                        msgid++;
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgive_{enteredText[1]}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        #endregion
+
+        #region Players
+        public static CrowdResponse HyperMove(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.HYPER_MOVE, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.FAST_MOVE, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse Drunk(ControlClient client, CrowdRequest req)
+        {
+            int dur = 10;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.DRUNK, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse SlowMove(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.SLOW_MOVE, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse Freeze(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.FREEZE, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse UltraJump(ControlClient client, CrowdRequest req)
+        {
+
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.ULTRA_JUMP, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse HighJump(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_JUMP, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse LowJump(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_JUMP, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse Revive(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+
+                            StartOfRound.Instance.ReviveDeadPlayers();
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_revive</size>");
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse TeleportToShip(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+
+                            StartOfRound.Instance.ForcePlayerIntoShip();
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse TeleportCrewToShip(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_ship_{(int)player.playerClientId}</size>");
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse TeleportToCrew(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            playerRef.TeleportPlayer(player.transform.position);
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse TeleportCrewTo(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_tele_{(int)player.playerClientId}_{(int)playerRef.playerClientId}</size>");
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse SpawnBody(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+
+                            //playerRef.SpawnDeadBody((int)playerRef.playerClientId, playerRef.transform.up * 2.0f + playerRef.transform.forward * 5.0f, 0, playerRef);
+
+                            msgid++;
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_body_{(int)playerRef.playerClientId}_{msgid}</size>");
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse SpawnCrewBody(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && !player.IsServer && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Could not find Active player to Spawn Crew Body");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, StartOfRound.Instance.connectedPlayersAmount)]; //test fixing Crew bodies?
+
+                if (player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+
+                            msgid++;
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_body_{(int)player.playerClientId}_{msgid}</size>");
+
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        #endregion
+
+        #region Health
+        public static CrowdResponse HealFull(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+
+            try
+            {
+                NetworkManager networkManager = StartOfRound.Instance.NetworkManager;
+                if (networkManager == null || !networkManager.IsListening)
+                {
+                    status = CrowdResponse.Status.STATUS_RETRY;
+                }
+                else
+                {
+                    TestMod.test = true;
+
+                    //StartOfRound.Instance.ChangeLevel(6);
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse Kill(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            try
+            {
+                var playerRef = StartOfRound.Instance.localPlayerController;
+
+                if (playerRef.health <= 0 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        if (TestMod.isHost)
+                        {
+                            playerRef.KillPlayer(playerRef.transform.up * 100.0f);
+                        }
+                        else
+                        {
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_kill_{(int)playerRef.playerClientId}</size>");
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse KillCrewmate(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_kill_{(int)player.playerClientId}</size>");
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse Damage(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            try
+            {
+                var playerRef = StartOfRound.Instance.localPlayerController;
+
+                if (playerRef.health <= 20 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        int dmg = 25;
+                        if (playerRef.health < 25) dmg = playerRef.health - 1;
+                        playerRef.DamagePlayer(dmg);
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse DamageCrew(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && player.health >= 20 && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_damage_{(int)player.playerClientId}</size>");
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse Heal(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            try
+            {
+
+                var playerRef = StartOfRound.Instance.localPlayerController;
+
+                if (playerRef.health >= 100 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        playerRef.health = Mathf.Clamp(playerRef.health + 25, 0, 100);
+
+                        if (playerRef.health >= 20)
+                        {
+                            playerRef.MakeCriticallyInjured(false);
+                        }
+
+                        HUDManager.Instance.UpdateHealthUI(playerRef.health, true);
+                    });
+
+
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse HealCrew(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+            {
+                if (player != null && player.health < 100 && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                    list.Add(player);
+            }
+
+            if (list.Count <= 0)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            try
+            {
+                var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_heal_{(int)player.playerClientId}</size>");
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+
+        public static CrowdResponse OHKO(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.OHKO, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse Invul(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.INVUL, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        #endregion
+
+        #region Stamina
+        public static CrowdResponse DrainStamins(ControlClient client, CrowdRequest req)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            if (playerRef.sprintMeter < 0.1f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            playerRef.sprintMeter = 0;
+            playerRef.isExhausted = true;
+
+
+            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse RestoreStamins(ControlClient client, CrowdRequest req)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            if (playerRef.sprintMeter > 0.9f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            playerRef.sprintMeter = 1.0f;
+            playerRef.isExhausted = false;
+
+
+            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse InfiniteStamina(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.INFSTAM, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse NoStamina(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.NOSTAM, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        #endregion
+
+        #region Sounds
+        public static CrowdResponse Footstep(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        playerRef.PlayFootstepServer();
+                        playerRef.movementAudio.PlayOneShot(StartOfRound.Instance.footstepSurfaces[0].clips[0], 4.0f);
+                        WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, StartOfRound.Instance.footstepSurfaces[0].clips[0], 4.0f);
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static void SpawnAndPlayScreech(SpawnableEnemyWithRarity source)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
+            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+
+            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
+
+            BaboonBirdAI bird = obj.gameObject.GetComponent<BaboonBirdAI>();
+
+            playerRef.movementAudio.PlayOneShot(bird.cawScreamSFX[0], 4.0f);
+            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.cawScreamSFX[0], 4.0f);
+            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
+
+            UnityEngine.Object.Destroy(obj);
+
+        }
+        public static CrowdResponse Screech(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        foreach (var level in StartOfRound.Instance.levels)
+                        {
+                            foreach (var outsideEnemy in level.OutsideEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayScreech(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.Enemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayScreech(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.DaytimeEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayScreech(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static void SpawnAndPlayBreathing(SpawnableEnemyWithRarity source)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
+            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+
+            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
+
+            DressGirlAI bird = obj.gameObject.GetComponent<DressGirlAI>();
+
+            playerRef.movementAudio.PlayOneShot(bird.breathingSFX, 4.0f);
+            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.breathingSFX, 4.0f);
+            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
+
+            UnityEngine.Object.Destroy(obj);
+        }
+
+        public static CrowdResponse Breathing(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        foreach (var level in StartOfRound.Instance.levels)
+                        {
+                            foreach (var outsideEnemy in level.OutsideEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.Enemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.DaytimeEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static void SpawnAndPlayBlob(SpawnableEnemyWithRarity source)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
+            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+
+            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
+
+            BlobAI bird = obj.gameObject.GetComponent<BlobAI>();
+
+            playerRef.movementAudio.PlayOneShot(bird.jiggleSFX, 4.0f);
+            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.jiggleSFX, 4.0f);
+            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
+
+            UnityEngine.Object.Destroy(obj);
+        }
+
+        public static CrowdResponse BlobSound(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        foreach (var level in StartOfRound.Instance.levels)
+                        {
+                            foreach (var outsideEnemy in level.OutsideEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.Enemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in level.DaytimeEnemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                {
+                                    try
+                                    {
+                                        SpawnAndPlayBreathing(outsideEnemy);
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse HighPitch(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            TestMod.ActionQueue.Enqueue(() =>
+            {
+                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.5</size>");
+            });
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_PITCH, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        public static CrowdResponse LowPitch(ControlClient client, CrowdRequest req)
+        {
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+
+            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            TestMod.ActionQueue.Enqueue(() =>
+            {
+                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_0.65</size>");
+            });
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_PITCH, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+
+        #endregion
+        public static CrowdResponse Launch(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+
+            try
+            {
+                var playerRef = StartOfRound.Instance.localPlayerController;
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        int layerMask = ~LayerMask.GetMask(new string[]
+                        {
+                            "Room"
+                        });
+                        layerMask = ~LayerMask.GetMask(new string[]
+                        {
+                            "Colliders"
+                        });
+
+                        var pos = playerRef.transform.position - playerRef.transform.up * 5.0f;
+
+                        var array = Physics.OverlapSphere(pos, 10f, layerMask);
+                        for (int j = 0; j < array.Length; j++)
+                        {
+                            Rigidbody component2 = array[j].GetComponent<Rigidbody>();
+                            if (component2 != null)
+                            {
+                                component2.AddExplosionForce(70f, pos, 10f);
+                            }
+                        }
+
                     });
                 }
 
@@ -678,7 +1929,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.currentLevel.planetHasTime || tod.globalTime<=tod.lengthOfHours || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.currentLevel.planetHasTime || tod.globalTime <= tod.lengthOfHours || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     if (TestMod.isHost)
@@ -698,7 +1949,7 @@ namespace ControlValley
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_remhour</size>");
                         });
                     }
-                   
+
                 }
 
             }
@@ -904,7 +2155,7 @@ namespace ControlValley
                     TestMod.ActionQueue.Enqueue(() =>
                     {
                         tod.profitQuota += give;
-                        if(give>0)
+                        if (give > 0)
                             HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " raised the quota by " + give);
                         else
                             HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " lowered the quota by " + give);
@@ -916,9 +2167,9 @@ namespace ControlValley
                         //tod.SyncNewProfitQuotaClientRpc(tod.profitQuota, 0, tod.quotaFulfilled);
 
                         //if (desk != null)
-                            //desk.SellItemsClientRpc(val, terminal.groupCredits, desk.itemsOnCounterAmount, StartOfRound.Instance.companyBuyingRate);
+                        //desk.SellItemsClientRpc(val, terminal.groupCredits, desk.itemsOnCounterAmount, StartOfRound.Instance.companyBuyingRate);
                         //else
-                            tod.quotaFulfilled = val;
+                        tod.quotaFulfilled = val;
 
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_quota_{val}_{tod.profitQuota}</size>");
 
@@ -956,7 +2207,7 @@ namespace ControlValley
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
 
-            
+
 
             try
             {
@@ -969,7 +2220,7 @@ namespace ControlValley
                 if (give > 0 && tod.quotaFulfilled >= tod.profitQuota) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
                 if (give < 0 && tod.quotaFulfilled <= 0) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
 
-                
+
 
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
@@ -1002,12 +2253,12 @@ namespace ControlValley
                         //else
                         {
                             tod.quotaFulfilled = val;
-                            
+
                             if (give > 0)
                                 HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " filled the quota by " + give + "%");
                             else
                                 HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " emptied the quota by " + give + "%");
-                            
+
                         }
                         StartOfRound.Instance.profitQuotaMonitorText.text = string.Format("PROFIT QUOTA:\n${0} / ${1}", tod.quotaFulfilled, tod.profitQuota);
 
@@ -1124,416 +2375,7 @@ namespace ControlValley
 
             return new CrowdResponse(req.GetReqID(), status, message);
         }
-        public static CrowdResponse GiveItem(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            int give = 0;
-
-            string[] enteredText = req.code.Split('_');
-            if (enteredText.Length == 2)
-            {
-                give = int.Parse(enteredText[1]);
-            }
-            else
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-            }
-
-
-            try
-            {
-                var playerRef = StartOfRound.Instance.localPlayerController;
-                var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
-
-
-
-                if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-
-                if (!TestMod.isHost)
-                {
-                    givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)playerRef.playerClientId}_{msgid}</size>");
-                    });
-                    return new CrowdResponse(req.GetReqID(), status, message);
-                }
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                        gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                        var grab = gameObject.GetComponent<GrabbableObject>();
-
-                        setProperty(playerRef, "currentlyGrabbingObject", grab);
-                        setProperty(playerRef, "grabInvalidated", false);
-
-
-                        NetworkObject networkObject = grab.NetworkObject;
-                        if (networkObject == null || !networkObject.IsSpawned)
-                        {
-                            return;
-                        }
-                        grab.InteractItem();
-
-
-                        playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
-                        playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
-                        playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
-                        playerRef.playerBodyAnimator.ResetTrigger("Throw");
-
-                        callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
-
-                        playerRef.isGrabbingObjectAnimation = true;
-                        playerRef.cursorIcon.enabled = false;
-                        playerRef.cursorTip.text = "";
-                        playerRef.twoHanded = grab.itemProperties.twoHanded;
-                        playerRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
-                        if (grab.itemProperties.grabAnimationTime > 0f)
-                        {
-                            playerRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
-                        }
-                        else
-                        {
-                            playerRef.grabObjectAnimationTime = 0.4f;
-                        }
-
-                        callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference( networkObject ));
-
-                        Coroutine goc = (Coroutine)getProperty(playerRef, "grabObjectCoroutine");
-                            
-                        if (goc != null)
-                        {
-                            ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
-                        }
-
-                        setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-   
        
-public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-
-            try
-            {
-                string[] enteredText = req.code.Split('_');
-                if (enteredText.Length == 2)
-                {
-
-                }
-                else
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-                }
-
-                var playerRef = StartOfRound.Instance.localPlayerController;
-                var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
-
-                GameObject prefab = null;
-
-                foreach (var level in StartOfRound.Instance.levels)
-                {
-                    if(prefab==null)
-                    foreach (var spawn in level.spawnableScrap)
-                    {
-                            if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
-                    }
-                }
-
-
-                if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0 || prefab == null)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-
-                if (!TestMod.isHost)
-                {
-                    givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)playerRef.playerClientId}_{msgid}</size>");
-                    });
-                    return new CrowdResponse(req.GetReqID(), status, message);
-                }
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                        gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                        var grab = gameObject.GetComponent<GrabbableObject>();
-
-                        setProperty(playerRef, "currentlyGrabbingObject", grab);
-                        setProperty(playerRef, "grabInvalidated", false);
-
-
-                        NetworkObject networkObject = grab.NetworkObject;
-                        if (networkObject == null || !networkObject.IsSpawned)
-                        {
-                            return;
-                        }
-                        grab.InteractItem();
-
-
-                        playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
-                        playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
-                        playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
-                        playerRef.playerBodyAnimator.ResetTrigger("Throw");
-
-                        callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
-
-                        playerRef.isGrabbingObjectAnimation = true;
-                        playerRef.cursorIcon.enabled = false;
-                        playerRef.cursorTip.text = "";
-                        playerRef.twoHanded = grab.itemProperties.twoHanded;
-                        playerRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
-                        if (grab.itemProperties.grabAnimationTime > 0f)
-                        {
-                            playerRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
-                        }
-                        else
-                        {
-                            playerRef.grabObjectAnimationTime = 0.4f;
-                        }
-
-                        callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference( networkObject ));
-
-                        Coroutine goc = (Coroutine)getProperty(playerRef, "grabObjectCoroutine");
-                            
-                        if (goc != null)
-                        {
-                            ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
-                        }
-
-                        setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse GiveCrewItem(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            int give = 0;
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            string[] enteredText = req.code.Split('_');
-            if (enteredText.Length == 2)
-            {
-                give = int.Parse(enteredText[1]);
-            }
-            else
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-            }
-
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled && !playerRef.isGrabbingObjectAnimation)
-                {
-                    list.Add(player);
-                }
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-            
-
-            try
-            {
-                PlayerControllerB player;
-                
-                player = list[UnityEngine.Random.Range(0, list.Count)];
-                
-                if (!TestMod.isHost)
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)player.playerClientId}_{msgid}</size>");
-                    });
-                    return new CrowdResponse(req.GetReqID(), status, message);
-                }
-
-                var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
-
-                if (player.inSpecialInteractAnimation || slot == -1)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                        gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_give_{give}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-    public static CrowdResponse GiveCrewSpecial(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            string[] enteredText = req.code.Split('_');
-            if (enteredText.Length == 2)
-            {
-            }
-            else
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-            }
-
-            GameObject prefab = null;
-
-            foreach (var level in StartOfRound.Instance.levels)
-            {
-                if (prefab == null)
-                    foreach (var spawn in level.spawnableScrap)
-                    {
-                        if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
-                    }
-            }
-
-            if(prefab == null)
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
-
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-
-                foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-                {
-                    if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled && !playerRef.isGrabbingObjectAnimation)
-                    {
-                        list.Add(player);
-                    }
-                }
-
-                if (list.Count <= 0)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-            
-
-            try
-            {
-                PlayerControllerB player;
-
-                player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                if (!TestMod.isHost)
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        msgid++;
-                        if(player.IsHost)
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_-1_{msgid}</size>");
-                        else
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)player.playerClientId}_{msgid}</size>");
-                    });
-                    return new CrowdResponse(req.GetReqID(), status, message);
-                }
-
-                var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
-
-                if (player.inSpecialInteractAnimation || slot == -1)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                        gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgive_{enteredText[1]}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
         public static CrowdResponse PlayHorn(ControlClient client, CrowdRequest req)
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
@@ -1654,617 +2496,6 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
 
             return new CrowdResponse(req.GetReqID(), status, message);
         }
-
-
-        public static CrowdResponse TeleportToShip(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
-                else {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-
-                            StartOfRound.Instance.ForcePlayerIntoShip();
-    
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse TeleportCrewToShip(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_ship_{(int)player.playerClientId}</size>");
-
-                    });
-                }
-                
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-        public static CrowdResponse SpawnBody(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-
-                            //playerRef.SpawnDeadBody((int)playerRef.playerClientId, playerRef.transform.up * 2.0f + playerRef.transform.forward * 5.0f, 0, playerRef);
-
-                            msgid++;
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_body_{(int)playerRef.playerClientId}_{msgid}</size>");
-
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse SpawnCrewBody(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && !player.IsServer && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Could not find Active player to Spawn Crew Body");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, StartOfRound.Instance.connectedPlayersAmount)]; //test fixing Crew bodies?
-
-                if(player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-
-                            msgid++;
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_body_{(int)player.playerClientId}_{msgid}</size>");
-
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse TeleportToCrew(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-                            playerRef.TeleportPlayer(player.transform.position);
-
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse TeleportCrewTo(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
-                    list.Add(player);
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-            try
-            {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_tele_{(int)player.playerClientId}_{(int)playerRef.playerClientId}</size>");
-
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Revive(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-                {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                    else
-                    {
-                        TestMod.ActionQueue.Enqueue(() =>
-                        {
-
-                            StartOfRound.Instance.ReviveDeadPlayers();
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_revive</size>");
-
-                        });
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse Footstep(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        playerRef.PlayFootstepServer();
-                        playerRef.movementAudio.PlayOneShot(StartOfRound.Instance.footstepSurfaces[0].clips[0], 4.0f);
-                        WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, StartOfRound.Instance.footstepSurfaces[0].clips[0], 4.0f);
-                    });
-                }
-                
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static void SpawnAndPlayScreech(SpawnableEnemyWithRarity source)
-        {
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
-            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
-            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
-
-            BaboonBirdAI bird = obj.gameObject.GetComponent<BaboonBirdAI>();
-
-            playerRef.movementAudio.PlayOneShot(bird.cawScreamSFX[0], 4.0f);
-            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.cawScreamSFX[0], 4.0f);
-            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
-
-            UnityEngine.Object.Destroy(obj);
-
-        }
-        public static CrowdResponse Screech(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-               
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        foreach (var level in StartOfRound.Instance.levels)
-                        {
-                            foreach (var outsideEnemy in level.OutsideEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayScreech(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.Enemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayScreech(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.DaytimeEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayScreech(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-
-        public static void SpawnAndPlayBreathing(SpawnableEnemyWithRarity source)
-        {
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
-            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
-            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
-
-            DressGirlAI bird = obj.gameObject.GetComponent<DressGirlAI>();
-
-            playerRef.movementAudio.PlayOneShot(bird.breathingSFX, 4.0f);
-            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.breathingSFX, 4.0f);
-            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
-
-            UnityEngine.Object.Destroy(obj);
-        }
-
-        public static CrowdResponse Breathing(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        foreach (var level in StartOfRound.Instance.levels)
-                        {
-                            foreach (var outsideEnemy in level.OutsideEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.Enemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.DaytimeEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static void SpawnAndPlayBlob(SpawnableEnemyWithRarity source)
-        {
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            GameObject obj = UnityEngine.Object.Instantiate(source.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
-            //obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
-            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
-
-            BlobAI bird = obj.gameObject.GetComponent<BlobAI>();
-
-            playerRef.movementAudio.PlayOneShot(bird.jiggleSFX, 4.0f);
-            WalkieTalkie.TransmitOneShotAudio(playerRef.movementAudio, bird.jiggleSFX, 4.0f);
-            RoundManager.Instance.PlayAudibleNoise(playerRef.transform.position, 12f, 4.0f, 0, false, 911);
-
-            UnityEngine.Object.Destroy(obj);
-        }
-
-        public static CrowdResponse BlobSound(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            try
-            {
-
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-
-                        foreach (var level in StartOfRound.Instance.levels)
-                        {
-                            foreach (var outsideEnemy in level.OutsideEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.Enemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                            foreach (var outsideEnemy in level.DaytimeEnemies)
-                            {
-
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
-                                {
-                                    try
-                                    {
-                                        SpawnAndPlayBreathing(outsideEnemy);
-                                    }
-                                    catch (Exception e)
-                                    {
-
-                                    }
-                                    return;
-                                }
-                            }
-                        }
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
 
         public static void SpawnAnMakeWebs(SpawnableEnemyWithRarity source)
         {
@@ -2537,7 +2768,6 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
             return new CrowdResponse(req.GetReqID(), status, message);
         }
 
-
         public static CrowdResponse NightVision(ControlClient client, CrowdRequest req)
         {
             int dur = 30;
@@ -2549,224 +2779,6 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
             if (BuffThread.isRunning(BuffType.NIGHT_VISION)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             
             new Thread(new BuffThread(req.GetReqID(), BuffType.NIGHT_VISION, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-        public static CrowdResponse HyperMove(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HYPER_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse HighPitch(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                    
-            TestMod.ActionQueue.Enqueue(() =>
-            {
-                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.5</size>");
-            });
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_PITCH, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse LowPitch(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            TestMod.ActionQueue.Enqueue(() =>
-            {
-                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_0.65</size>");
-            });
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_PITCH, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.FAST_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-
-        public static CrowdResponse Drunk(ControlClient client, CrowdRequest req)
-        {
-            int dur = 10;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.DRUNK, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-
-        public static CrowdResponse SlowMove(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.SLOW_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse Freeze(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.FREEZE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-
-        public static CrowdResponse UltraJump(ControlClient client, CrowdRequest req)
-        {
-
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.ULTRA_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse HighJump(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse LowJump(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse OHKO(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.OHKO, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse Invul(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.INVUL, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse DrainStamins(ControlClient client, CrowdRequest req)
-        {
-            var playerRef = StartOfRound.Instance.localPlayerController;
-            if(playerRef.sprintMeter < 0.1f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            playerRef.sprintMeter = 0;
-            playerRef.isExhausted = true;
-
-
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse RestoreStamins(ControlClient client, CrowdRequest req)
-        {
-            var playerRef = StartOfRound.Instance.localPlayerController;
-            if (playerRef.sprintMeter > 0.9f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            playerRef.sprintMeter = 1.0f;
-            playerRef.isExhausted = false;
-
-
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse InfiniteStamina(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.INFSTAM, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
-        }
-
-        public static CrowdResponse NoStamina(ControlClient client, CrowdRequest req)
-        {
-            int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-
-            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-
-            new Thread(new BuffThread(req.GetReqID(), BuffType.NOSTAM, dur * 1000).Run).Start();
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
 
@@ -2836,7 +2848,6 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
                 }
             }
 
-
             if (!found)
             foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
             {
@@ -2905,7 +2916,6 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
                         return;
                     }
 
-
                     if (enteredText[1] == "landmine")
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_landmine_{(int)playerRef.playerClientId}</size>");
@@ -2924,6 +2934,7 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
                             }
                             catch (Exception e)
                             {
+                                TestMod.mls.LogWarning("Monster is Not Present Outside on Moon, Aborting");
 
                             }
                             return;
@@ -2940,7 +2951,7 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
                             }
                             catch (Exception e)
                             {
-
+                                TestMod.mls.LogWarning("Monster is Not Present Inside on Moon, Aborting");
                             }
                             return;
                         }
@@ -3210,5 +3221,9 @@ public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
 
         }
 
+        protected EnemyAI GetEnemyAIFromEnemyGameObject(GameObject enemyObj)
+        {
+            return enemyObj.GetComponentInChildren<EnemyAI>();
+        }
     }
 }

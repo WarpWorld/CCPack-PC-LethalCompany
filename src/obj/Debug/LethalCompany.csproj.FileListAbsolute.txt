@@ -105,3 +105,4 @@ C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalComp
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\CrowdControl.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\CrowdControl.pdb
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.CopyComplete
+C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache

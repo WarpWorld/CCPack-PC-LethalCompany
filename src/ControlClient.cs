@@ -142,6 +142,8 @@ namespace ControlValley
                 {"give_11", CrowdDelegates.GiveItem},
                 {"give_12", CrowdDelegates.GiveItem},
                 {"give_13", CrowdDelegates.GiveItem},
+                {"give_18", CrowdDelegates.GiveItem},
+                {"give_19", CrowdDelegates.GiveItem},
 
                 {"givem_tragedymask", CrowdDelegates.GiveSpecial},
                 {"givem_comedymask", CrowdDelegates.GiveSpecial},

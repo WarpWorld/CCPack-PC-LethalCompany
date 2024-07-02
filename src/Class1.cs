@@ -90,6 +90,7 @@ namespace LethalCompanyTestMod
         public static uint verwait = 0;
 
         public static uint floodtime = 0;
+
         void Awake()
         {
 
@@ -98,7 +99,6 @@ namespace LethalCompanyTestMod
             // Plugin startup logic
             mls.LogInfo($"Loaded {modGUID}. Patching.");
             harmony.PatchAll(typeof(TestMod));
-
             mls.LogInfo($"Initializing Crowd Control");
 
             try
@@ -151,7 +151,6 @@ namespace LethalCompanyTestMod
         {
             currentStart = StartOfRound.Instance;
         }
-
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
         static void setIsHost()
@@ -181,7 +180,6 @@ namespace LethalCompanyTestMod
             // avoid setting manually in case there is a missed path that executes even if not host
             //isHost = true;
             // doesn't need to be returned early as a result of above mentioned
-
 
             currentRound = RoundManager.Instance;
             if (!levelEnemySpawns.ContainsKey(newLevel))
