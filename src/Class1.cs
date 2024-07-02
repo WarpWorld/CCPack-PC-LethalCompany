@@ -62,7 +62,6 @@ namespace LethalCompanyTestMod
         public static EnemyVent[] currentLevelVents;
         public static RoundManager currentRound;
         public static StartOfRound currentStart;
-
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
 

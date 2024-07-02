@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Steamworks.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Threading;
 using System.Xml.Linq;
@@ -1233,6 +1234,119 @@ namespace ControlValley
             return new CrowdResponse(req.GetReqID(), status, message);
         }
 
+        /*
+        public static CrowdResponse GiveSpecial (ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            try
+            {
+                string[] enteredText = req.code.Split('_');
+                if (enteredText.Length == 2)
+                {
+
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
+                var clientRef = StartOfRound.Instance.localPlayerController;
+                var slot = (int)callAndReturnFunc(clientRef, "FirstEmptyItemSlot", null);
+
+                GameObject prefab = null;
+                foreach (var level in StartOfRound.Instance.levels)
+                {
+                    if (prefab == null)
+                        foreach (var spawn in level.spawnableScrap)
+                        {
+                            if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
+                        }
+                }
+                if (clientRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0 || prefab == null)
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            }
+
+            if (!TestMod.isHost)
+            {
+                givedelay = 20;
+                TestMod.ActionQueue.Enqueue(() =>
+                {
+                    msgid++;
+                    HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)clientRef.playerClientId}_{msgid}</size>");
+                });
+                return new CrowdResponse(req.GetReqID(), status, message);
+            }
+
+            if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !clientRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+            else
+            {
+                givedelay = 20;
+                TestMod.ActionQueue.Enqueue(() =>
+                {
+
+                    Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                    GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, clientRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                    gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                    gameObject.GetComponent<NetworkObject>().Spawn(false);
+
+                    var grab = gameObject.GetComponent<GrabbableObject>();
+
+                    setProperty(clientRef, "currentlyGrabbingObject", grab);
+                    setProperty(clientRef, "grabInvalidated", false);
+
+
+                    NetworkObject networkObject = grab.NetworkObject;
+                    if (networkObject == null || !networkObject.IsSpawned)
+                    {
+                        return;
+                    }
+                    grab.InteractItem();
+
+
+                    clientRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
+                    clientRef.playerBodyAnimator.SetBool("GrabValidated", false);
+                    clientRef.playerBodyAnimator.SetBool("cancelHolding", false);
+                    clientRef.playerBodyAnimator.ResetTrigger("Throw");
+
+                    callFunc(clientRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
+
+                    clientRef.isGrabbingObjectAnimation = true;
+                    clientRef.cursorIcon.enabled = false;
+                    clientRef.cursorTip.text = "";
+                    clientRef.twoHanded = grab.itemProperties.twoHanded;
+                    clientRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
+                    if (grab.itemProperties.grabAnimationTime > 0f)
+                    {
+                        clientRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
+                    }
+                    else
+                    {
+                        clientRef.grabObjectAnimationTime = 0.4f;
+                    }
+
+                    callFunc(clientRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
+
+                    Coroutine goc = (Coroutine)getProperty(clientRef, "grabObjectCoroutine");
+
+                    if (goc != null)
+                    {
+                        ((UnityEngine.MonoBehaviour)clientRef).StopCoroutine(goc);
+                    }
+
+                    setProperty(clientRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)clientRef).StartCoroutine("GrabObject"));
+                });
+            }
+
+        }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+}*///Was testing some stuff, ignore this. Works for giving scrap items, funnily enough, same as it does for masks.
 public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
@@ -1782,14 +1896,14 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Could not find Active player to Spawn Crew Body");
             }
 
             try
             {
-                var player = list[UnityEngine.Random.Range(0, list.Count)];
+                var player = list[UnityEngine.Random.Range(0, StartOfRound.Instance.connectedPlayersAmount)]; //test fixing Crew bodies?
 
-                if (player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                if(player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
@@ -2843,7 +2957,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
                 if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                 {
                     found = true;
-                    if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
+                    if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
                     {
                         try
                         {
@@ -2865,6 +2979,7 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
 
                 TestMod.ActionQueue.Enqueue(() =>
                 {
+                        
                     if (enteredText[1] == "mimic")
                     {
                         GameObject prefab = null;
@@ -3031,8 +3146,9 @@ public static CrowdResponse GiveMask(ControlClient client, CrowdRequest req)
                     if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                     {
                         found = true;
-                        if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
-                        {
+                            TestMod.mls.LogInfo("Found Monster: " + enteredText[1]);
+                         if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
+                            {
                             try
                             {
                                 if (player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");

@@ -109,7 +109,6 @@ namespace ControlValley
                 {"webs", CrowdDelegates.CreateWebs},
                 {"killenemies", CrowdDelegates.KillEnemies},
                 {"spawn_radmech", CrowdDelegates.Spawn},
-                {"spawn_spring", CrowdDelegates.Spawn},
 
                 {"cspawn_pede", CrowdDelegates.CrewSpawn},
                 {"cspawn_spider", CrowdDelegates.CrewSpawn},
@@ -128,7 +127,6 @@ namespace ControlValley
                 {"cspawn_mimic", CrowdDelegates.CrewSpawn},
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
                 {"cspawn_radmech", CrowdDelegates.CrewSpawn},
-                {"cspawn_spring", CrowdDelegates.CrewSpawn},
 
                 {"give_0", CrowdDelegates.GiveItem},
                 {"give_1", CrowdDelegates.GiveItem},
@@ -142,6 +140,8 @@ namespace ControlValley
                 {"give_9", CrowdDelegates.GiveItem},
                 {"give_10", CrowdDelegates.GiveItem},
                 {"give_11", CrowdDelegates.GiveItem},
+                {"give_12", CrowdDelegates.GiveItem},
+                {"give_13", CrowdDelegates.GiveItem},
 
                 {"givem_tragedymask", CrowdDelegates.GiveMask},
                 {"givem_comedymask", CrowdDelegates.GiveMask},

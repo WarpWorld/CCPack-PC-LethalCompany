@@ -70,7 +70,6 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Mimic", "spawn_mimic") { Category = "Spawn Enemies"},
                 new("Spawn Landmine", "spawn_landmine") { Category = "Spawn Enemies"},
                 new("Spawn Old Bird", "spawn_radmech") { Category = "Spawn Enemies"},
-                new("Spawn Coil Head", "spawn_spring") { Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
@@ -89,7 +88,6 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Mimic at Crewmate", "cspawn_mimic") { Category = "Spawn Enemies"},
                 new("Spawn Landmine at Crewmate", "cspawn_landmine") { Category = "Spawn Enemies"},
                 new("Spawn Old Bird at Crewmate", "cspawn_radmech") { Category = "Spawn Enemies" },
-                new("Spawn Coil Head at Crewmate", "cspawn_spring") { Category = "Spawn Enemies"},
 
                 new("Give Walkie-Talkie", "give_0") { Category = "Items"},
                 new("Give Flashlight", "give_1") { Category = "Items"},
@@ -105,6 +103,8 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Radar Booster", "give_11") { Category = "Items"},
                 new("Give Tragedy Mask", "givem_tragedymask") { Category = "Items"},
                 new("Give Comedy Mask", "givem_comedymask") { Category = "Items"},
+                new("Give Spray Paint", "give_12"){ Category = "Items"},
+                new("Give Weed Killer", "give_13"){ Category = "Items"},
 
                 new("Give Crewmate Walkie-Talkie", "cgive_0") { Category = "Items"},
                 new("Give Crewmate Flashlight", "cgive_1") { Category = "Items"},
@@ -120,6 +120,8 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Radar Booster", "cgive_11") { Category = "Items"},
                 new("Give Crewmate Tragedy Mask", "cgivem_tragedymask") { Category = "Items"},
                 new("Give Crewmate Comedy Mask", "cgivem_comedymask") { Category = "Items"},
+                new("Give Crewmate Spray Paint", "cgive_12"){Category= "Items"},
+                new("Give Crewmate Weed Killer", "cgive_13"){Category= "Items"},
 
                 new("Charge Item Battery", "charge") { Category = "Items"},
                 new("Drain Item Battery", "uncharge") { Category = "Items"},
