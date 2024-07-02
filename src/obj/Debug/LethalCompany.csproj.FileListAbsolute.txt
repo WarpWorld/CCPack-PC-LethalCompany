@@ -101,8 +101,8 @@ C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\bin\Debug\CrowdContr
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\bin\Debug\CrowdControl.pdb
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\bin\Debug\Newtonsoft.Json.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\bin\Debug\Newtonsoft.Json.xml
+C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.CoreCompileInputs.cache
+C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCo.C96713F5.Up2Date
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\CrowdControl.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\CrowdControl.pdb
-C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache
-C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany\src\obj\Debug\LethalCo.C96713F5.Up2Date
