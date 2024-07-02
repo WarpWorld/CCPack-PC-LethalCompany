@@ -62,7 +62,7 @@ namespace ControlValley
 
             Delegate = new Dictionary<string, CrowdDelegate>()
             {
-           
+
                 {"heal_full", CrowdDelegates.HealFull},
                 {"kill", CrowdDelegates.Kill},
                 {"killcrew", CrowdDelegates.KillCrewmate},
@@ -143,8 +143,8 @@ namespace ControlValley
                 {"give_12", CrowdDelegates.GiveItem},
                 {"give_13", CrowdDelegates.GiveItem},
 
-                {"givem_tragedymask", CrowdDelegates.GiveMask},
-                {"givem_comedymask", CrowdDelegates.GiveMask},
+                {"givem_tragedymask", CrowdDelegates.GiveSpecial},
+                {"givem_comedymask", CrowdDelegates.GiveSpecial},
 
                 {"cgive_0",  CrowdDelegates.GiveCrewItem},
                 {"cgive_1",  CrowdDelegates.GiveCrewItem},
@@ -159,8 +159,8 @@ namespace ControlValley
                 {"cgive_10", CrowdDelegates.GiveCrewItem},
                 {"cgive_11", CrowdDelegates.GiveCrewItem},
 
-                {"cgivem_tragedymask", CrowdDelegates.GiveCrewMask},
-                {"cgivem_comedymask", CrowdDelegates.GiveCrewMask},
+                {"cgivem_tragedymask", CrowdDelegates.GiveCrewSpecial},
+                {"cgivem_comedymask", CrowdDelegates.GiveCrewSpecial },
 
                 {"weather_-1", CrowdDelegates.Weather},
                 {"weather_1", CrowdDelegates.Weather},
