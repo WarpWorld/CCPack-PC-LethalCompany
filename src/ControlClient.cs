@@ -62,7 +62,7 @@ namespace ControlValley
 
             Delegate = new Dictionary<string, CrowdDelegate>()
             {
-           
+
                 {"heal_full", CrowdDelegates.HealFull},
                 {"kill", CrowdDelegates.Kill},
                 {"killcrew", CrowdDelegates.KillCrewmate},
@@ -108,6 +108,7 @@ namespace ControlValley
                 {"spawn_landmine", CrowdDelegates.Spawn},
                 {"webs", CrowdDelegates.CreateWebs},
                 {"killenemies", CrowdDelegates.KillEnemies},
+                {"spawn_radmech", CrowdDelegates.Spawn},
 
                 {"cspawn_pede", CrowdDelegates.CrewSpawn},
                 {"cspawn_spider", CrowdDelegates.CrewSpawn},
@@ -125,38 +126,47 @@ namespace ControlValley
                 {"cspawn_cracker", CrowdDelegates.CrewSpawn},
                 {"cspawn_mimic", CrowdDelegates.CrewSpawn},
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
+                {"cspawn_radmech", CrowdDelegates.CrewSpawn},
 
-                {"give_0", CrowdDelegates.GiveItem},
-                {"give_1", CrowdDelegates.GiveItem},
-                {"give_2", CrowdDelegates.GiveItem},
+                {"give_14", CrowdDelegates.GiveItem},
                 {"give_3", CrowdDelegates.GiveItem},
-                {"give_4", CrowdDelegates.GiveItem},
-                {"give_5", CrowdDelegates.GiveItem},
-                {"give_6", CrowdDelegates.GiveItem},
-                {"give_7", CrowdDelegates.GiveItem},
-                {"give_8", CrowdDelegates.GiveItem},
-                {"give_9", CrowdDelegates.GiveItem},
                 {"give_10", CrowdDelegates.GiveItem},
+                {"give_6", CrowdDelegates.GiveItem},
+                {"give_9", CrowdDelegates.GiveItem},
                 {"give_11", CrowdDelegates.GiveItem},
+                {"give_1", CrowdDelegates.GiveItem},
+                {"give_13", CrowdDelegates.GiveItem},
+                {"give_15", CrowdDelegates.GiveItem},
+                {"give_4", CrowdDelegates.GiveItem},
+                {"give_12", CrowdDelegates.GiveItem},
+                {"give_57", CrowdDelegates.GiveItem},
+                {"give_61", CrowdDelegates.GiveItem},
+                {"give_70", CrowdDelegates.GiveItem},
+                {"give_5", CrowdDelegates.GiveItem},
+                {"give_59", CrowdDelegates.GiveItem},
 
-                {"givem_tragedymask", CrowdDelegates.GiveMask},
-                {"givem_comedymask", CrowdDelegates.GiveMask},
+                {"give_65", CrowdDelegates.GiveItem},
+                {"give_66", CrowdDelegates.GiveItem},
 
-                {"cgive_0",  CrowdDelegates.GiveCrewItem},
-                {"cgive_1",  CrowdDelegates.GiveCrewItem},
-                {"cgive_2",  CrowdDelegates.GiveCrewItem},
+                {"cgive_14",  CrowdDelegates.GiveCrewItem},
                 {"cgive_3",  CrowdDelegates.GiveCrewItem},
-                {"cgive_4",  CrowdDelegates.GiveCrewItem},
-                {"cgive_5",  CrowdDelegates.GiveCrewItem},
+                {"cgive_10",  CrowdDelegates.GiveCrewItem},
                 {"cgive_6",  CrowdDelegates.GiveCrewItem},
-                {"cgive_7",  CrowdDelegates.GiveCrewItem},
-                {"cgive_8",  CrowdDelegates.GiveCrewItem},
                 {"cgive_9",  CrowdDelegates.GiveCrewItem},
-                {"cgive_10", CrowdDelegates.GiveCrewItem},
-                {"cgive_11", CrowdDelegates.GiveCrewItem},
+                {"cgive_11",  CrowdDelegates.GiveCrewItem},
+                {"cgive_1",  CrowdDelegates.GiveCrewItem},
+                {"cgive_13",  CrowdDelegates.GiveCrewItem},
+                {"cgive_15",  CrowdDelegates.GiveCrewItem},
+                {"cgive_4",  CrowdDelegates.GiveCrewItem},
+                {"cgive_12", CrowdDelegates.GiveCrewItem},
+                {"cgive_57", CrowdDelegates.GiveCrewItem},
+                {"cgive_61",  CrowdDelegates.GiveCrewItem},
+                {"cgive_70",  CrowdDelegates.GiveCrewItem},
+                {"cgive_5", CrowdDelegates.GiveCrewItem},
+                {"cgive_59", CrowdDelegates.GiveCrewItem},
 
-                {"cgivem_tragedymask", CrowdDelegates.GiveCrewMask},
-                {"cgivem_comedymask", CrowdDelegates.GiveCrewMask},
+                {"cgive_65", CrowdDelegates.GiveCrewSpecial},
+                {"cgive_66", CrowdDelegates.GiveCrewSpecial },
 
                 {"weather_-1", CrowdDelegates.Weather},
                 {"weather_1", CrowdDelegates.Weather},
@@ -420,6 +430,5 @@ namespace ControlValley
         {
             Running = false;
         }
-
     }
 }
