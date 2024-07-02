@@ -3,7 +3,7 @@
   "WorkspaceRootPath": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|c:\\users\\mrfaw\\documents\\github\\ccpack-pc-lethalcompany\\src\\crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -65,8 +65,7 @@
               "RelativeToolTip": "..\\LethalCompany.cs",
               "ViewState": "AQIAAG0AAAAAAAAAAAAiwEcAAABVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-29T22:12:01.761Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-06-29T22:12:01.761Z"
             },
             {
               "$type": "Document",
@@ -90,8 +89,7 @@
               "RelativeToolTip": "CrowdResponse.cs",
               "ViewState": "AQIAACQAAAAAAAAAAAAowBgAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-28T23:25:06.351Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-06-28T23:25:06.351Z"
             },
             {
               "$type": "Document",
@@ -137,7 +135,7 @@
               "RelativeDocumentMoniker": "CrowdDelegates.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdDelegates.cs",
               "RelativeToolTip": "CrowdDelegates.cs",
-              "ViewState": "AQIAAN0EAAAAAAAAAAASwPAEAABxAAAA",
+              "ViewState": "AQIAABsFAAAAAAAAAAAiwDoFAAAgAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-28T23:16:51.16Z",
               "EditorCaption": ""
@@ -152,8 +150,7 @@
               "RelativeToolTip": "ControlClient.cs",
               "ViewState": "AQIAAIwAAAAAAAAAAAAiwK0AAAA2AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-28T23:16:20.116Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-06-28T23:16:20.116Z"
             },
             {
               "$type": "Document",
