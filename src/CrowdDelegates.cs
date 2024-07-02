@@ -1202,7 +1202,6 @@ namespace ControlValley
             {
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
-
             bool found = false;
             if (enteredText[1] == "mimic")
             {
@@ -1263,7 +1262,7 @@ namespace ControlValley
                     if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                     {
                         found = true;
-                        if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
+                        if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
                         {
                             try
                             {
@@ -1334,9 +1333,11 @@ namespace ControlValley
 
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
+                            
                             try
                             {
-                                TestMod.SpawnEnemy(outsideEnemy, 1, false);
+                                if (enteredText[1] == "weed") RoundManager.Instance.SpawnWeedEnemies();
+                                else TestMod.SpawnEnemy(outsideEnemy, 1, false);
 
                             }
                             catch (Exception e)
@@ -1786,7 +1787,6 @@ namespace ControlValley
                         setProperty(playerRef, "currentlyGrabbingObject", grab);
                         setProperty(playerRef, "grabInvalidated", false);
 
-
                         NetworkObject networkObject = grab.NetworkObject;
                         if (networkObject == null || !networkObject.IsSpawned)
                         {
@@ -1822,7 +1822,7 @@ namespace ControlValley
 
                         if (goc != null)
                         {
-                            ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
+                            ((MonoBehaviour)playerRef).StopCoroutine(goc);
                         }
 
                         setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));

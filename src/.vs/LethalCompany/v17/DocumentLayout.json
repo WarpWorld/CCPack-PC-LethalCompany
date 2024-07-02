@@ -3,19 +3,19 @@
   "WorkspaceRootPath": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowdresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowdresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|c:\\users\\mrfaw\\documents\\github\\ccpack-pc-lethalcompany\\src\\crowdresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowdresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowdrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -49,7 +49,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -57,13 +57,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "LethalCompany.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs",
               "RelativeDocumentMoniker": "..\\LethalCompany.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs",
               "RelativeToolTip": "..\\LethalCompany.cs",
-              "ViewState": "AQIAADEAAAAAAAAAAAAiwDsAAAArAAAA",
+              "ViewState": "AQIAAG0AAAAAAAAAAAAiwEcAAABVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-29T22:12:01.761Z",
               "EditorCaption": ""
@@ -82,13 +82,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "CrowdResponse.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdResponse.cs",
               "RelativeDocumentMoniker": "CrowdResponse.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdResponse.cs",
               "RelativeToolTip": "CrowdResponse.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABgAAAAXAAAA",
+              "ViewState": "AQIAACQAAAAAAAAAAAAowBgAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-28T23:25:06.351Z",
               "EditorCaption": ""
@@ -131,26 +131,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "CrowdDelegates.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdDelegates.cs",
               "RelativeDocumentMoniker": "CrowdDelegates.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdDelegates.cs",
               "RelativeToolTip": "CrowdDelegates.cs",
-              "ViewState": "AQIAAPkGAAAAAAAAAAAcwDEHAABPAAAA",
+              "ViewState": "AQIAAN0EAAAAAAAAAAASwPAEAABxAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-28T23:16:51.16Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "ControlClient.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\ControlClient.cs",
               "RelativeDocumentMoniker": "ControlClient.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\ControlClient.cs",
               "RelativeToolTip": "ControlClient.cs",
-              "ViewState": "AQIAAIkAAAAAAAAAAAAiwKgAAAAaAAAA",
+              "ViewState": "AQIAAIwAAAAAAAAAAAAiwK0AAAA2AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-28T23:16:20.116Z",
               "EditorCaption": ""
