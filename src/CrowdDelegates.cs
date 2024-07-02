@@ -1336,8 +1336,7 @@ namespace ControlValley
                             
                             try
                             {
-                                if (enteredText[1] == "weed") RoundManager.Instance.SpawnWeedEnemies();
-                                else TestMod.SpawnEnemy(outsideEnemy, 1, false);
+                                TestMod.SpawnEnemy(outsideEnemy, 1, false);
 
                             }
                             catch (Exception e)
