@@ -8,7 +8,7 @@ Crowd Control supports multiple platforms, such as Twitch, YouTube, Discord and 
 
 To get started using this project you will need to check the ``readme.md`` in the src folder.
 
-You can load the ``SupermarketSimulator.cs`` in our SDK which can be found on our [Developer Page](https://developer.crowdcontrol.live/sdk/).
+You can load the ``LethalCompany.cs`` in our SDK which can be found on our [Developer Page](https://developer.crowdcontrol.live/sdk/).
 
 Follow instructions on that page to learn how to add effects to your CS file and how to activate them.
 
