@@ -1,3 +1,13 @@
+**1.1.8** :
+
+```
+Updates to support v55
+Standardize item ids
+Add Spawn Radmech
+Big thanks to @TheUnknownCod3r
+```
+
+
 **1.1.7** :
 
 ```
