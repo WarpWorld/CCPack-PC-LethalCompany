@@ -62,7 +62,7 @@ namespace ControlValley
 
             Delegate = new Dictionary<string, CrowdDelegate>()
             {
-
+           
                 {"heal_full", CrowdDelegates.HealFull},
                 {"kill", CrowdDelegates.Kill},
                 {"killcrew", CrowdDelegates.KillCrewmate},
@@ -108,7 +108,6 @@ namespace ControlValley
                 {"spawn_landmine", CrowdDelegates.Spawn},
                 {"webs", CrowdDelegates.CreateWebs},
                 {"killenemies", CrowdDelegates.KillEnemies},
-                {"spawn_radmech", CrowdDelegates.Spawn},
 
                 {"cspawn_pede", CrowdDelegates.CrewSpawn},
                 {"cspawn_spider", CrowdDelegates.CrewSpawn},
@@ -126,48 +125,38 @@ namespace ControlValley
                 {"cspawn_cracker", CrowdDelegates.CrewSpawn},
                 {"cspawn_mimic", CrowdDelegates.CrewSpawn},
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
-                {"cspawn_radmech", CrowdDelegates.CrewSpawn},
 
+                {"give_0", CrowdDelegates.GiveItem},
+                {"give_1", CrowdDelegates.GiveItem},
+                {"give_2", CrowdDelegates.GiveItem},
+                {"give_3", CrowdDelegates.GiveItem},
+                {"give_4", CrowdDelegates.GiveItem},
+                {"give_5", CrowdDelegates.GiveItem},
+                {"give_6", CrowdDelegates.GiveItem},
+                {"give_7", CrowdDelegates.GiveItem},
+                {"give_8", CrowdDelegates.GiveItem},
+                {"give_9", CrowdDelegates.GiveItem},
+                {"give_10", CrowdDelegates.GiveItem},
+                {"give_11", CrowdDelegates.GiveItem},
 
-                { "give_walkie", CrowdDelegates.GiveItem},
-                { "give_flashlight", CrowdDelegates.GiveItem},
-                { "give_shovel", CrowdDelegates.GiveItem},
-                { "give_lockpicker", CrowdDelegates.GiveItem},
-                { "give_proflashlight", CrowdDelegates.GiveItem},
-                { "give_stungrenade", CrowdDelegates.GiveItem},
-                { "give_boombox", CrowdDelegates.GiveItem},
-                { "give_inhaler", CrowdDelegates.GiveItem},
-                { "give_stungun", CrowdDelegates.GiveItem},
-                { "give_jetpack", CrowdDelegates.GiveItem},
-                { "give_extensionladder", CrowdDelegates.GiveItem},
-                { "give_radarbooster", CrowdDelegates.GiveItem},
-                { "give_tragedymask", CrowdDelegates.GiveItem},
-                { "give_comedymask", CrowdDelegates.GiveItem},
-                { "give_spraypaint", CrowdDelegates.GiveItem},
-                { "give_weedkiller", CrowdDelegates.GiveItem},
-                { "give_key", CrowdDelegates.GiveItem},
-                { "give_shotgun", CrowdDelegates.GiveItem},
-                { "give_shells", CrowdDelegates.GiveItem},
+                {"givem_tragedymask", CrowdDelegates.GiveMask},
+                {"givem_comedymask", CrowdDelegates.GiveMask},
 
-                {"cgive_walkie",  CrowdDelegates.GiveCrewItem},
-                {"cgive_flashlight",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shovel",  CrowdDelegates.GiveCrewItem},
-                {"cgive_lockpicker",  CrowdDelegates.GiveCrewItem},
-                {"cgive_proflashlight",  CrowdDelegates.GiveCrewItem},
-                {"cgive_stungrennade",  CrowdDelegates.GiveCrewItem},
-                {"cgive_boombox",  CrowdDelegates.GiveCrewItem},
-                {"cgive_inhaler",  CrowdDelegates.GiveCrewItem},
-                {"cgive_stungun",  CrowdDelegates.GiveCrewItem},
-                {"cgive_jetpack",  CrowdDelegates.GiveCrewItem},
-                {"cgive_extensionladder",  CrowdDelegates.GiveCrewItem},
-                {"cgive_radarbooster",  CrowdDelegates.GiveCrewItem},
-                {"cgive_tragedymask",  CrowdDelegates.GiveCrewItem},
-                {"cgive_comedymask",  CrowdDelegates.GiveCrewItem},
-                {"cgive_spraypaint",  CrowdDelegates.GiveCrewItem},
-                {"cgive_weedkiller",  CrowdDelegates.GiveCrewItem},
-                {"cgive_key",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shotgun",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shells",  CrowdDelegates.GiveCrewItem},
+                {"cgive_0",  CrowdDelegates.GiveCrewItem},
+                {"cgive_1",  CrowdDelegates.GiveCrewItem},
+                {"cgive_2",  CrowdDelegates.GiveCrewItem},
+                {"cgive_3",  CrowdDelegates.GiveCrewItem},
+                {"cgive_4",  CrowdDelegates.GiveCrewItem},
+                {"cgive_5",  CrowdDelegates.GiveCrewItem},
+                {"cgive_6",  CrowdDelegates.GiveCrewItem},
+                {"cgive_7",  CrowdDelegates.GiveCrewItem},
+                {"cgive_8",  CrowdDelegates.GiveCrewItem},
+                {"cgive_9",  CrowdDelegates.GiveCrewItem},
+                {"cgive_10", CrowdDelegates.GiveCrewItem},
+                {"cgive_11", CrowdDelegates.GiveCrewItem},
+
+                {"cgivem_tragedymask", CrowdDelegates.GiveCrewMask},
+                {"cgivem_comedymask", CrowdDelegates.GiveCrewMask},
 
                 {"weather_-1", CrowdDelegates.Weather},
                 {"weather_1", CrowdDelegates.Weather},
@@ -182,18 +171,18 @@ namespace ControlValley
                 {"dropitem", CrowdDelegates.DropItem},
                 {"takecrewitem", CrowdDelegates.TakeCrewItem},
 
-                {"buy_walkie",  CrowdDelegates.BuyItem},
-                {"buy_flashlighht",  CrowdDelegates.BuyItem},
-                {"buy_shovel",  CrowdDelegates.BuyItem},
-                {"buy_lockpicker",  CrowdDelegates.BuyItem},
-                {"buy_proflashlight",  CrowdDelegates.BuyItem},
-                {"buy_stungrenade",  CrowdDelegates.BuyItem},
-                {"buy_boombox",  CrowdDelegates.BuyItem},
-                {"buy_inhaler",  CrowdDelegates.BuyItem},
-                {"buy_stungun",  CrowdDelegates.BuyItem},
-                {"buy_jetpack",  CrowdDelegates.BuyItem},
-                {"buy_extensionladder",  CrowdDelegates.BuyItem},
-                {"buy_radarbooster",  CrowdDelegates.BuyItem},
+                {"buy_0",  CrowdDelegates.BuyItem},
+                {"buy_1",  CrowdDelegates.BuyItem},
+                {"buy_2",  CrowdDelegates.BuyItem},
+                {"buy_3",  CrowdDelegates.BuyItem},
+                {"buy_4",  CrowdDelegates.BuyItem},
+                {"buy_5",  CrowdDelegates.BuyItem},
+                {"buy_6",  CrowdDelegates.BuyItem},
+                {"buy_7",  CrowdDelegates.BuyItem},
+                {"buy_8",  CrowdDelegates.BuyItem},
+                {"buy_9",  CrowdDelegates.BuyItem},
+                {"buy_10", CrowdDelegates.BuyItem},
+                {"buy_11", CrowdDelegates.BuyItem},
 
                 {"charge", CrowdDelegates.ChargeItem},
                 {"uncharge", CrowdDelegates.UnchargeItem},
@@ -314,20 +303,18 @@ namespace ControlValley
         {
             inGame = true;
 
-            if (StartOfRound.Instance == null || StartOfRound.Instance.allPlayersDead || StartOfRound.Instance.livingPlayers < 1) inGame = false;
+            if(StartOfRound.Instance == null || StartOfRound.Instance.allPlayersDead || StartOfRound.Instance.livingPlayers < 1) inGame = false;
 
             if (Saving || !inGame)
             {
                 BuffThread.addTime(200);
                 paused = true;
-            }
-            else if (paused)
+            } else if(paused)
             {
                 paused = false;
                 BuffThread.unPause();
                 BuffThread.tickTime(200);
-            }
-            else
+            }  else
             {
                 BuffThread.tickTime(200);
             }
@@ -341,7 +328,7 @@ namespace ControlValley
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             while (Running)
             {
-
+                
                 TestMod.mls.LogInfo("Attempting to connect to Crowd Control");
 
                 try
@@ -421,8 +408,7 @@ namespace ControlValley
                 if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("gordion")) return false;
                 if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("company")) return false;
             }
-            catch (Exception e)
-            {
+            catch(Exception e) {
                 TestMod.mls.LogError(e.ToString());
                 return false;
             }
@@ -434,5 +420,6 @@ namespace ControlValley
         {
             Running = false;
         }
+
     }
 }
