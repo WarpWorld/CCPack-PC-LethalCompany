@@ -96,7 +96,7 @@ namespace ControlValley
                 {"spawn_flower", CrowdDelegates.Spawn},
                 {"spawn_crawl", CrowdDelegates.Spawn},
                 {"spawn_blob", CrowdDelegates.Spawn},
-                {"spawn_coil", CrowdDelegates.Spawn},
+                {"spawn_spring", CrowdDelegates.Spawn},
                 {"spawn_puff", CrowdDelegates.Spawn},
                 {"spawn_dog", CrowdDelegates.Spawn},
                 {"spawn_giant", CrowdDelegates.Spawn},
@@ -118,7 +118,7 @@ namespace ControlValley
                 {"cspawn_flower", CrowdDelegates.CrewSpawn},
                 {"cspawn_crawl", CrowdDelegates.CrewSpawn},
                 {"cspawn_blob", CrowdDelegates.CrewSpawn},
-                {"cspawn_coil", CrowdDelegates.CrewSpawn},
+                {"cspawn_spring", CrowdDelegates.CrewSpawn},
                 {"cspawn_puff", CrowdDelegates.CrewSpawn},
                 {"cspawn_dog", CrowdDelegates.CrewSpawn},
                 {"cspawn_giant", CrowdDelegates.CrewSpawn},
@@ -133,7 +133,6 @@ namespace ControlValley
 
                 { "give_binoculars", CrowdDelegates.GiveItem},//binoculars
                 { "give_boombox", CrowdDelegates.GiveItem},//boombox
-                { "give_box", CrowdDelegates.GiveItem},//cardboard box
                 { "give_flashlight", CrowdDelegates.GiveItem},//flashlight
                 { "give_jetpack", CrowdDelegates.GiveItem},//jetpack
                 { "give_key", CrowdDelegates.GiveItem},//Key
