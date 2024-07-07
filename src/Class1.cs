@@ -64,7 +64,6 @@ namespace LethalCompanyTestMod
         public static StartOfRound currentStart;
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
-        public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Concat(UnityEngine.Object.FindObjectsByType<Item>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID)).ToList();
 
         public static bool noClipEnabled;
         public static bool enableGod;
@@ -1185,9 +1184,6 @@ namespace LethalCompanyTestMod
 
 
         }
-
-
-
     }
 
 }
