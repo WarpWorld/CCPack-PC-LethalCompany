@@ -18,15 +18,44 @@ using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.GraphicsBuffer;
 
 
+
+
 namespace ControlValley
 {
     public delegate CrowdResponse CrowdDelegate(ControlClient client, CrowdRequest req);
+
+
 
     public class CrowdDelegates
     {
         public static uint msgid = 0;
 
         public static uint givedelay = 0;
+
+
+        public enum ItemList
+        {
+            walkie = 14,
+            flashlight = 3,
+            shovel = 10,
+            lockpicker = 6,
+            proflashlight = 9,
+            stungrenade = 11,
+            boombox = 1,
+            inhaler = 13,
+            stungun = 15,
+            jetpack = 4,
+            extensionladder = 4,
+            radarbooster = 57,
+            tragedymask = 65,
+            comedymask = 66,
+            spraypaint = 61,
+            weedkiller = 70,
+            key = 5,
+            shotgun = 59,
+            shells = 60
+        }
+
 
         #region Health
         public static CrowdResponse HealFull(ControlClient client, CrowdRequest req)
@@ -1333,7 +1362,7 @@ namespace ControlValley
 
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
-                            
+
                             try
                             {
                                 TestMod.SpawnEnemy(outsideEnemy, 1, false);
@@ -1741,7 +1770,17 @@ namespace ControlValley
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
-                give = int.Parse(enteredText[1]);
+                string item = enteredText[1];
+
+                if (Enum.TryParse(item, out ItemList itemNumber))
+                {
+                    give = (int)itemNumber;
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
+
             }
             else
             {
@@ -1866,7 +1905,7 @@ namespace ControlValley
         //                    if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
         //                }
         //         }
-                
+
         //        if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0 || prefab == null)
         //        {
         //            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -1963,7 +2002,16 @@ namespace ControlValley
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
-                give = int.Parse(enteredText[1]);
+                string item = enteredText[1];
+
+                if (Enum.TryParse(item, out ItemList itemNumber))
+                {
+                    give = (int)itemNumber;
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
             }
             else
             {
@@ -2145,7 +2193,16 @@ namespace ControlValley
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
-                give = int.Parse(enteredText[1]);
+                string item = enteredText[1];
+
+                if (Enum.TryParse(item, out ItemList itemNumber))
+                {
+                    give = (int)itemNumber;
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
             }
             else
             {
@@ -2980,7 +3037,7 @@ namespace ControlValley
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
             string message = "";
-           
+
 
             try
             {
@@ -3050,7 +3107,7 @@ namespace ControlValley
             //ISearchList results = UnityEngine.SearchService.Request($"p: t:prefab t:{typeof(SandSpiderAI).Name}", SearchFlags.Synchronous);
             //foreach (var result in results)
 
-                try
+            try
             {
 
 
@@ -3177,10 +3234,10 @@ namespace ControlValley
             if (req.duration > 0) dur = req.duration / 1000;
 
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if(TestMod.nightVision) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (TestMod.nightVision) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
             if (BuffThread.isRunning(BuffType.NIGHT_VISION)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            
+
             new Thread(new BuffThread(req.GetReqID(), BuffType.NIGHT_VISION, dur * 1000).Run).Start();
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
