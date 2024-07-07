@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.8.0";
+        private const string modVersion = "1.1.6.0";
 
-        public static string tsVersion = "1.1.8";
+        public static string tsVersion = "1.1.6";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -62,14 +62,15 @@ namespace LethalCompanyTestMod
         public static EnemyVent[] currentLevelVents;
         public static RoundManager currentRound;
         public static StartOfRound currentStart;
+
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
-        public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Concat(UnityEngine.Object.FindObjectsByType<Item>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID)).ToList();
 
         public static bool noClipEnabled;
         public static bool enableGod;
         public static bool nightVision;
         public static bool infSprint;
+
 
         public static PlayerControllerB playerRef;
         public static bool speedHack;
@@ -90,7 +91,6 @@ namespace LethalCompanyTestMod
         public static uint verwait = 0;
 
         public static uint floodtime = 0;
-
         void Awake()
         {
 
@@ -99,6 +99,7 @@ namespace LethalCompanyTestMod
             // Plugin startup logic
             mls.LogInfo($"Loaded {modGUID}. Patching.");
             harmony.PatchAll(typeof(TestMod));
+
             mls.LogInfo($"Initializing Crowd Control");
 
             try
@@ -151,6 +152,7 @@ namespace LethalCompanyTestMod
         {
             currentStart = StartOfRound.Instance;
         }
+
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
         static void setIsHost()
@@ -180,6 +182,7 @@ namespace LethalCompanyTestMod
             // avoid setting manually in case there is a missed path that executes even if not host
             //isHost = true;
             // doesn't need to be returned early as a result of above mentioned
+
 
             currentRound = RoundManager.Instance;
             if (!levelEnemySpawns.ContainsKey(newLevel))
@@ -230,6 +233,7 @@ namespace LethalCompanyTestMod
                 enemy.enemyType.probabilityCurve = prob;
             }
             HUDManager.Instance.AddTextToChatOnServer("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
 
 
 
@@ -607,7 +611,7 @@ namespace LethalCompanyTestMod
                             if (dist.magnitude < 6.0f) pos = test;
 
 
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), TestMod.currentStart.propsContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.EulerAngles(-90, 0, 0), TestMod.currentStart.propsContainer);
 
                             break;
                         }
@@ -909,7 +913,7 @@ namespace LethalCompanyTestMod
                             foreach (var player in StartOfRound.Instance.allPlayerScripts)
                             {
                                 if (player != null && player.isActiveAndEnabled && !player.isPlayerDead && (int)player.playerClientId == cur && player.isPlayerControlled)
-                                    player.KillPlayer(player.transform.up * 100.0f, true, CauseOfDeath.Gravity, 2);
+                                    player.KillPlayer(player.transform.up * 100.0f);
                             }
                         }
                         break;
