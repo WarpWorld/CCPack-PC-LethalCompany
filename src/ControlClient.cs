@@ -96,7 +96,7 @@ namespace ControlValley
                 {"spawn_flower", CrowdDelegates.Spawn},
                 {"spawn_crawl", CrowdDelegates.Spawn},
                 {"spawn_blob", CrowdDelegates.Spawn},
-                {"spawn_coil", CrowdDelegates.Spawn},
+                {"spawn_spring", CrowdDelegates.Spawn},
                 {"spawn_puff", CrowdDelegates.Spawn},
                 {"spawn_dog", CrowdDelegates.Spawn},
                 {"spawn_giant", CrowdDelegates.Spawn},
@@ -109,6 +109,8 @@ namespace ControlValley
                 {"webs", CrowdDelegates.CreateWebs},
                 {"killenemies", CrowdDelegates.KillEnemies},
                 {"spawn_radmech", CrowdDelegates.Spawn},
+                {"spawn_clay", CrowdDelegates.Spawn},
+                {"spawn_butler", CrowdDelegates.Spawn},
 
                 {"cspawn_pede", CrowdDelegates.CrewSpawn},
                 {"cspawn_spider", CrowdDelegates.CrewSpawn},
@@ -116,7 +118,7 @@ namespace ControlValley
                 {"cspawn_flower", CrowdDelegates.CrewSpawn},
                 {"cspawn_crawl", CrowdDelegates.CrewSpawn},
                 {"cspawn_blob", CrowdDelegates.CrewSpawn},
-                {"cspawn_coil", CrowdDelegates.CrewSpawn},
+                {"cspawn_spring", CrowdDelegates.CrewSpawn},
                 {"cspawn_puff", CrowdDelegates.CrewSpawn},
                 {"cspawn_dog", CrowdDelegates.CrewSpawn},
                 {"cspawn_giant", CrowdDelegates.CrewSpawn},
@@ -127,27 +129,40 @@ namespace ControlValley
                 {"cspawn_mimic", CrowdDelegates.CrewSpawn},
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
                 {"cspawn_radmech", CrowdDelegates.CrewSpawn},
+                {"cspawn_butler", CrowdDelegates.CrewSpawn},
 
-
-                { "give_walkie", CrowdDelegates.GiveItem},
-                { "give_flashlight", CrowdDelegates.GiveItem},
-                { "give_shovel", CrowdDelegates.GiveItem},
-                { "give_lockpicker", CrowdDelegates.GiveItem},
-                { "give_proflashlight", CrowdDelegates.GiveItem},
-                { "give_stungrenade", CrowdDelegates.GiveItem},
-                { "give_boombox", CrowdDelegates.GiveItem},
-                { "give_inhaler", CrowdDelegates.GiveItem},
-                { "give_stungun", CrowdDelegates.GiveItem},
-                { "give_jetpack", CrowdDelegates.GiveItem},
-                { "give_extensionladder", CrowdDelegates.GiveItem},
-                { "give_radarbooster", CrowdDelegates.GiveItem},
-                { "give_tragedymask", CrowdDelegates.GiveItem},
-                { "give_comedymask", CrowdDelegates.GiveItem},
-                { "give_spraypaint", CrowdDelegates.GiveItem},
-                { "give_weedkiller", CrowdDelegates.GiveItem},
-                { "give_key", CrowdDelegates.GiveItem},
-                { "give_shotgun", CrowdDelegates.GiveItem},
-                { "give_shells", CrowdDelegates.GiveItem},
+                { "give_binoculars", CrowdDelegates.GiveItem},//binoculars
+                { "give_boombox", CrowdDelegates.GiveItem},//boombox
+                { "give_flashlight", CrowdDelegates.GiveItem},//flashlight
+                { "give_jetpack", CrowdDelegates.GiveItem},//jetpack
+                { "give_key", CrowdDelegates.GiveItem},//Key
+                { "give_lockpicker", CrowdDelegates.GiveItem},//Lockpicker
+                { "give_apparatus", CrowdDelegates.GiveItem},//Apparatus
+                { "give_mapper", CrowdDelegates.GiveItem},//Mapper
+                { "give_proflashlight", CrowdDelegates.GiveItem},//Pro-Flashlight
+                { "give_shovel", CrowdDelegates.GiveItem},//Shovel
+                { "give_stungrenade", CrowdDelegates.GiveItem},//Stun Grenade
+                { "give_extensionladder", CrowdDelegates.GiveItem},//Extension Ladder
+                { "give_inhaler", CrowdDelegates.GiveItem},//TZP Inhalant
+                { "give_walkie", CrowdDelegates.GiveItem},//Walkie Talkie
+                { "give_zapgun", CrowdDelegates.GiveItem},//Zap Gun
+                { "give_magic7ball", CrowdDelegates.GiveItem},//Magic 7 Ball
+                { "give_airhorn", CrowdDelegates.GiveItem},//Airhorn
+                { "give_bottles", CrowdDelegates.GiveItem},//Bottles
+                { "give_clownhorn", CrowdDelegates.GiveItem},//Clown Horn
+                { "give_goldbar", CrowdDelegates.GiveItem},//Gold Bar
+                { "give_stopsign", CrowdDelegates.GiveItem},//Stop Sign
+                { "give_radarbooster", CrowdDelegates.GiveItem},//Radar Booster
+                { "give_yieldsign", CrowdDelegates.GiveItem},//Yield Sign
+                { "give_shotgun", CrowdDelegates.GiveItem},//Shotgun
+                { "give_gunAmmo", CrowdDelegates.GiveItem},//Ammo
+                { "give_spraypaint", CrowdDelegates.GiveItem},//Spraypaint
+                { "give_present", CrowdDelegates.GiveItem},//Gift Box
+                { "give_tragedy", CrowdDelegates.GiveItem},//Tragedy Mask
+                { "give_comedy", CrowdDelegates.GiveItem},//Comedy Mask
+                { "give_knife", CrowdDelegates.GiveItem},//Kitchen Knife
+                { "give_egg", CrowdDelegates.GiveItem},//Easter Egg
+                { "give_weedkiller", CrowdDelegates.GiveItem},//Weed Killer
 
                 {"cgive_walkie",  CrowdDelegates.GiveCrewItem},
                 {"cgive_flashlight",  CrowdDelegates.GiveCrewItem},
@@ -183,7 +198,7 @@ namespace ControlValley
                 {"takecrewitem", CrowdDelegates.TakeCrewItem},
 
                 {"buy_walkie",  CrowdDelegates.BuyItem},
-                {"buy_flashlighht",  CrowdDelegates.BuyItem},
+                {"buy_flashlight",  CrowdDelegates.BuyItem},
                 {"buy_shovel",  CrowdDelegates.BuyItem},
                 {"buy_lockpicker",  CrowdDelegates.BuyItem},
                 {"buy_proflashlight",  CrowdDelegates.BuyItem},
@@ -194,6 +209,9 @@ namespace ControlValley
                 {"buy_jetpack",  CrowdDelegates.BuyItem},
                 {"buy_extensionladder",  CrowdDelegates.BuyItem},
                 {"buy_radarbooster",  CrowdDelegates.BuyItem},
+                {"buy_spraypaint",  CrowdDelegates.BuyItem},
+                {"buy_weedkiller",  CrowdDelegates.BuyItem},
+                {"buy_cruiser", CrowdDelegates.BuyCruiser},
 
                 {"charge", CrowdDelegates.ChargeItem},
                 {"uncharge", CrowdDelegates.UnchargeItem},

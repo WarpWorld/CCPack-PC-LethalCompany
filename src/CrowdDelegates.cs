@@ -32,28 +32,58 @@ namespace ControlValley
 
         public static uint givedelay = 0;
 
-
+        public enum buyableItemList
+        {
+            walkie = 0,
+            flashlight = 1,
+            shovel = 2,
+            lockpicker = 3,
+            proflashlight = 4,
+            stungrenade = 5,
+            boombox = 6,
+            inhaler = 7,
+            stungun = 8,
+            jetpack = 9,
+            extensionladder = 10,
+            radarbooster = 11,
+            spraypaint = 12,
+            weedkiller = 13
+        }
         public enum ItemList
         {
-            walkie = 14,
-            flashlight = 3,
-            shovel = 10,
-            lockpicker = 6,
-            proflashlight = 9,
-            stungrenade = 11,
+            binoculars = 0,
             boombox = 1,
-            inhaler = 13,
-            stungun = 15,
+            box = 2,
+            flashlight = 3,
             jetpack = 4,
-            extensionladder = 4,
-            radarbooster = 57,
-            tragedymask = 65,
-            comedymask = 66,
-            spraypaint = 61,
-            weedkiller = 70,
             key = 5,
+            lockpicker = 6,
+            apparatus = 7,
+            mapper = 8,
+            proflashlight = 9,
+            shovel = 10,
+            stungrenade = 11,
+            extensionladder = 12,
+            inhaler = 13,
+            walkie = 14,
+            zapgun = 15,
+            magic7ball = 16,
+            airhorn = 17,
+            bottles = 20,
+            clownhorn = 25,
+            goldbar = 36,
+            stopsign = 52,
+            radarbooster = 57,
+            yieldsign = 58,
             shotgun = 59,
-            shells = 60
+            gunAmmo = 60,
+            spraypaint = 61,
+            present = 63,
+            tragedy = 65,
+            comedy = 66,
+            knife = 68,
+            egg = 69,
+            weedkiller = 70
         }
 
 
@@ -1818,6 +1848,9 @@ namespace ControlValley
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
                         GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
                         gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        int Value = UnityEngine.Random.Range(0, 100);
+                        gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
+                        gameObject.GetComponent <GrabbableObject>().SetScrapValue(Value);
                         gameObject.GetComponent<NetworkObject>().Spawn(false);
 
                         var grab = gameObject.GetComponent<GrabbableObject>();
@@ -1876,121 +1909,6 @@ namespace ControlValley
 
             return new CrowdResponse(req.GetReqID(), status, message);
         }
-
-        //This might not be needed anymore, since GiveItem now works for Masks?
-        //public static CrowdResponse GiveSpecial(ControlClient client, CrowdRequest req)
-        //{
-        //    CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-        //    string message = "";
-
-        //    try
-        //    {
-        //        string[] enteredText = req.code.Split('_');
-        //        if (enteredText.Length == 2)
-        //        {
-
-        //        }
-        //        else
-        //        {
-        //            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-        //        }
-        //        var playerRef = StartOfRound.Instance.localPlayerController;
-        //        var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
-        //        GameObject prefab = null;
-        //        foreach (var level in StartOfRound.Instance.levels)
-        //        {
-        //            if (prefab == null)
-        //                foreach (var spawn in level.spawnableScrap)
-        //                {
-        //                    if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
-        //                }
-        //         }
-
-        //        if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0 || prefab == null)
-        //        {
-        //            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-        //        }
-
-        //        if (!TestMod.isHost)
-        //        {
-        //            givedelay = 20;
-        //            TestMod.ActionQueue.Enqueue(() =>
-        //            {
-        //                msgid++;
-        //                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)playerRef.playerClientId}_{msgid}</size>");
-        //            });
-        //            return new CrowdResponse(req.GetReqID(), status, message);
-        //        }
-
-        //        if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-        //        else
-        //        {
-        //            givedelay = 20;
-        //            TestMod.ActionQueue.Enqueue(() =>
-        //            {
-
-        //                Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-        //                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-        //                gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-        //                gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-        //                var grab = gameObject.GetComponent<GrabbableObject>();
-
-        //                setProperty(playerRef, "currentlyGrabbingObject", grab);
-        //                setProperty(playerRef, "grabInvalidated", false);
-
-
-        //                NetworkObject networkObject = grab.NetworkObject;
-        //                if (networkObject == null || !networkObject.IsSpawned)
-        //                {
-        //                    return;
-        //                }
-        //                grab.InteractItem();
-
-
-        //                playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
-        //                playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
-        //                playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
-        //                playerRef.playerBodyAnimator.ResetTrigger("Throw");
-
-        //                callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
-
-        //                playerRef.isGrabbingObjectAnimation = true;
-        //                playerRef.cursorIcon.enabled = false;
-        //                playerRef.cursorTip.text = "";
-        //                playerRef.twoHanded = grab.itemProperties.twoHanded;
-        //                playerRef.carryWeight += Mathf.Clamp(grab.itemProperties.weight - 1f, 0f, 10f);
-        //                if (grab.itemProperties.grabAnimationTime > 0f)
-        //                {
-        //                    playerRef.grabObjectAnimationTime = grab.itemProperties.grabAnimationTime;
-        //                }
-        //                else
-        //                {
-        //                    playerRef.grabObjectAnimationTime = 0.4f;
-        //                }
-
-        //                callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
-
-        //                Coroutine goc = (Coroutine)getProperty(playerRef, "grabObjectCoroutine");
-
-        //                if (goc != null)
-        //                {
-        //                    ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
-        //                }
-
-        //                setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
-        //            });
-        //        }
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        status = CrowdResponse.Status.STATUS_RETRY;
-        //        TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-        //    }
-
-        //    return new CrowdResponse(req.GetReqID(), status, message);
-        //}
 
         public static CrowdResponse GiveCrewItem(ControlClient client, CrowdRequest req)
         {
@@ -2065,110 +1983,14 @@ namespace ControlValley
                     {
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
                         GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f; 
+                        int Value = UnityEngine.Random.Range(0, 100);
+                        gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
+                        gameObject.GetComponent<GrabbableObject>().SetScrapValue(Value);
                         gameObject.GetComponent<NetworkObject>().Spawn(false);
 
                         msgid++;
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_give_{give}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
-
-                    });
-                }
-
-            }
-            catch (Exception e)
-            {
-                status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
-            }
-
-            return new CrowdResponse(req.GetReqID(), status, message);
-        }
-
-        public static CrowdResponse GiveCrewSpecial(ControlClient client, CrowdRequest req)
-        {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
-            string message = "";
-            var playerRef = StartOfRound.Instance.localPlayerController;
-
-            string[] enteredText = req.code.Split('_');
-            if (enteredText.Length == 2)
-            {
-            }
-            else
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-            }
-
-            GameObject prefab = null;
-
-            foreach (var level in StartOfRound.Instance.levels)
-            {
-                if (prefab == null)
-                    foreach (var spawn in level.spawnableScrap)
-                    {
-                        if (spawn.spawnableItem.name.ToLower() == enteredText[1]) prefab = spawn.spawnableItem.spawnPrefab;
-                    }
-            }
-
-            if (prefab == null)
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
-
-
-            List<PlayerControllerB> list = new List<PlayerControllerB>();
-
-
-            foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
-            {
-                if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled && !playerRef.isGrabbingObjectAnimation)
-                {
-                    list.Add(player);
-                }
-            }
-
-            if (list.Count <= 0)
-            {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            }
-
-
-            try
-            {
-                PlayerControllerB player;
-
-                player = list[UnityEngine.Random.Range(0, list.Count)];
-
-                if (!TestMod.isHost)
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        msgid++;
-                        if (player.IsHost)
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_-1_{msgid}</size>");
-                        else
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgiver_{enteredText[1]}_{(int)player.playerClientId}_{msgid}</size>");
-                    });
-                    return new CrowdResponse(req.GetReqID(), status, message);
-                }
-
-                var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
-
-                if (player.inSpecialInteractAnimation || slot == -1)
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-                }
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
-                else
-                {
-                    TestMod.ActionQueue.Enqueue(() =>
-                    {
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                        gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                        msgid++;
-                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgive_{enteredText[1]}_{(int)player.playerClientId}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{msgid}</size>");
 
                     });
                 }
@@ -2195,7 +2017,7 @@ namespace ControlValley
             {
                 string item = enteredText[1];
 
-                if (Enum.TryParse(item, out ItemList itemNumber))
+                if (Enum.TryParse(item, out buyableItemList itemNumber))
                 {
                     give = (int)itemNumber;
                 }
@@ -2208,7 +2030,6 @@ namespace ControlValley
             {
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
-
 
             try
             {
@@ -2229,6 +2050,48 @@ namespace ControlValley
                         terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0);
 
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + terminal.buyableItemsList[give].name);
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+        public static CrowdResponse BuyCruiser(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            int give = 0;
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        terminal.BuyVehicleServerRpc(terminal.buyableVehicles.Count() - 1, terminal.groupCredits, false);
+
+                        HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a Company Cruiser");
                     });
                 }
 
