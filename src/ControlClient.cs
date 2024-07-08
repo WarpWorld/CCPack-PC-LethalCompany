@@ -236,6 +236,7 @@ namespace ControlValley
                 {"blob", CrowdDelegates.BlobSound},
                 {"highpitch", CrowdDelegates.HighPitch},
                 {"lowpitch", CrowdDelegates.LowPitch},
+                {"springchair", CrowdDelegates.SpringChair},
 
                 {"addhour", CrowdDelegates.AddHour},
                 {"remhour", CrowdDelegates.RemoveHour},

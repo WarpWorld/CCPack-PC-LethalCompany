@@ -2066,7 +2066,6 @@ namespace ControlValley
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
             string message = "";
-            int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
 
             string[] enteredText = req.code.Split('_');
@@ -3045,7 +3044,40 @@ namespace ControlValley
             return new CrowdResponse(req.GetReqID(), status, message);
         }
 
+        public static CrowdResponse SpringChair(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
 
+            try
+            {
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        VehicleController[] veh = UnityEngine.Object.FindObjectsByType<VehicleController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                        if(veh.Length == 0)
+                        {
+                            status = CrowdResponse.Status.STATUS_RETRY;
+                        }
+                        else
+                        {
+                            VehicleController obj = veh[0];
+                            obj.SpringDriverSeatClientRpc();
+                        }
+                    });
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
 
         public static CrowdResponse Ghost(ControlClient client, CrowdRequest req)
         {
