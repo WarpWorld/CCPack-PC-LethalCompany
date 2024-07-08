@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.8.0";
+        private const string modVersion = "1.1.9.0";
 
-        public static string tsVersion = "1.1.8";
+        public static string tsVersion = "1.1.9";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -64,7 +64,6 @@ namespace LethalCompanyTestMod
         public static StartOfRound currentStart;
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
-        public static List<Item> AllItems => Resources.FindObjectsOfTypeAll<Item>().Concat(UnityEngine.Object.FindObjectsByType<Item>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID)).ToList();
 
         public static bool noClipEnabled;
         public static bool enableGod;
@@ -119,6 +118,7 @@ namespace LethalCompanyTestMod
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
+
 
             noClipEnabled = false;
             enableGod = false;
@@ -1185,9 +1185,6 @@ namespace LethalCompanyTestMod
 
 
         }
-
-
-
     }
 
 }
