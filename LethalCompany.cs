@@ -164,9 +164,12 @@ namespace CrowdControl.Games.Packs.LethalCompany
 
                 new("Turn Breakers On", "breakerson"),
                 new("Turn Breakers Off", "breakersoff"),
-                new("Spring Vehicle Chair", "springchair"),
-
                 new("Kill Nearby Enemies", "killenemies"),
+                
+                new("Spring Vehicle Chair", "springchair") { Category = "Vehicle"},
+                new("Turn off Vehicle Engine", "turnoffengine") { Category = "Vehicle"},
+                new("Destroy Vehicle", "destroyvehicle") { Category = "Vehicle"},
+                new("Stock Company Cruiser", "buy_cruiser") { Category = "Vehicle"},
 
                 new("Stock Walkie-Talkie", "buy_walkie") { Category = "Items"},
                 new("Stock Flashlight", "buy_flashlight") { Category = "Items"},
@@ -182,7 +185,6 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Stock Radar Booster", "buy_radarbooster") { Category = "Items"},
                 new("Stock Spray Paint", "buy_spraypaint") { Category = "Items"},
                 new("Stock Weed Killer", "buy_weedkiller") { Category = "Items"},
-                new("Stock Company Cruiser", "buy_cruiser") { Category = "Items"},
 
                 new("Take Held Item", "takeitem") { Category = "Items"},
                 new("Drop Held Item", "dropitem") { Category = "Items"},

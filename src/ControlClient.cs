@@ -211,7 +211,10 @@ namespace ControlValley
                 {"buy_radarbooster",  CrowdDelegates.BuyItem},
                 {"buy_spraypaint",  CrowdDelegates.BuyItem},
                 {"buy_weedkiller",  CrowdDelegates.BuyItem},
+                
                 {"buy_cruiser", CrowdDelegates.BuyCruiser},
+                {"turnoffengine", CrowdDelegates.TurnOffEngine},
+                {"destroyvehicle", CrowdDelegates.DestroyVehicle},
 
                 {"charge", CrowdDelegates.ChargeItem},
                 {"uncharge", CrowdDelegates.UnchargeItem},
