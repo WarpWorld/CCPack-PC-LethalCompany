@@ -166,10 +166,11 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Turn Breakers Off", "breakersoff"),
                 new("Kill Nearby Enemies", "killenemies"),
                 
-                new("Spring Vehicle Chair", "springchair") { Category = "Vehicle"},
-                new("Turn off Vehicle Engine", "turnoffengine") { Category = "Vehicle"},
-                new("Destroy Vehicle", "destroyvehicle") { Category = "Vehicle"},
+                new("Spring Vehicle Chair", "spring_chair") { Category = "Vehicle"},
+                new("Turn off Vehicle Engine", "turn_off_engine") { Category = "Vehicle"},
+                new("Destroy Vehicle", "destroy_vehicle") { Category = "Vehicle"},
                 new("Stock Company Cruiser", "buy_cruiser") { Category = "Vehicle"},
+                new("Start Vehicle Engine", "start_vehicle") { Category = "Vehicle"},
 
                 new("Stock Walkie-Talkie", "buy_walkie") { Category = "Items"},
                 new("Stock Flashlight", "buy_flashlight") { Category = "Items"},
