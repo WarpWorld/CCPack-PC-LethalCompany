@@ -213,8 +213,10 @@ namespace ControlValley
                 {"buy_weedkiller",  CrowdDelegates.BuyItem},
                 
                 {"buy_cruiser", CrowdDelegates.BuyCruiser},
-                {"turnoffengine", CrowdDelegates.TurnOffEngine},
-                {"destroyvehicle", CrowdDelegates.DestroyVehicle},
+                {"turn_off_engine", CrowdDelegates.TurnOffEngine},
+                {"destroy_vehicle", CrowdDelegates.DestroyVehicle},
+                {"start_vehicle", CrowdDelegates.TurnOnVehicle},
+                {"spring_chair", CrowdDelegates.SpringChair},
 
                 {"charge", CrowdDelegates.ChargeItem},
                 {"uncharge", CrowdDelegates.UnchargeItem},
@@ -239,7 +241,6 @@ namespace ControlValley
                 {"blob", CrowdDelegates.BlobSound},
                 {"highpitch", CrowdDelegates.HighPitch},
                 {"lowpitch", CrowdDelegates.LowPitch},
-                {"springchair", CrowdDelegates.SpringChair},
 
                 {"addhour", CrowdDelegates.AddHour},
                 {"remhour", CrowdDelegates.RemoveHour},

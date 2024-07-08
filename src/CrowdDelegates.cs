@@ -1,4 +1,5 @@
 ﻿
+using ControlValley;
 using DunGen;
 using GameNetcodeStuff;
 using LethalCompanyTestMod;
@@ -2071,6 +2072,7 @@ namespace ControlValley
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
             string message = "";
+            int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
 
             string[] enteredText = req.code.Split('_');
@@ -2091,10 +2093,8 @@ namespace ControlValley
                 {
                     TestMod.ActionQueue.Enqueue(() =>
                     {
-
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        terminal.BuyVehicleServerRpc(terminal.buyableVehicles.Count() - 1, terminal.groupCredits, false);
-
+                        terminal.BuyVehicleServerRpc(0, terminal.groupCredits, false);
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a Company Cruiser");
                     });
                 }
@@ -2106,6 +2106,48 @@ namespace ControlValley
                 TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+
+        public static CrowdResponse TurnOnVehicle(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 3)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+            try
+            {
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+                        VehicleController[] veh = UnityEngine.Object.FindObjectsByType<VehicleController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                        if (veh.Length == 0)
+                        {
+                            status = CrowdResponse.Status.STATUS_RETRY;
+                        }
+                        else
+                        {
+                            VehicleController obj = veh[0];
+                            obj.StartIgnitionServerRpc(1);
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
             return new CrowdResponse(req.GetReqID(), status, message);
         }
 
@@ -2130,10 +2172,7 @@ namespace ControlValley
                         else
                         {
                             VehicleController obj = veh[0];
-                            if(obj.currentDriver == playerRef)
-                                obj.SpringDriverSeatClientRpc();
-                            else
-                                status = CrowdResponse.Status.STATUS_RETRY;
+                            obj.SpringDriverSeatClientRpc();
                         }
                     });
 
@@ -2167,10 +2206,7 @@ namespace ControlValley
                         else
                         {
                             VehicleController obj = veh[0];
-                            if (obj.currentDriver == playerRef)
-                                obj.RemoveKeyFromIgnition();
-                            else
-                                status = CrowdResponse.Status.STATUS_RETRY;
+                           obj.RemoveKeyFromIgnition();
                         }
                     });
                 }
