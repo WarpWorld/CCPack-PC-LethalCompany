@@ -159,31 +159,12 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Easter Egg", "cgive_egg") { Category = "Items"},
                 new("Give Crewmate Weed Killer", "cgive_weedkiller") { Category = "Items"},//v55 item
 
-                new("Give Crewmate Walkie-Talkie", "cgive_walkie") { Category = "Items"},
-                new("Give Crewmate Flashlight", "cgive_flashlight") { Category = "Items"},
-                new("Give Crewmate Shovel", "cgive_shovel") { Category = "Items"},
-                new("Give Crewmate Lockpicker", "cgive_lockpicker") { Category = "Items"},
-                new("Give Crewmate Pro Flashlight", "cgive_proflashlight") { Category = "Items"},
-                new("Give Crewmate Stun Grenade", "cgive_stungrennade") { Category = "Items"},
-                new("Give Crewmate Boom Box", "cgive_boombox") { Category = "Items"},
-                new("Give Crewmate Inhaler", "cgive_inhaler") { Category = "Items"},
-                new("Give Crewmate Stun Gun", "cgive_stungun") { Category = "Items"},
-                new("Give Crewmate Jet Pack", "cgive_jetpack") { Category = "Items"},
-                new("Give Crewmate Extension Ladder", "cgive_extensionladder") { Category = "Items"},
-                new("Give Crewmate Radar Booster", "cgive_radarbooster") { Category = "Items"},
-                new("Give Crewmate Tragedy Mask", "cgive_tragedymask") { Category = "Items"},
-                new("Give Crewmate Comedy Mask", "cgive_comedymask") { Category = "Items"},
-                new("Give Crewmate Spray Paint", "cgive_spraypaint"){Category= "Items"},
-                new("Give Crewmate Weed Killer", "cgive_weedkiller"){Category= "Items"},
-                new("Give Crewmate Key", "cgive_key"){Category= "Items"},
-                new("Give Crewmate Shotgun", "cgive_shotgun"){Category= "Items"},
-                new("Give Crewmate Shells", "cgive_shells"){Category= "Items"},
-
                 new("Charge Item Battery", "charge") { Category = "Items"},
                 new("Drain Item Battery", "uncharge") { Category = "Items"},
 
                 new("Turn Breakers On", "breakerson"),
                 new("Turn Breakers Off", "breakersoff"),
+                new("Spring Vehicle Chair", "springchair"),
 
                 new("Kill Nearby Enemies", "killenemies"),
 

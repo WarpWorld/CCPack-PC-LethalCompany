@@ -3,20 +3,27 @@
   "WorkspaceRootPath": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|c:\\users\\mrfaw\\documents\\github\\ccpack-pc-lethalcompany\\src\\controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowddelegates.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:controlclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowdrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:crowdrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\buffthread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:buffthread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\crowdresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -31,10 +38,6 @@
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:timedresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\buffthread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:buffthread.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\patches\\playercontrollerbpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4F6B961-E8AE-4E4B-950C-37644E42D4CA}|LethalCompany.csproj|solutionrelative:patches\\playercontrollerbpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -46,7 +49,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -54,7 +57,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 2,
+              "Title": "LethalCompany.cs",
+              "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs",
+              "RelativeDocumentMoniker": "..\\LethalCompany.cs",
+              "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\LethalCompany.cs",
+              "RelativeToolTip": "..\\LethalCompany.cs",
+              "ViewState": "AQIAAJYAAAAAAAAAAAAAAJ8AAABlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-08T01:16:07.087Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "GUILoader.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\GUILoader.cs",
               "RelativeDocumentMoniker": "GUILoader.cs",
@@ -66,7 +82,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "CrowdResponse.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdResponse.cs",
               "RelativeDocumentMoniker": "CrowdResponse.cs",
@@ -90,20 +106,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "Class1.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\Class1.cs",
               "RelativeDocumentMoniker": "Class1.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\Class1.cs",
               "RelativeToolTip": "Class1.cs",
-              "ViewState": "AQIAANsAAAAAAAAAAAAmwC0AAAAvAAAA",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAowC0AAAAvAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-28T23:24:51.01Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-06-28T23:24:51.01Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "BuffThread.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\BuffThread.cs",
               "RelativeDocumentMoniker": "BuffThread.cs",
@@ -115,15 +130,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "CrowdDelegates.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdDelegates.cs",
               "RelativeDocumentMoniker": "CrowdDelegates.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\CrowdDelegates.cs",
               "RelativeToolTip": "CrowdDelegates.cs",
-              "ViewState": "AQIAAA0AAAAAAAAAAAAmwOQHAAARAAAA",
+              "ViewState": "AQIAAAQIAAAAAAAAAAAuwBAIAAAiAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-28T23:16:51.16Z"
+              "WhenOpened": "2024-06-28T23:16:51.16Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -133,14 +149,14 @@
               "RelativeDocumentMoniker": "ControlClient.cs",
               "ToolTip": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\ControlClient.cs",
               "RelativeToolTip": "ControlClient.cs",
-              "ViewState": "AQIAALUAAAAAAAAAAAAQwNQAAAArAAAA",
+              "ViewState": "AQIAAMQAAAAAAAAAAAAQwNUAAAAzAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-06-28T23:16:20.116Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "TimedResponse.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\TimedResponse.cs",
               "RelativeDocumentMoniker": "TimedResponse.cs",
@@ -152,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "PlayerControllerBPatch.cs",
               "DocumentMoniker": "C:\\Users\\mrfaw\\Documents\\GitHub\\CCPack-PC-LethalCompany\\src\\Patches\\PlayerControllerBPatch.cs",
               "RelativeDocumentMoniker": "Patches\\PlayerControllerBPatch.cs",
