@@ -32,7 +32,23 @@ namespace ControlValley
 
         public static uint givedelay = 0;
 
-
+        public enum buyableItemList
+        {
+            walkie = 0,
+            flashlight = 1,
+            shovel = 2,
+            lockpicker = 3,
+            proflashlight = 4,
+            stungrenade = 5,
+            boombox = 6,
+            inhaler = 7,
+            stungun = 8,
+            jetpack = 9,
+            extensionladder = 10,
+            radarbooster = 11,
+            spraypaint = 12,
+            weedkiller = 13
+        }
         public enum ItemList
         {
             binoculars = 0,
@@ -1999,7 +2015,16 @@ namespace ControlValley
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
-                give = int.Parse(enteredText[1]);//revert to int id since Terminal RPC uses Terminal.BuyableItems
+                string item = enteredText[1];
+
+                if (Enum.TryParse(item, out buyableItemList itemNumber))
+                {
+                    give = (int)itemNumber;
+                }
+                else
+                {
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                }
             }
             else
             {
