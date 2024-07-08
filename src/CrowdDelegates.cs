@@ -1832,6 +1832,9 @@ namespace ControlValley
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
                         GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
                         gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        int Value = UnityEngine.Random.Range(0, 100);
+                        gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
+                        gameObject.GetComponent <GrabbableObject>().SetScrapValue(Value);
                         gameObject.GetComponent<NetworkObject>().Spawn(false);
 
                         var grab = gameObject.GetComponent<GrabbableObject>();
@@ -1964,7 +1967,10 @@ namespace ControlValley
                     {
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
                         GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
+                        gameObject.GetComponent<GrabbableObject>().fallTime = 0f; 
+                        int Value = UnityEngine.Random.Range(0, 100);
+                        gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
+                        gameObject.GetComponent<GrabbableObject>().SetScrapValue(Value);
                         gameObject.GetComponent<NetworkObject>().Spawn(false);
 
                         msgid++;
@@ -1993,22 +1999,12 @@ namespace ControlValley
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
-                string item = enteredText[1];
-
-                if (Enum.TryParse(item, out ItemList itemNumber))
-                {
-                    give = (int)itemNumber;
-                }
-                else
-                {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
-                }
+                give = int.Parse(enteredText[1]);//revert to int id since Terminal RPC uses Terminal.BuyableItems
             }
             else
             {
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
-
 
             try
             {
@@ -2029,6 +2025,48 @@ namespace ControlValley
                         terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0);
 
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + terminal.buyableItemsList[give].name);
+                    });
+                }
+
+            }
+            catch (Exception e)
+            {
+                status = CrowdResponse.Status.STATUS_RETRY;
+                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+            }
+
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+        public static CrowdResponse BuyCruiser(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            int give = 0;
+            var playerRef = StartOfRound.Instance.localPlayerController;
+
+            string[] enteredText = req.code.Split('_');
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+
+            try
+            {
+
+
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                else
+                {
+                    TestMod.ActionQueue.Enqueue(() =>
+                    {
+
+                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+                        terminal.BuyVehicleServerRpc(terminal.buyableVehicles.Count() - 1, terminal.groupCredits, false);
+
+                        HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a Company Cruiser");
                     });
                 }
 

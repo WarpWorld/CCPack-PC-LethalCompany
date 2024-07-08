@@ -119,6 +119,7 @@ namespace LethalCompanyTestMod
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
 
+
             noClipEnabled = false;
             enableGod = false;
             infSprint = false;
