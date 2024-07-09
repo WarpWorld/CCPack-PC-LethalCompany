@@ -1,3 +1,10 @@
+**1.1.9** :
+
+```
+Fixes for some items ids
+Big thanks, again, to @TheUnknownCod3r
+```
+
 **1.1.8** :
 
 ```
@@ -6,7 +13,6 @@ Standardize item ids
 Add Spawn Radmech
 Big thanks to @TheUnknownCod3r
 ```
-
 
 **1.1.7** :
 
