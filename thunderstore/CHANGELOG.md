@@ -1,3 +1,14 @@
+<<<<<<< Updated upstream
+=======
+**1.1.10** :
+
+```
+Fix All Item ID's across the board
+Vehicle Options (Give Cruiser, Spring Seat, Turn on Engine, Turn off Engine, Destroy Vehicle)
+Thanks again to @TheUnknownCod3r : https://www.github.com/TheUnknownCod3r/
+```
+
+>>>>>>> Stashed changes
 **1.1.9** :
 
 ```
