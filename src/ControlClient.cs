@@ -163,26 +163,39 @@ namespace ControlValley
                 { "give_knife", CrowdDelegates.GiveItem},//Kitchen Knife
                 { "give_egg", CrowdDelegates.GiveItem},//Easter Egg
                 { "give_weedkiller", CrowdDelegates.GiveItem},//Weed Killer
-
-                {"cgive_walkie",  CrowdDelegates.GiveCrewItem},
-                {"cgive_flashlight",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shovel",  CrowdDelegates.GiveCrewItem},
-                {"cgive_lockpicker",  CrowdDelegates.GiveCrewItem},
-                {"cgive_proflashlight",  CrowdDelegates.GiveCrewItem},
-                {"cgive_stungrennade",  CrowdDelegates.GiveCrewItem},
-                {"cgive_boombox",  CrowdDelegates.GiveCrewItem},
-                {"cgive_inhaler",  CrowdDelegates.GiveCrewItem},
-                {"cgive_stungun",  CrowdDelegates.GiveCrewItem},
-                {"cgive_jetpack",  CrowdDelegates.GiveCrewItem},
-                {"cgive_extensionladder",  CrowdDelegates.GiveCrewItem},
-                {"cgive_radarbooster",  CrowdDelegates.GiveCrewItem},
-                {"cgive_tragedymask",  CrowdDelegates.GiveCrewItem},
-                {"cgive_comedymask",  CrowdDelegates.GiveCrewItem},
-                {"cgive_spraypaint",  CrowdDelegates.GiveCrewItem},
-                {"cgive_weedkiller",  CrowdDelegates.GiveCrewItem},
-                {"cgive_key",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shotgun",  CrowdDelegates.GiveCrewItem},
-                {"cgive_shells",  CrowdDelegates.GiveCrewItem},
+                
+                { "cgive_binoculars", CrowdDelegates.GiveCrewItem},//binoculars
+                { "cgive_boombox", CrowdDelegates.GiveCrewItem},//boombox
+                { "cgive_flashlight", CrowdDelegates.GiveCrewItem},//flashlight
+                { "cgive_jetpack", CrowdDelegates.GiveCrewItem},//jetpack
+                { "cgive_key", CrowdDelegates.GiveCrewItem},//Key
+                { "cgive_lockpicker", CrowdDelegates.GiveCrewItem},//Lockpicker
+                { "cgive_apparatus", CrowdDelegates.GiveCrewItem},//Apparatus
+                { "cgive_mapper", CrowdDelegates.GiveCrewItem},//Mapper
+                { "cgive_proflashlight", CrowdDelegates.GiveCrewItem},//Pro-Flashlight
+                { "cgive_shovel", CrowdDelegates.GiveCrewItem},//Shovel
+                { "cgive_stungrenade", CrowdDelegates.GiveCrewItem},//Stun Grenade
+                { "cgive_extensionladder", CrowdDelegates.GiveCrewItem},//Extension Ladder
+                { "cgive_inhaler", CrowdDelegates.GiveCrewItem},//TZP Inhalant
+                { "cgive_walkie", CrowdDelegates.GiveCrewItem},//Walkie Talkie
+                { "cgive_zapgun", CrowdDelegates.GiveCrewItem},//Zap Gun
+                { "cgive_magic7ball", CrowdDelegates.GiveCrewItem},//Magic 7 Ball
+                { "cgive_airhorn", CrowdDelegates.GiveCrewItem},//Airhorn
+                { "cgive_bottles", CrowdDelegates.GiveCrewItem},//Bottles
+                { "cgive_clownhorn", CrowdDelegates.GiveCrewItem},//Clown Horn
+                { "cgive_goldbar", CrowdDelegates.GiveCrewItem},//Gold Bar
+                { "cgive_stopsign", CrowdDelegates.GiveCrewItem},//Stop Sign
+                { "cgive_radarbooster", CrowdDelegates.GiveCrewItem},//Radar Booster
+                { "cgive_yieldsign", CrowdDelegates.GiveCrewItem},//Yield Sign
+                { "cgive_shotgun", CrowdDelegates.GiveCrewItem},//Shotgun
+                { "cgive_gunAmmo", CrowdDelegates.GiveCrewItem},//Ammo
+                { "cgive_spraypaint", CrowdDelegates.GiveCrewItem},//Spraypaint
+                { "cgive_present", CrowdDelegates.GiveCrewItem},//Gift Box
+                { "cgive_tragedy", CrowdDelegates.GiveCrewItem},//Tragedy Mask
+                { "cgive_comedy", CrowdDelegates.GiveCrewItem},//Comedy Mask
+                { "cgive_knife", CrowdDelegates.GiveCrewItem},//Kitchen Knife
+                { "cgive_egg", CrowdDelegates.GiveCrewItem},//Easter Egg
+                { "cgive_weedkiller", CrowdDelegates.GiveCrewItem},//Weed Killer
 
                 {"weather_-1", CrowdDelegates.Weather},
                 {"weather_1", CrowdDelegates.Weather},
