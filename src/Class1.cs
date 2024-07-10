@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.9.0";
+        private const string modVersion = "1.1.10.0";
 
-        public static string tsVersion = "1.1.9";
+        public static string tsVersion = "1.1.10";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -667,7 +667,7 @@ namespace LethalCompanyTestMod
 
 
                             Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(terminal.buyableItemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);//Fix Item Giving for Non Host, Oops
                             gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
                             gameObject.GetComponent<NetworkObject>().Spawn(false);
 
@@ -676,66 +676,6 @@ namespace LethalCompanyTestMod
 
                             break;
                         }
-
-                    case "mgiver":
-                        {
-                            if (!isHost) return true;
-
-                            CrowdDelegates.givedelay = 20;
-
-                            string give = values[1];
-                            int id = int.Parse(values[2]);
-                            uint mid = uint.Parse(values[3]);
-
-                            if (mid == msgid2) return true;
-
-                            msgid2 = mid;
-
-                            PlayerControllerB player = null;
-
-                            if (id != -1)
-                            {
-                                foreach (var playero in StartOfRound.Instance.allPlayerScripts)
-                                {
-                                    if (playero != null && playero.isActiveAndEnabled && !playero.isPlayerDead && (int)playero.playerClientId == id && playero.isPlayerControlled)
-                                        player = playero;
-                                }
-                                if (player == StartOfRound.Instance.localPlayerController) id = -1;
-                            }
-                            else player = StartOfRound.Instance.localPlayerController;
-
-                            if (player == null)
-                            {
-                                player = StartOfRound.Instance.localPlayerController;
-                                id = -1;
-                            }
-
-
-                            GameObject prefab = null;
-
-                            foreach (var level in StartOfRound.Instance.levels)
-                            {
-                                if (prefab == null)
-                                    foreach (var spawn in level.spawnableScrap)
-                                    {
-                                        if (spawn.spawnableItem.name.ToLower() == give) prefab = spawn.spawnableItem.spawnPrefab;
-                                    }
-                            }
-
-                            if (prefab == null)
-                                return true;
-
-                            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
-                            gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
-                            gameObject.GetComponent<NetworkObject>().Spawn(false);
-
-                            CrowdDelegates.msgid++;
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mgive_{give}_{id}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{CrowdDelegates.msgid}</size>");
-
-                            break;
-                        }
-
                     case "mimic":
                         {
                             ulong gid = ulong.Parse(values[1]);
