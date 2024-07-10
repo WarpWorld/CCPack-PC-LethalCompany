@@ -159,33 +159,18 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Easter Egg", "cgive_egg") { Category = "Items"},
                 new("Give Crewmate Weed Killer", "cgive_weedkiller") { Category = "Items"},//v55 item
 
-                new("Give Crewmate Walkie-Talkie", "cgive_walkie") { Category = "Items"},
-                new("Give Crewmate Flashlight", "cgive_flashlight") { Category = "Items"},
-                new("Give Crewmate Shovel", "cgive_shovel") { Category = "Items"},
-                new("Give Crewmate Lockpicker", "cgive_lockpicker") { Category = "Items"},
-                new("Give Crewmate Pro Flashlight", "cgive_proflashlight") { Category = "Items"},
-                new("Give Crewmate Stun Grenade", "cgive_stungrennade") { Category = "Items"},
-                new("Give Crewmate Boom Box", "cgive_boombox") { Category = "Items"},
-                new("Give Crewmate Inhaler", "cgive_inhaler") { Category = "Items"},
-                new("Give Crewmate Stun Gun", "cgive_stungun") { Category = "Items"},
-                new("Give Crewmate Jet Pack", "cgive_jetpack") { Category = "Items"},
-                new("Give Crewmate Extension Ladder", "cgive_extensionladder") { Category = "Items"},
-                new("Give Crewmate Radar Booster", "cgive_radarbooster") { Category = "Items"},
-                new("Give Crewmate Tragedy Mask", "cgive_tragedymask") { Category = "Items"},
-                new("Give Crewmate Comedy Mask", "cgive_comedymask") { Category = "Items"},
-                new("Give Crewmate Spray Paint", "cgive_spraypaint"){Category= "Items"},
-                new("Give Crewmate Weed Killer", "cgive_weedkiller"){Category= "Items"},
-                new("Give Crewmate Key", "cgive_key"){Category= "Items"},
-                new("Give Crewmate Shotgun", "cgive_shotgun"){Category= "Items"},
-                new("Give Crewmate Shells", "cgive_shells"){Category= "Items"},
-
                 new("Charge Item Battery", "charge") { Category = "Items"},
                 new("Drain Item Battery", "uncharge") { Category = "Items"},
 
                 new("Turn Breakers On", "breakerson"),
                 new("Turn Breakers Off", "breakersoff"),
-
                 new("Kill Nearby Enemies", "killenemies"),
+                
+                new("Spring Vehicle Chair", "spring_chair") { Category = "Vehicle"},
+                new("Turn off Vehicle Engine", "turn_off_engine") { Category = "Vehicle"},
+                new("Destroy Vehicle", "destroy_vehicle") { Category = "Vehicle"},
+                new("Stock Company Cruiser", "buy_cruiser") { Category = "Vehicle"},
+                new("Start Vehicle Engine", "start_vehicle") { Category = "Vehicle"},
 
                 new("Stock Walkie-Talkie", "buy_walkie") { Category = "Items"},
                 new("Stock Flashlight", "buy_flashlight") { Category = "Items"},
@@ -201,7 +186,6 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Stock Radar Booster", "buy_radarbooster") { Category = "Items"},
                 new("Stock Spray Paint", "buy_spraypaint") { Category = "Items"},
                 new("Stock Weed Killer", "buy_weedkiller") { Category = "Items"},
-                new("Stock Company Cruiser", "buy_cruiser") { Category = "Items"},
 
                 new("Take Held Item", "takeitem") { Category = "Items"},
                 new("Drop Held Item", "dropitem") { Category = "Items"},

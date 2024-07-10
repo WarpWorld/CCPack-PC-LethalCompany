@@ -1,4 +1,5 @@
 ﻿
+using ControlValley;
 using DunGen;
 using GameNetcodeStuff;
 using LethalCompanyTestMod;
@@ -86,6 +87,10 @@ namespace ControlValley
             weedkiller = 70
         }
 
+        public enum buyableVehiclesList//Future Planning
+        {
+            Cruiser = 0
+        }
 
         #region Health
         public static CrowdResponse HealFull(ControlClient client, CrowdRequest req)
@@ -2062,6 +2067,11 @@ namespace ControlValley
 
             return new CrowdResponse(req.GetReqID(), status, message);
         }
+
+        #endregion
+
+        #region VehicleStuff
+
         public static CrowdResponse BuyCruiser(ControlClient client, CrowdRequest req)
         {
             CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
@@ -2069,6 +2079,9 @@ namespace ControlValley
             int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
 
+
+            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            var veh = terminal.buyableVehicles[0];
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
             {
@@ -2087,11 +2100,8 @@ namespace ControlValley
                 {
                     TestMod.ActionQueue.Enqueue(() =>
                     {
-
-                        Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        terminal.BuyVehicleServerRpc(terminal.buyableVehicles.Count() - 1, terminal.groupCredits, false);
-
-                        HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a Company Cruiser");
+                        terminal.BuyVehicleServerRpc(0, terminal.groupCredits, false);
+                        HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + veh.vehicleDisplayName);
                     });
                 }
 
@@ -2102,6 +2112,221 @@ namespace ControlValley
                 TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+
+        public static CrowdResponse TurnOnVehicle(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            string[] enteredText = req.code.Split('_');
+            bool found = false;
+            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+            if (!found)
+            {
+                try
+                {
+                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    else found = true;
+                }
+                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+            }
+            if (found)
+            {
+                try
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            if (Veh1)
+                            {
+                                Veh1.carHP = 12;
+                                Veh1.ignitionStarted = true;
+                                Veh1.StartIgnitionServerRpc(1);
+                            }
+                            else
+                            {
+
+                            }
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    status = CrowdResponse.Status.STATUS_RETRY;
+                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                }
+            }
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse SpringChair(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            bool found = false;
+            string[] enteredText = req.code.Split('_');
+            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+            if (!found)
+            {
+                try
+                {
+                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    else found = true;
+                }
+                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+            }
+            if (found)
+            {
+                try
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            if (Veh1)
+                            {
+                                Veh1.SpringDriverSeatServerRpc();
+                            }
+                            else
+                            {
+
+                            }
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    status = CrowdResponse.Status.STATUS_RETRY;
+                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                }
+            }
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse TurnOffEngine(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            bool found = false;
+            string[] enteredText = req.code.Split('_');
+            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            if (enteredText.Length == 3)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+            if (!found)
+            {
+                try
+                {
+                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    else found = true;
+                }
+                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+            }
+            if (found)
+            {
+                try
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            if (Veh1)
+                            {
+                                Veh1.RemoveKeyFromIgnition();
+                            }
+                            else
+                            {
+
+                            }
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    status = CrowdResponse.Status.STATUS_RETRY;
+                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                }
+            }
+            return new CrowdResponse(req.GetReqID(), status, message);
+        }
+
+        public static CrowdResponse DestroyVehicle(ControlClient client, CrowdRequest req)
+        {
+            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            string message = "";
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            bool found = false;
+            string[] enteredText = req.code.Split('_');
+            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            if (enteredText.Length == 2)
+            {
+            }
+            else
+            {
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+            }
+            if (!found)
+            {
+                try
+                {
+                    if (Veh1.currentDriver == playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    else found = true;
+                }
+                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+            }
+            if (found)
+            {
+                try
+                {
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    else
+                    {
+                        TestMod.ActionQueue.Enqueue(() =>
+                        {
+                            if (Veh1)
+                            {
+                                Veh1.DestroyCarServerRpc(1);
+                            }
+                            else
+                            {
+
+                            }
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    status = CrowdResponse.Status.STATUS_RETRY;
+                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                }
+            }
             return new CrowdResponse(req.GetReqID(), status, message);
         }
 
@@ -3044,8 +3269,6 @@ namespace ControlValley
 
             return new CrowdResponse(req.GetReqID(), status, message);
         }
-
-
 
         public static CrowdResponse Ghost(ControlClient client, CrowdRequest req)
         {
