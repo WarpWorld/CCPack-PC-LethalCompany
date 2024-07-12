@@ -398,7 +398,6 @@ namespace LethalCompanyTestMod
 
                             break;
                         }
-
                     case "cspawn":
                         {
                             if (!isHost) return true;

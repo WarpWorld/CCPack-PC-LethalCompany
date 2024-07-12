@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Xml.Linq;
 using Unity.Netcode;
@@ -1252,7 +1253,7 @@ namespace ControlValley
 
         #region Enemies
 
-        public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
+    public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is dead");
@@ -1288,7 +1289,6 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
 
             }
-
             if (enteredText[1] == "landmine")
             {
                 if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
@@ -1385,7 +1385,6 @@ namespace ControlValley
                         UnityEngine.Object.Destroy(gameObject);
                         return;
                     }
-
                     if (enteredText[1] == "landmine")
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_landmine_{(int)playerRef.playerClientId}</size>");
@@ -1826,8 +1825,10 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
 
-
-
+                if (StartOfRound.Instance.allItemsList.itemsList[2].itemName.ToLower() != "box" && give >= 2) //Lethal Level Loader Patch
+                {
+                    give--;
+                }
                 if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -1867,9 +1868,8 @@ namespace ControlValley
                         if (networkObject == null || !networkObject.IsSpawned)
                         {
                             return;
-                        }
+                        }   
                         grab.InteractItem();
-
 
                         playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
                         playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
@@ -2052,7 +2052,7 @@ namespace ControlValley
 
 
 
-                        terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0);
+                        terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0); // a = terminal.buyableItemsList[give].itemId
 
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + terminal.buyableItemsList[give].name);
                     });
@@ -3386,9 +3386,5 @@ namespace ControlValley
 
         }
 
-        protected EnemyAI GetEnemyAIFromEnemyGameObject(GameObject enemyObj)
-        {
-            return enemyObj.GetComponentInChildren<EnemyAI>();
-        }
     }
 }
