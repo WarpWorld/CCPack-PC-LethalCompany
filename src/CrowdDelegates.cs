@@ -34,7 +34,7 @@ namespace ControlValley
 
         public static uint givedelay = 0;
 
-        public enum buyableItemList
+        public enum BuyableItemList
         {
             walkie = 0,
             flashlight = 1,
@@ -86,7 +86,7 @@ namespace ControlValley
             knife = 68,
             egg = 69,
             weedkiller = 70
-        }
+        } // no longer needed.
 
         public enum buyableVehiclesList//Future Planning
         {
@@ -1805,12 +1805,12 @@ namespace ControlValley
             if (enteredText.Length == 2)
             {
                 string item = enteredText[1];
-
-                if (Enum.TryParse(item, out ItemList itemNumber))
+                try
                 {
-                    give = (int)itemNumber;
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));
+                    give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
-                else
+                catch (IndexOutOfRangeException)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
                 }
@@ -1825,10 +1825,10 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
 
-                if (StartOfRound.Instance.allItemsList.itemsList[2].itemName.ToLower() != "box" && give >= 2) //Lethal Level Loader Patch
-                {
-                    give--;
-                }
+                //if (StartOfRound.Instance.allItemsList.itemsList[2].itemName.ToLower() != "box" && give >= 2) //Lethal Level Loader Patch
+                //{
+                   // give--;
+               // }
                 if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -1926,12 +1926,12 @@ namespace ControlValley
             if (enteredText.Length == 2)
             {
                 string item = enteredText[1];
-
-                if (Enum.TryParse(item, out ItemList itemNumber))
+                try
                 {
-                    give = (int)itemNumber;
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));
+                    give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
-                else
+                catch (IndexOutOfRangeException)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
                 }
@@ -2022,7 +2022,7 @@ namespace ControlValley
             {
                 string item = enteredText[1];
 
-                if (Enum.TryParse(item, out buyableItemList itemNumber))
+                if (Enum.TryParse(item, out BuyableItemList itemNumber))
                 {
                     give = (int)itemNumber;
                 }
