@@ -159,6 +159,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Easter Egg", "cgive_egg") { Category = "Items"},
                 new("Give Crewmate Weed Killer", "cgive_weedkiller") { Category = "Items"},//v55 item
 
+
                 new("Charge Item Battery", "charge") { Category = "Items"},
                 new("Drain Item Battery", "uncharge") { Category = "Items"},
 
