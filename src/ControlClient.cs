@@ -137,18 +137,18 @@ namespace ControlValley
                 { "give_jetpack", CrowdDelegates.GiveItem},//jetpack
                 { "give_key", CrowdDelegates.GiveItem},//Key
                 { "give_lockpicker", CrowdDelegates.GiveItem},//Lockpicker
-                { "give_apparatus", CrowdDelegates.GiveItem},//Apparatus
-                { "give_mapper", CrowdDelegates.GiveItem},//Mapper
+                { "give_lungapparatus", CrowdDelegates.GiveItem},//Apparatus
+                { "give_mapdevice", CrowdDelegates.GiveItem},//Mapper
                 { "give_proflashlight", CrowdDelegates.GiveItem},//Pro-Flashlight
                 { "give_shovel", CrowdDelegates.GiveItem},//Shovel
                 { "give_stungrenade", CrowdDelegates.GiveItem},//Stun Grenade
                 { "give_extensionladder", CrowdDelegates.GiveItem},//Extension Ladder
-                { "give_inhaler", CrowdDelegates.GiveItem},//TZP Inhalant
-                { "give_walkie", CrowdDelegates.GiveItem},//Walkie Talkie
+                { "give_tzpinhaler", CrowdDelegates.GiveItem},//TZP Inhalant
+                { "give_walkietalkie", CrowdDelegates.GiveItem},//Walkie Talkie
                 { "give_zapgun", CrowdDelegates.GiveItem},//Zap Gun
-                { "give_magic7ball", CrowdDelegates.GiveItem},//Magic 7 Ball
+                { "give_7ball", CrowdDelegates.GiveItem},//Magic 7 Ball
                 { "give_airhorn", CrowdDelegates.GiveItem},//Airhorn
-                { "give_bottles", CrowdDelegates.GiveItem},//Bottles
+                { "give_bottlebin", CrowdDelegates.GiveItem},//Bottles
                 { "give_clownhorn", CrowdDelegates.GiveItem},//Clown Horn
                 { "give_goldbar", CrowdDelegates.GiveItem},//Gold Bar
                 { "give_stopsign", CrowdDelegates.GiveItem},//Stop Sign
@@ -157,11 +157,11 @@ namespace ControlValley
                 { "give_shotgun", CrowdDelegates.GiveItem},//Shotgun
                 { "give_gunAmmo", CrowdDelegates.GiveItem},//Ammo
                 { "give_spraypaint", CrowdDelegates.GiveItem},//Spraypaint
-                { "give_present", CrowdDelegates.GiveItem},//Gift Box
-                { "give_tragedy", CrowdDelegates.GiveItem},//Tragedy Mask
-                { "give_comedy", CrowdDelegates.GiveItem},//Comedy Mask
+                { "give_giftbox", CrowdDelegates.GiveItem},//Gift Box
+                { "give_tragedymask", CrowdDelegates.GiveItem},//Tragedy Mask
+                { "give_comedymask", CrowdDelegates.GiveItem},//Comedy Mask
                 { "give_knife", CrowdDelegates.GiveItem},//Kitchen Knife
-                { "give_egg", CrowdDelegates.GiveItem},//Easter Egg
+                { "give_easteregg", CrowdDelegates.GiveItem},//Easter Egg
                 { "give_weedkiller", CrowdDelegates.GiveItem},//Weed Killer
                 
                 { "cgive_binoculars", CrowdDelegates.GiveCrewItem},//binoculars
@@ -170,18 +170,18 @@ namespace ControlValley
                 { "cgive_jetpack", CrowdDelegates.GiveCrewItem},//jetpack
                 { "cgive_key", CrowdDelegates.GiveCrewItem},//Key
                 { "cgive_lockpicker", CrowdDelegates.GiveCrewItem},//Lockpicker
-                { "cgive_apparatus", CrowdDelegates.GiveCrewItem},//Apparatus
-                { "cgive_mapper", CrowdDelegates.GiveCrewItem},//Mapper
+                { "cgive_lungapparatus", CrowdDelegates.GiveCrewItem},//Apparatus
+                { "cgive_mapdevice", CrowdDelegates.GiveCrewItem},//Mapper
                 { "cgive_proflashlight", CrowdDelegates.GiveCrewItem},//Pro-Flashlight
                 { "cgive_shovel", CrowdDelegates.GiveCrewItem},//Shovel
                 { "cgive_stungrenade", CrowdDelegates.GiveCrewItem},//Stun Grenade
                 { "cgive_extensionladder", CrowdDelegates.GiveCrewItem},//Extension Ladder
-                { "cgive_inhaler", CrowdDelegates.GiveCrewItem},//TZP Inhalant
-                { "cgive_walkie", CrowdDelegates.GiveCrewItem},//Walkie Talkie
+                { "cgive_tzpinhaler", CrowdDelegates.GiveCrewItem},//TZP Inhalant
+                { "cgive_walkietalkie", CrowdDelegates.GiveCrewItem},//Walkie Talkie
                 { "cgive_zapgun", CrowdDelegates.GiveCrewItem},//Zap Gun
-                { "cgive_magic7ball", CrowdDelegates.GiveCrewItem},//Magic 7 Ball
+                { "cgive_7ball", CrowdDelegates.GiveCrewItem},//Magic 7 Ball
                 { "cgive_airhorn", CrowdDelegates.GiveCrewItem},//Airhorn
-                { "cgive_bottles", CrowdDelegates.GiveCrewItem},//Bottles
+                { "cgive_bottlebin", CrowdDelegates.GiveCrewItem},//Bottles
                 { "cgive_clownhorn", CrowdDelegates.GiveCrewItem},//Clown Horn
                 { "cgive_goldbar", CrowdDelegates.GiveCrewItem},//Gold Bar
                 { "cgive_stopsign", CrowdDelegates.GiveCrewItem},//Stop Sign
@@ -190,11 +190,11 @@ namespace ControlValley
                 { "cgive_shotgun", CrowdDelegates.GiveCrewItem},//Shotgun
                 { "cgive_gunAmmo", CrowdDelegates.GiveCrewItem},//Ammo
                 { "cgive_spraypaint", CrowdDelegates.GiveCrewItem},//Spraypaint
-                { "cgive_present", CrowdDelegates.GiveCrewItem},//Gift Box
-                { "cgive_tragedy", CrowdDelegates.GiveCrewItem},//Tragedy Mask
-                { "cgive_comedy", CrowdDelegates.GiveCrewItem},//Comedy Mask
+                { "cgive_giftbox", CrowdDelegates.GiveCrewItem},//Gift Box
+                { "cgive_tragedymask", CrowdDelegates.GiveCrewItem},//Tragedy Mask
+                { "cgive_comedymask", CrowdDelegates.GiveCrewItem},//Comedy Mask
                 { "cgive_knife", CrowdDelegates.GiveCrewItem},//Kitchen Knife
-                { "cgive_egg", CrowdDelegates.GiveCrewItem},//Easter Egg
+                { "cgive_easteregg", CrowdDelegates.GiveCrewItem},//Easter Egg
                 { "cgive_weedkiller", CrowdDelegates.GiveCrewItem},//Weed Killer
 
                 {"weather_-1", CrowdDelegates.Weather},

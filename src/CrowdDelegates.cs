@@ -51,43 +51,6 @@ namespace ControlValley
             spraypaint = 12,
             weedkiller = 13
         }
-        public enum ItemList
-        {
-            binoculars = 0,
-            boombox = 1,
-            box = 2,
-            flashlight = 3,
-            jetpack = 4,
-            key = 5,
-            lockpicker = 6,
-            apparatus = 7,
-            mapper = 8,
-            proflashlight = 9,
-            shovel = 10,
-            stungrenade = 11,
-            extensionladder = 12,
-            inhaler = 13,
-            walkie = 14,
-            zapgun = 15,
-            magic7ball = 16,
-            airhorn = 17,
-            bottles = 20,
-            clownhorn = 25,
-            goldbar = 36,
-            stopsign = 52,
-            radarbooster = 57,
-            yieldsign = 58,
-            shotgun = 59,
-            gunAmmo = 60,
-            spraypaint = 61,
-            present = 63,
-            tragedy = 65,
-            comedy = 66,
-            knife = 68,
-            egg = 69,
-            weedkiller = 70
-        } // no longer needed.
-
         public enum buyableVehiclesList//Future Planning
         {
             Cruiser = 0
@@ -1807,7 +1770,7 @@ namespace ControlValley
                 string item = enteredText[1];
                 try
                 {
-                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));//Lethal Level Loader patch. Search for item name instead, since it removes items from the list.
                     give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
                 catch (IndexOutOfRangeException)
@@ -1928,7 +1891,7 @@ namespace ControlValley
                 string item = enteredText[1];
                 try
                 {
-                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));//Lethal Level Loader patch. Search for item name instead, since it removes items from the list.
                     give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
                 catch (IndexOutOfRangeException)
