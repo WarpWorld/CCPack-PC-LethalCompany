@@ -104,7 +104,7 @@ namespace ControlValley
                     {
                         if (TestMod.isHost)
                         {
-                            playerRef.KillPlayer(playerRef.transform.up * 100.0f);
+                            playerRef.KillPlayer(playerRef.transform.up * 100.0f, true, CauseOfDeath.Inertia, 0);
                         }
                         else
                         {
