@@ -398,7 +398,6 @@ namespace LethalCompanyTestMod
 
                             break;
                         }
-
                     case "cspawn":
                         {
                             if (!isHost) return true;
@@ -849,7 +848,7 @@ namespace LethalCompanyTestMod
                             foreach (var player in StartOfRound.Instance.allPlayerScripts)
                             {
                                 if (player != null && player.isActiveAndEnabled && !player.isPlayerDead && (int)player.playerClientId == cur && player.isPlayerControlled)
-                                    player.KillPlayer(player.transform.up * 100.0f, true, CauseOfDeath.Gravity, 2);
+                                    player.KillPlayer(player.transform.up * 100.0f, true, CauseOfDeath.Inertia, 0);
                             }
                         }
                         break;

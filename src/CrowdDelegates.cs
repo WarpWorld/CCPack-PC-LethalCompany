@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Xml.Linq;
 using Unity.Netcode;
@@ -33,7 +34,7 @@ namespace ControlValley
 
         public static uint givedelay = 0;
 
-        public enum buyableItemList
+        public enum BuyableItemList
         {
             walkie = 0,
             flashlight = 1,
@@ -50,43 +51,6 @@ namespace ControlValley
             spraypaint = 12,
             weedkiller = 13
         }
-        public enum ItemList
-        {
-            binoculars = 0,
-            boombox = 1,
-            box = 2,
-            flashlight = 3,
-            jetpack = 4,
-            key = 5,
-            lockpicker = 6,
-            apparatus = 7,
-            mapper = 8,
-            proflashlight = 9,
-            shovel = 10,
-            stungrenade = 11,
-            extensionladder = 12,
-            inhaler = 13,
-            walkie = 14,
-            zapgun = 15,
-            magic7ball = 16,
-            airhorn = 17,
-            bottles = 20,
-            clownhorn = 25,
-            goldbar = 36,
-            stopsign = 52,
-            radarbooster = 57,
-            yieldsign = 58,
-            shotgun = 59,
-            gunAmmo = 60,
-            spraypaint = 61,
-            present = 63,
-            tragedy = 65,
-            comedy = 66,
-            knife = 68,
-            egg = 69,
-            weedkiller = 70
-        }
-
         public enum buyableVehiclesList//Future Planning
         {
             Cruiser = 0
@@ -140,7 +104,7 @@ namespace ControlValley
                     {
                         if (TestMod.isHost)
                         {
-                            playerRef.KillPlayer(playerRef.transform.up * 100.0f);
+                            playerRef.KillPlayer(playerRef.transform.up * 100.0f, true, CauseOfDeath.Inertia, 0);
                         }
                         else
                         {
@@ -1252,7 +1216,7 @@ namespace ControlValley
 
         #region Enemies
 
-        public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
+    public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is dead");
@@ -1288,7 +1252,6 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
 
             }
-
             if (enteredText[1] == "landmine")
             {
                 if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
@@ -1385,7 +1348,6 @@ namespace ControlValley
                         UnityEngine.Object.Destroy(gameObject);
                         return;
                     }
-
                     if (enteredText[1] == "landmine")
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_landmine_{(int)playerRef.playerClientId}</size>");
@@ -1806,12 +1768,12 @@ namespace ControlValley
             if (enteredText.Length == 2)
             {
                 string item = enteredText[1];
-
-                if (Enum.TryParse(item, out ItemList itemNumber))
+                try
                 {
-                    give = (int)itemNumber;
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));//Lethal Level Loader patch. Search for item name instead, since it removes items from the list.
+                    give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
-                else
+                catch (IndexOutOfRangeException)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
                 }
@@ -1826,8 +1788,10 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var slot = (int)callAndReturnFunc(playerRef, "FirstEmptyItemSlot", null);
 
-
-
+                //if (StartOfRound.Instance.allItemsList.itemsList[2].itemName.ToLower() != "box" && give >= 2) //Lethal Level Loader Patch
+                //{
+                   // give--;
+               // }
                 if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -1867,9 +1831,8 @@ namespace ControlValley
                         if (networkObject == null || !networkObject.IsSpawned)
                         {
                             return;
-                        }
+                        }   
                         grab.InteractItem();
-
 
                         playerRef.playerBodyAnimator.SetBool("GrabInvalidated", false);
                         playerRef.playerBodyAnimator.SetBool("GrabValidated", false);
@@ -1926,12 +1889,12 @@ namespace ControlValley
             if (enteredText.Length == 2)
             {
                 string item = enteredText[1];
-
-                if (Enum.TryParse(item, out ItemList itemNumber))
+                try
                 {
-                    give = (int)itemNumber;
+                    Item Requested = StartOfRound.Instance.allItemsList.itemsList.Find(z => z.name.ToLower().Equals(item.ToLower()));//Lethal Level Loader patch. Search for item name instead, since it removes items from the list.
+                    give = StartOfRound.Instance.allItemsList.itemsList.IndexOf(Requested);
                 }
-                else
+                catch (IndexOutOfRangeException)
                 {
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
                 }
@@ -2022,7 +1985,7 @@ namespace ControlValley
             {
                 string item = enteredText[1];
 
-                if (Enum.TryParse(item, out buyableItemList itemNumber))
+                if (Enum.TryParse(item, out BuyableItemList itemNumber))
                 {
                     give = (int)itemNumber;
                 }
@@ -2052,7 +2015,7 @@ namespace ControlValley
 
 
 
-                        terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0);
+                        terminal.BuyItemsServerRpc(a, terminal.groupCredits, 0); // a = terminal.buyableItemsList[give].itemId
 
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + terminal.buyableItemsList[give].name);
                     });
@@ -3386,9 +3349,5 @@ namespace ControlValley
 
         }
 
-        protected EnemyAI GetEnemyAIFromEnemyGameObject(GameObject enemyObj)
-        {
-            return enemyObj.GetComponentInChildren<EnemyAI>();
-        }
     }
 }
