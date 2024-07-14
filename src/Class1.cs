@@ -150,6 +150,10 @@ namespace LethalCompanyTestMod
         static void startRound()
         {
             currentStart = StartOfRound.Instance;
+            //foreach(Item item in currentStart.allItemsList.itemsList)
+            //{
+               // mls.LogInfo(item.name);
+            //}//Test code, used for printing all item names in the list on round start (Landing ship)
         }
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
@@ -1123,6 +1127,27 @@ namespace LethalCompanyTestMod
             return;
 
 
+        }
+
+        public static void RetractClaws(PlayerControllerB playerRef)
+        {
+            LockPicker[] lp1 = FindObjectsByType<LockPicker>(FindObjectsSortMode.None);
+            foreach (var lp2 in lp1)
+            {
+                if(lp2.playerHeldBy.IsLocalPlayer || lp2.playerHeldBy == playerRef)
+                {
+                    lp2.isOnDoor = false;
+                    lp2.isPickingLock = false;
+                    lp2.armsAnimator.SetBool("mounted", value: false);
+                    lp2.armsAnimator.SetBool("picking", value: false);
+                    if(lp2.currentlyPickingDoor != null)
+                    {
+                        lp2.currentlyPickingDoor.isPickingLock = false;
+                        lp2.currentlyPickingDoor.lockPickTimeLeft = lp2.currentlyPickingDoor.maxTimeLeft;
+                        lp2.currentlyPickingDoor = null;
+                    }
+                }
+            }
         }
     }
 
