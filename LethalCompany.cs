@@ -105,7 +105,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Shovel", "give_shovel") { Category = "Items"},
                 new("Give Stun Grenade", "give_stungrenade") { Category = "Items"},
                 new("Give Extension Ladder", "give_extensionladder") { Category = "Items"},
-                new("Give TZP Inhalant", "give_tzpinhaler") { Category = "Items"},
+                new("Give TZP Inhalant", "give_tzpinhalant") { Category = "Items"},
                 new("Give Walkie Talkie", "give_walkietalkie") { Category = "Items"},
                 new("Give Zap Gun", "give_zapgun") { Category = "Items"},
                 new("Give Magic 7 Ball", "give_7ball") { Category = "Items"},
@@ -124,7 +124,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Comedy Mask", "give_comedymask") { Category = "Items"},
                 new("Give Kitchen Knife", "give_knife") { Category = "Items"},
                 new("Give Easter Egg", "give_easteregg") { Category = "Items"},
-                new("Give Weed Killer", "give_weedkiller") { Category = "Items"},//v55 item
+                new("Give Weed Killer", "give_weedkillerbottle") { Category = "Items"},//v55 item
 
                 new("Give Crewmate Binoculars", "cgive_binoculars") { Category = "Items"},
                 new("Give Crewmate Boombox", "cgive_boombox") { Category = "Items"},
@@ -138,7 +138,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Shovel", "cgive_shovel") { Category = "Items"},
                 new("Give Crewmate Stun Grenade", "cgive_stungrenade") { Category = "Items"},
                 new("Give Crewmate Extension Ladder", "cgive_extensionladder") { Category = "Items"},
-                new("Give Crewmate TZP Inhalant", "cgive_tzpinhaler") { Category = "Items"},
+                new("Give Crewmate TZP Inhalant", "cgive_tzpinhalant") { Category = "Items"},
                 new("Give Crewmate Walkie Talkie", "cgive_walkietalkie") { Category = "Items"},
                 new("Give Crewmate Zap Gun", "cgive_zapgun") { Category = "Items"},
                 new("Give Crewmate Magic 7 Ball", "cgive_7ball") { Category = "Items"},
@@ -157,7 +157,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Give Crewmate Comedy Mask", "cgive_comedymask") { Category = "Items"},
                 new("Give Crewmate Kitchen Knife", "cgive_knife") { Category = "Items"},
                 new("Give Crewmate Easter Egg", "cgive_easteregg") { Category = "Items"},
-                new("Give Crewmate Weed Killer", "cgive_weedkiller") { Category = "Items"},//v55 item
+                new("Give Crewmate Weed Killer", "cgive_weedkillerbottle") { Category = "Items"},//v55 item
 
 
                 new("Charge Item Battery", "charge") { Category = "Items"},
