@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.10.0";
+        private const string modVersion = "1.1.11";
 
-        public static string tsVersion = "1.1.10";
+        public static string tsVersion = "1.1.11";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -1127,27 +1127,6 @@ namespace LethalCompanyTestMod
             return;
 
 
-        }
-
-        public static void RetractClaws(PlayerControllerB playerRef)
-        {
-            LockPicker[] lp1 = FindObjectsByType<LockPicker>(FindObjectsSortMode.None);
-            foreach (var lp2 in lp1)
-            {
-                if(lp2.playerHeldBy.IsLocalPlayer || lp2.playerHeldBy == playerRef)
-                {
-                    lp2.isOnDoor = false;
-                    lp2.isPickingLock = false;
-                    lp2.armsAnimator.SetBool("mounted", value: false);
-                    lp2.armsAnimator.SetBool("picking", value: false);
-                    if(lp2.currentlyPickingDoor != null)
-                    {
-                        lp2.currentlyPickingDoor.isPickingLock = false;
-                        lp2.currentlyPickingDoor.lockPickTimeLeft = lp2.currentlyPickingDoor.maxTimeLeft;
-                        lp2.currentlyPickingDoor = null;
-                    }
-                }
-            }
         }
     }
 

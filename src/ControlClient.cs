@@ -238,7 +238,7 @@ namespace ControlValley
                 {"breakersoff", CrowdDelegates.BreakersOff},
 
                 {"toship", CrowdDelegates.TeleportToShip},
-                {"crewship", CrowdDelegates.TeleportCrewToShip},
+                {"crewship", CrowdDelegates.TeleportCrewToShip },
                 {"body", CrowdDelegates.SpawnBody},
                 {"crewbody", CrowdDelegates.SpawnCrewBody},
                 {"nightvision", CrowdDelegates.NightVision},
