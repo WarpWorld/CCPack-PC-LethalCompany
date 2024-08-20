@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.10.0";
+        private const string modVersion = "1.1.11";
 
-        public static string tsVersion = "1.1.10";
+        public static string tsVersion = "1.1.11";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -150,6 +150,10 @@ namespace LethalCompanyTestMod
         static void startRound()
         {
             currentStart = StartOfRound.Instance;
+            //foreach(Item item in currentStart.allItemsList.itemsList)
+            //{
+               // mls.LogInfo(item.name);
+            //}//Test code, used for printing all item names in the list on round start (Landing ship)
         }
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPrefix]
