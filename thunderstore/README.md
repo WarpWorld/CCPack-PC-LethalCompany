@@ -16,4 +16,4 @@ Our Lethal Company setup guide can be found here: https://crowdcontrol.live/guid
 
 If you plan to play with others, **everyone needs this mod installed**!
 
-Compatibility with other mods is limited. Some effects may not work or the game may become less stable. Try creating a new profile and gp from there!
+Compatibility with other mods is limited. Some effects may not work or the game may become less stable. Try creating a new profile in your mod manager and go from there!
