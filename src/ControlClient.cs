@@ -143,7 +143,7 @@ namespace ControlValley
                 { "give_shovel", CrowdDelegates.GiveItem},//Shovel
                 { "give_stungrenade", CrowdDelegates.GiveItem},//Stun Grenade
                 { "give_extensionladder", CrowdDelegates.GiveItem},//Extension Ladder
-                { "give_tzpinhaler", CrowdDelegates.GiveItem},//TZP Inhalant
+                { "give_tzpinhalant", CrowdDelegates.GiveItem},//TZP Inhalant
                 { "give_walkietalkie", CrowdDelegates.GiveItem},//Walkie Talkie
                 { "give_zapgun", CrowdDelegates.GiveItem},//Zap Gun
                 { "give_7ball", CrowdDelegates.GiveItem},//Magic 7 Ball
@@ -176,7 +176,7 @@ namespace ControlValley
                 { "cgive_shovel", CrowdDelegates.GiveCrewItem},//Shovel
                 { "cgive_stungrenade", CrowdDelegates.GiveCrewItem},//Stun Grenade
                 { "cgive_extensionladder", CrowdDelegates.GiveCrewItem},//Extension Ladder
-                { "cgive_tzpinhaler", CrowdDelegates.GiveCrewItem},//TZP Inhalant
+                { "cgive_tzpinhalant", CrowdDelegates.GiveCrewItem},//TZP Inhalant
                 { "cgive_walkietalkie", CrowdDelegates.GiveCrewItem},//Walkie Talkie
                 { "cgive_zapgun", CrowdDelegates.GiveCrewItem},//Zap Gun
                 { "cgive_7ball", CrowdDelegates.GiveCrewItem},//Magic 7 Ball
@@ -238,7 +238,7 @@ namespace ControlValley
                 {"breakersoff", CrowdDelegates.BreakersOff},
 
                 {"toship", CrowdDelegates.TeleportToShip},
-                {"crewship", CrowdDelegates.TeleportCrewToShip},
+                {"crewship", CrowdDelegates.TeleportCrewToShip },
                 {"body", CrowdDelegates.SpawnBody},
                 {"crewbody", CrowdDelegates.SpawnCrewBody},
                 {"nightvision", CrowdDelegates.NightVision},

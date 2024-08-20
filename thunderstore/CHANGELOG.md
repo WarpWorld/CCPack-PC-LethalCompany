@@ -1,3 +1,10 @@
+**1.1.11** :
+```
+Fix Incompatibility with LethalLevelLoader
+Fully Fix Item ID's.
+Fix Mimics / Masks
+```
+
 **1.1.10** :
 
 ```
