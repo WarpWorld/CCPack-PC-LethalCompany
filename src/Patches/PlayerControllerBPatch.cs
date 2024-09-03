@@ -1,66 +1,64 @@
 using GameNetcodeStuff;
 using HarmonyLib;
-using System;
 using UnityEngine;
 
-namespace LethalCompanyTestMod.Patches
+namespace BepinControl.Patches;
+
+[HarmonyPatch(typeof(PlayerControllerB))]
+public class PlayerControllerBPatch
 {
-    [HarmonyPatch(typeof(PlayerControllerB))]
-    public class PlayerControllerBPatch
+
+    [HarmonyPatch("Start")]
+    [HarmonyPrefix]
+    static void getNightVision(ref PlayerControllerB __instance)
     {
+        Mod.playerRef = __instance;
+        Mod.nightVision = Mod.playerRef.nightVision.enabled;
+        // store nightvision values
+        Mod.nightVisionIntensity = Mod.playerRef.nightVision.intensity;
+        Mod.nightVisionColor = Mod.playerRef.nightVision.color;
+        Mod.nightVisionRange = Mod.playerRef.nightVision.range;
 
-        [HarmonyPatch("Start")]
-        [HarmonyPrefix]
-        static void getNightVision(ref PlayerControllerB __instance)
+        Mod.playerRef.nightVision.color = UnityEngine.Color.green;
+        Mod.playerRef.nightVision.intensity = 1000f;
+        Mod.playerRef.nightVision.range = 10000f;
+    }
+
+    [HarmonyPatch("SetNightVisionEnabled")]
+    [HarmonyPostfix]
+    static void updateNightVision()
+    {
+        //instead of enabling/disabling nightvision, set the variables
+
+        if (Mod.nightVision)
         {
-            TestMod.playerRef = __instance;
-            TestMod.nightVision = TestMod.playerRef.nightVision.enabled;
-            // store nightvision values
-            TestMod.nightVisionIntensity = TestMod.playerRef.nightVision.intensity;
-            TestMod.nightVisionColor = TestMod.playerRef.nightVision.color;
-            TestMod.nightVisionRange = TestMod.playerRef.nightVision.range;
-
-            TestMod.playerRef.nightVision.color = UnityEngine.Color.green;
-            TestMod.playerRef.nightVision.intensity = 1000f;
-            TestMod.playerRef.nightVision.range = 10000f;
+            Mod.playerRef.nightVision.color = UnityEngine.Color.green;
+            Mod.playerRef.nightVision.intensity = 1000f;
+            Mod.playerRef.nightVision.range = 10000f;
+        }
+        else
+        {
+            Mod.playerRef.nightVision.color = Mod.nightVisionColor;
+            Mod.playerRef.nightVision.intensity = Mod.nightVisionIntensity;
+            Mod.playerRef.nightVision.range = Mod.nightVisionRange;
         }
 
-        [HarmonyPatch("SetNightVisionEnabled")]
-        [HarmonyPostfix]
-        static void updateNightVision()
-        {
-            //instead of enabling/disabling nightvision, set the variables
-
-            if (TestMod.nightVision)
-            {
-                TestMod.playerRef.nightVision.color = UnityEngine.Color.green;
-                TestMod.playerRef.nightVision.intensity = 1000f;
-                TestMod.playerRef.nightVision.range = 10000f;
-            }
-            else
-            {
-                TestMod.playerRef.nightVision.color = TestMod.nightVisionColor;
-                TestMod.playerRef.nightVision.intensity = TestMod.nightVisionIntensity;
-                TestMod.playerRef.nightVision.range = TestMod.nightVisionRange;
-            }
-
-            // should always be on
-            TestMod.playerRef.nightVision.enabled = true;
-        }
+        // should always be on
+        Mod.playerRef.nightVision.enabled = true;
+    }
         
-        [HarmonyPatch("AllowPlayerDeath")]
-        [HarmonyPrefix]
-        static bool OverrideDeath()
-        {
-            if (!TestMod.isHost) { return true; }
-            return !TestMod.enableGod;
-        }
+    [HarmonyPatch("AllowPlayerDeath")]
+    [HarmonyPrefix]
+    static bool OverrideDeath()
+    {
+        if (!Mod.isHost) { return true; }
+        return !Mod.enableGod;
+    }
 
-        [HarmonyPatch("Update")]
-        [HarmonyPostfix]
-        static void InfiniteSprint(ref float ___sprintMeter)
-        {
-            if (TestMod.infSprint && TestMod.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
-        }
+    [HarmonyPatch("Update")]
+    [HarmonyPostfix]
+    static void InfiniteSprint(ref float ___sprintMeter)
+    {
+        if (Mod.infSprint && Mod.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
     }
 }
