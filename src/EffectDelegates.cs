@@ -1004,7 +1004,37 @@ public class EffectDelegates
 
         return new EffectResponse(req.ID, status, message);
     }
+    public static EffectResponse InverseTeleport(ControlClient client, EffectRequest req)
+    {
+        EffectStatus status = EffectStatus.Success;
+        string message = "";
+        PlayerControllerB playerRef = StartOfRound.Instance.localPlayerController;
 
+        try
+        {
+            if(StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.isInsideFactory)
+            {
+                status = EffectStatus.Retry;
+            }
+            else
+            {
+                Mod.ActionQueue.Enqueue(() =>
+                {
+                    var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed);
+                    Vector3 pos1 = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                    Vector3 pos2 = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(pos1,randomSeed:randomSeed);
+
+                    playerRef.TeleportPlayer(pos2);
+                });
+            }
+        }
+        catch(Exception e)
+        {
+            status = EffectStatus.Retry;
+            Mod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+        }
+        return new EffectResponse(req.ID, status, message);
+    }
     public static EffectResponse TeleportCrewTo(ControlClient client, EffectRequest req)
     {
         EffectStatus status = EffectStatus.Success;

@@ -229,6 +229,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
 
                 new("Return to Ship", "toship") { Category = "Player"},
                 new("Return Crewmate to Ship", "crewship") { Category = "Player"},
+                new("Inverse Teleport", "inverse"){Category = "Player"},
                 new("Teleport to Crewmate", "tocrew") { Category = "Player"},
                 new("Teleport Crewmate Here", "crewto") { Category = "Player"},
                 new("Spawn Dead Body", "body") { Category = "Player"},
