@@ -153,6 +153,51 @@ public class Mod : BaseUnityPlugin
         });
 
     }
+
+    [HarmonyPatch(typeof(StartOfRound), "StartGame")]//Credit to Maya in Discord, Better than my trashy fix, lol.
+    [HarmonyPostfix]
+    static void StartRound()
+    {
+        currentStart = StartOfRound.Instance;
+        EnemyAI[] spawnableObjects = Resources.FindObjectsOfTypeAll<EnemyAI>().ToArray();
+        foreach (var enemy in spawnableObjects)
+        {
+            SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+            currEnemy.enemyType = enemy.enemyType;
+            currEnemy.rarity = 0;
+            bool containsItem = currentStart.currentLevel.Enemies.Contains(currEnemy);
+            if (containsItem)
+            {
+
+            }
+            else
+            {
+                if (currEnemy.enemyType.isOutsideEnemy == false)
+                {
+                    currentStart.currentLevel.Enemies.Add(currEnemy);
+                }
+            }
+        }
+        foreach (var enemy in spawnableObjects)
+        {
+            SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+            currEnemy.enemyType = enemy.enemyType;
+            currEnemy.rarity = 0;
+            bool containsItem = currentStart.currentLevel.OutsideEnemies.Contains(currEnemy);
+
+            if (containsItem)
+            {
+
+            }
+            else
+            {
+                if (currEnemy.enemyType.isOutsideEnemy == true)
+                {
+                    currentStart.currentLevel.OutsideEnemies.Add(currEnemy);
+                }
+            }
+        }
+    }
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
     [HarmonyPrefix]
     static bool ModifyLevel(ref SelectableLevel newLevel)

@@ -1228,21 +1228,6 @@ public class EffectDelegates
             found = true;
         }
         if (!found)
-        {
-            foreach (var level in StartOfRound.Instance.levels)
-            {
-                enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                if (enemyRef != null)
-                {
-                    if (!Mod.currentLevel.Enemies.Contains(enemyRef))
-                    {
-                        enemyRef.rarity = 0;
-                        RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                    }
-                }
-            }
-        }
-        if (!found)
             foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
             {
 
@@ -1432,21 +1417,6 @@ public class EffectDelegates
             }
 
             if (!found)
-            {
-                foreach (var level in StartOfRound.Instance.levels)
-                {
-                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                    if (enemyRef != null)
-                    {
-                        if (!Mod.currentLevel.Enemies.Contains(enemyRef))
-                        {
-                            enemyRef.rarity = 0;
-                            RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                        }
-                    }
-                }
-            }
-            if (!found)
                 foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
 
@@ -1466,7 +1436,6 @@ public class EffectDelegates
                     }
                     found = true;
                 }
-
 
             if (!found)
                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
