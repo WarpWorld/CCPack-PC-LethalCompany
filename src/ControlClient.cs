@@ -19,7 +19,7 @@ namespace BepinControl;
 public class ControlClient
 {
     public static readonly string CV_HOST = "127.0.0.1";
-    public static readonly int CV_PORT = 51338;
+    public static readonly int CV_PORT = 51338;//Fix Port, Should be 51338 for Lethal Company.
 
     private static readonly string[] CommonMetadata = new string[] { "health" };
 
@@ -78,7 +78,8 @@ public class ControlClient
         { "spawn_radmech", EffectDelegates.Spawn },
         { "spawn_clay", EffectDelegates.Spawn },
         { "spawn_butler", EffectDelegates.Spawn },
-        {"spawn_jester", EffectDelegates.Spawn },
+        { "spawn_jester", EffectDelegates.Spawn },
+        { "spawn_eater", EffectDelegates.Spawn },
 
         { "cspawn_pede", EffectDelegates.CrewSpawn },
         { "cspawn_spider", EffectDelegates.CrewSpawn },
@@ -98,6 +99,8 @@ public class ControlClient
         { "cspawn_landmine", EffectDelegates.CrewSpawn },
         { "cspawn_radmech", EffectDelegates.CrewSpawn },
         { "cspawn_butler", EffectDelegates.CrewSpawn },
+        { "cspawn_jester", EffectDelegates.CrewSpawn },
+        { "cspawn_eater", EffectDelegates.CrewSpawn },
 
         { "give_binoculars", EffectDelegates.GiveItem }, //binoculars
         { "give_boombox", EffectDelegates.GiveItem }, //boombox

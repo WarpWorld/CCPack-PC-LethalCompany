@@ -1188,7 +1188,7 @@ public class EffectDelegates
     public static EffectResponse Spawn(ControlClient client, EffectRequest req)
     {
         var playerRef = StartOfRound.Instance.localPlayerController;
-        SpawnableEnemyWithRarity enemyRef = null;
+        SpawnableEnemyWithRarity? enemyRef = null;
         if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is dead");
 
         string[] enteredText = req.code.Split('_');
@@ -1236,6 +1236,7 @@ public class EffectDelegates
                 {
                     if (!Mod.currentLevel.Enemies.Contains(enemyRef))
                     {
+                        enemyRef.rarity = 0;
                         RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
                     }
                 }
@@ -1248,18 +1249,16 @@ public class EffectDelegates
 
                 if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                 {
-                    found = true;
                     try
                     {
                         if (!playerRef.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
                         if (enteredText[1] == "jester" && !playerRef.isInsideFactory || enteredText[1] == "butler" && !playerRef.isInsideFactory || enteredText[1] == "cracker" && !playerRef.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is Outside Building");
-
                     }
                     catch (Exception e)
                     {
-
                     }
                 }
+                found = true;
             }
 
         if (!found)
@@ -1394,7 +1393,7 @@ public class EffectDelegates
     public static EffectResponse CrewSpawn(ControlClient client, EffectRequest req)
     {
         var playerRef = StartOfRound.Instance.localPlayerController;
-
+        SpawnableEnemyWithRarity? enemyRef = null;
 
         string[] enteredText = req.code.Split('_');
         if (enteredText.Length == 2)
@@ -1433,15 +1432,31 @@ public class EffectDelegates
             }
 
             if (!found)
-                foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
+            {
+                foreach (var level in StartOfRound.Instance.levels)
+                {
+                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
+                    if (enemyRef != null)
+                    {
+                        if (!Mod.currentLevel.Enemies.Contains(enemyRef))
+                        {
+                            enemyRef.rarity = 0;
+                            RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
+                        }
+                    }
+                }
+            }
+            if (!found)
+                foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
 
-                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+
+                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                     {
-                        found = true;
                         try
                         {
-                            if (!player.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry);
+                            if (!player.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
+                            if (enteredText[1] == "jester" && !player.isInsideFactory || enteredText[1] == "butler" && !player.isInsideFactory || enteredText[1] == "cracker" && !player.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is Outside Building");
 
                         }
                         catch (Exception e)
@@ -1449,7 +1464,9 @@ public class EffectDelegates
 
                         }
                     }
+                    found = true;
                 }
+
 
             if (!found)
                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
