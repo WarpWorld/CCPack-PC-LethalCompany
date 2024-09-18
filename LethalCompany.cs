@@ -72,6 +72,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Old Bird", "spawn_radmech") { Category = "Spawn Enemies"},
                 new("Spawn Clay Surgeon", "spawn_clay") { Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Butler", "spawn_butler"){ Category = "Spawn Enemies"},//Tested on Dine
+                new("Spawn Jester", "spawn_jester"){Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},

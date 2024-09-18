@@ -13,6 +13,7 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
+using System.Linq;
 
 namespace BepinControl;
 
@@ -152,7 +153,6 @@ public class Mod : BaseUnityPlugin
         });
 
     }
-
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
     [HarmonyPrefix]
     static bool ModifyLevel(ref SelectableLevel newLevel)
@@ -161,7 +161,6 @@ public class Mod : BaseUnityPlugin
         // avoid setting manually in case there is a missed path that executes even if not host
         //isHost = true;
         // doesn't need to be returned early as a result of above mentioned
-
         currentRound = RoundManager.Instance;
         if (!levelEnemySpawns.ContainsKey(newLevel))
         {

@@ -19,7 +19,7 @@ namespace BepinControl;
 public class ControlClient
 {
     public static readonly string CV_HOST = "127.0.0.1";
-    public static readonly int CV_PORT = 51337;
+    public static readonly int CV_PORT = 51338;
 
     private static readonly string[] CommonMetadata = new string[] { "health" };
 
@@ -78,6 +78,7 @@ public class ControlClient
         { "spawn_radmech", EffectDelegates.Spawn },
         { "spawn_clay", EffectDelegates.Spawn },
         { "spawn_butler", EffectDelegates.Spawn },
+        {"spawn_jester", EffectDelegates.Spawn },
 
         { "cspawn_pede", EffectDelegates.CrewSpawn },
         { "cspawn_spider", EffectDelegates.CrewSpawn },
