@@ -1008,11 +1008,11 @@ public class EffectDelegates
     {
         EffectStatus status = EffectStatus.Success;
         string message = "";
-        PlayerControllerB playerRef = StartOfRound.Instance.localPlayerController;
+        var playerRef = StartOfRound.Instance.localPlayerController;
 
         try
         {
-            if(StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.isInsideFactory)
+            if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || !playerRef.isInsideFactory)
             {
                 status = EffectStatus.Retry;
             }
@@ -1020,21 +1020,68 @@ public class EffectDelegates
             {
                 Mod.ActionQueue.Enqueue(() =>
                 {
-                    var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed);
-                    Vector3 pos1 = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
-                    Vector3 pos2 = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(pos1,randomSeed:randomSeed);
+                    var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
+                    Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                    Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
 
-                    playerRef.TeleportPlayer(pos2);
+                    playerRef.TeleportPlayer(inBoxPredictable);
+
                 });
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             status = EffectStatus.Retry;
             Mod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
         }
+
         return new EffectResponse(req.ID, status, message);
     }
+
+    public static EffectResponse InverseTeleportCrew(ControlClient client, EffectRequest req)
+    {
+        EffectStatus status = EffectStatus.Success;
+        string message = "";
+        var playerRef = StartOfRound.Instance.localPlayerController;
+
+        List<PlayerControllerB> list = new List<PlayerControllerB>();
+
+        foreach (PlayerControllerB player in StartOfRound.Instance.allPlayerScripts)
+        {
+            if (player != null && !player.isPlayerDead && player != playerRef && player.isActiveAndEnabled && player.isPlayerControlled)
+                list.Add(player);
+        }
+
+        if (list.Count <= 0)
+        {
+            return new EffectResponse(req.ID, EffectStatus.Retry, "");
+        }
+
+        try
+        {
+            var player = list[UnityEngine.Random.Range(0, list.Count)];
+
+            {
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || !playerRef.isInsideFactory) status = EffectStatus.Retry;
+                else
+                {
+                    Mod.ActionQueue.Enqueue(() =>
+                    {
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_inverse_{(int)player.playerClientId}</size>");
+
+                    });
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            status = EffectStatus.Retry;
+            Mod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+        }
+
+        return new EffectResponse(req.ID, status, message);
+    }
+
     public static EffectResponse TeleportCrewTo(ControlClient client, EffectRequest req)
     {
         EffectStatus status = EffectStatus.Success;

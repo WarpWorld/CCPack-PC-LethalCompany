@@ -211,6 +211,7 @@ public class ControlClient
         { "toship", EffectDelegates.TeleportToShip },
         { "crewship", EffectDelegates.TeleportCrewToShip },
         { "inverse", EffectDelegates.InverseTeleport },
+        { "cinverse", EffectDelegates.InverseTeleportCrew },
         { "body", EffectDelegates.SpawnBody },
         { "crewbody", EffectDelegates.SpawnCrewBody },
         { "nightvision", EffectDelegates.NightVision },
