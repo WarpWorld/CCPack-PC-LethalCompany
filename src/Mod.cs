@@ -13,6 +13,7 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
+using System.Linq;
 
 namespace BepinControl;
 
@@ -153,6 +154,50 @@ public class Mod : BaseUnityPlugin
 
     }
 
+    [HarmonyPatch(typeof(StartOfRound), "StartGame")]//Credit to Maya in Discord, Better than my trashy fix, lol.
+    [HarmonyPostfix]
+    static void StartRound()
+    {
+        currentStart = StartOfRound.Instance;
+        EnemyAI[] spawnableObjects = Resources.FindObjectsOfTypeAll<EnemyAI>().ToArray();
+        foreach (var enemy in spawnableObjects)
+        {
+            SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+            currEnemy.enemyType = enemy.enemyType;
+            currEnemy.rarity = 0;
+            bool containsItem = currentStart.currentLevel.Enemies.Contains(currEnemy);
+            if (containsItem)
+            {
+
+            }
+            else
+            {
+                if (currEnemy.enemyType.isOutsideEnemy == false)
+                {
+                    currentStart.currentLevel.Enemies.Add(currEnemy);
+                }
+            }
+        }
+        foreach (var enemy in spawnableObjects)
+        {
+            SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+            currEnemy.enemyType = enemy.enemyType;
+            currEnemy.rarity = 0;
+            bool containsItem = currentStart.currentLevel.OutsideEnemies.Contains(currEnemy);
+
+            if (containsItem)
+            {
+
+            }
+            else
+            {
+                if (currEnemy.enemyType.isOutsideEnemy == true)
+                {
+                    currentStart.currentLevel.OutsideEnemies.Add(currEnemy);
+                }
+            }
+        }
+    }
     [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
     [HarmonyPrefix]
     static bool ModifyLevel(ref SelectableLevel newLevel)
@@ -161,7 +206,6 @@ public class Mod : BaseUnityPlugin
         // avoid setting manually in case there is a missed path that executes even if not host
         //isHost = true;
         // doesn't need to be returned early as a result of above mentioned
-
         currentRound = RoundManager.Instance;
         if (!levelEnemySpawns.ContainsKey(newLevel))
         {
@@ -321,160 +365,160 @@ public class Mod : BaseUnityPlugin
                     return false;
 
                 case "vercheck":
-                {
-                    if (verwait > 0) return false;
-                    verwait = 30;
-                    playerRef = StartOfRound.Instance.localPlayerController;
-
-                    HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_version_{playerRef.playerUsername}_{tsVersion}_{ControlClient.Instance.Connected}</size>");
-
-                    return false;
-                }
-                case "spawn":
-                {
-                    if (!isHost) return true;
-
-                    //TestMod.mls.LogInfo($"client spawn received");
-
-                    Mod.ActionQueue.Enqueue(() =>
                     {
-                        foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
-                        {
+                        if (verwait > 0) return false;
+                        verwait = 30;
+                        playerRef = StartOfRound.Instance.localPlayerController;
 
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
-                            {
-                                try
-                                {
-                                    //TestMod.mls.LogInfo($"client spawning {values[1]}");
-                                    Mod.SpawnEnemy(outsideEnemy, 1, false);
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_version_{playerRef.playerUsername}_{tsVersion}_{ControlClient.Instance.Connected}</size>");
 
-                                }
-                                catch (Exception e)
-                                {
-
-                                }
-                                return;
-                            }
-                        }
-                        foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
-                        {
-
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
-                            {
-                                try
-                                {
-                                    //TestMod.mls.LogInfo($"client spawning {values[1]}");
-                                    Mod.SpawnEnemy(outsideEnemy, 1, false);
-
-                                }
-                                catch (Exception e)
-                                {
-
-                                }
-                                return;
-                            }
-                        }
-                    });
-
-
-                    break;
-                }
-                case "cspawn":
-                {
-                    if (!isHost) return true;
-
-                    int id = int.Parse(values[2]);
-
-                    PlayerControllerB player = null;
-
-                    foreach (var playero in StartOfRound.Instance.allPlayerScripts)
-                    {
-                        if (playero != null && playero.isActiveAndEnabled && !playero.isPlayerDead && (int)playero.playerClientId == id && playero.isPlayerControlled)
-                            player = playero;
+                        return false;
                     }
-
-                    if (player == null) return true;
-
-
-                    Mod.ActionQueue.Enqueue(() =>
+                case "spawn":
                     {
-                        foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
+                        if (!isHost) return true;
+
+                        //TestMod.mls.LogInfo($"client spawn received");
+
+                        Mod.ActionQueue.Enqueue(() =>
                         {
-
-                            if (values[1] == "mimic")
+                            foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                             {
-                                GameObject prefab = null;
 
-                                foreach (var level in StartOfRound.Instance.levels)
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
                                 {
-                                    if (prefab == null)
-                                        foreach (var spawn in level.spawnableScrap)
-                                        {
-                                            if (spawn.spawnableItem.name.ToLower() == "tragedymask") prefab = spawn.spawnableItem.spawnPrefab;
-                                        }
-                                }
+                                    try
+                                    {
+                                        //TestMod.mls.LogInfo($"client spawning {values[1]}");
+                                        Mod.SpawnEnemy(outsideEnemy, 1, false);
 
-                                if (prefab == null)
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
                                     return;
-
-                                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, Mod.currentStart.propsContainer);
-                                HauntedMaskItem component = gameObject.GetComponent<HauntedMaskItem>();
-
-                                GameObject obj = UnityEngine.Object.Instantiate(component.mimicEnemy.enemyPrefab, player.transform.position + player.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
-                                obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
-
-                                MaskedPlayerEnemy enemy = obj.GetComponent<MaskedPlayerEnemy>();
-                                enemy.mimickingPlayer = player;
-                                enemy.SetSuit(player.currentSuitID);
-                                enemy.SetEnemyOutside(!player.isInsideFactory);
-                                enemy.SetVisibilityOfMaskedEnemy();
-                                enemy.SetMaskType(component.maskTypeId);
-
-                                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mimic_{enemy.NetworkObject.NetworkObjectId}</size>");
-
-                                obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
-                                UnityEngine.Object.Destroy(gameObject);
-                                return;
+                                }
                             }
-
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                            foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                             {
-                                try
-                                {
-                                    Mod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
 
-                                }
-                                catch (Exception e)
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
                                 {
+                                    try
+                                    {
+                                        //TestMod.mls.LogInfo($"client spawning {values[1]}");
+                                        Mod.SpawnEnemy(outsideEnemy, 1, false);
 
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
                                 }
-                                return;
                             }
-                        }
-                        foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
+                        });
+
+
+                        break;
+                    }
+                case "cspawn":
+                    {
+                        if (!isHost) return true;
+
+                        int id = int.Parse(values[2]);
+
+                        PlayerControllerB player = null;
+
+                        foreach (var playero in StartOfRound.Instance.allPlayerScripts)
                         {
-
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
-                            {
-                                try
-                                {
-                                    Mod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
-
-                                }
-                                catch (Exception e)
-                                {
-
-                                }
-                                return;
-                            }
+                            if (playero != null && playero.isActiveAndEnabled && !playero.isPlayerDead && (int)playero.playerClientId == id && playero.isPlayerControlled)
+                                player = playero;
                         }
 
-                    });
+                        if (player == null) return true;
 
 
-                    break;
-                }
+                        Mod.ActionQueue.Enqueue(() =>
+                        {
+                            foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
+                            {
+
+                                if (values[1] == "mimic")
+                                {
+                                    GameObject prefab = null;
+
+                                    foreach (var level in StartOfRound.Instance.levels)
+                                    {
+                                        if (prefab == null)
+                                            foreach (var spawn in level.spawnableScrap)
+                                            {
+                                                if (spawn.spawnableItem.name.ToLower() == "tragedymask") prefab = spawn.spawnableItem.spawnPrefab;
+                                            }
+                                    }
+
+                                    if (prefab == null)
+                                        return;
+
+                                    GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, Mod.currentStart.propsContainer);
+                                    HauntedMaskItem component = gameObject.GetComponent<HauntedMaskItem>();
+
+                                    GameObject obj = UnityEngine.Object.Instantiate(component.mimicEnemy.enemyPrefab, player.transform.position + player.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
+                                    obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+
+
+                                    MaskedPlayerEnemy enemy = obj.GetComponent<MaskedPlayerEnemy>();
+                                    enemy.mimickingPlayer = player;
+                                    enemy.SetSuit(player.currentSuitID);
+                                    enemy.SetEnemyOutside(!player.isInsideFactory);
+                                    enemy.SetVisibilityOfMaskedEnemy();
+                                    enemy.SetMaskType(component.maskTypeId);
+
+                                    HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_mimic_{enemy.NetworkObject.NetworkObjectId}</size>");
+
+                                    obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
+                                    UnityEngine.Object.Destroy(gameObject);
+                                    return;
+                                }
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                {
+                                    try
+                                    {
+                                        Mod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+                            foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
+                            {
+
+                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                {
+                                    try
+                                    {
+                                        Mod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+
+                                    }
+                                    catch (Exception e)
+                                    {
+
+                                    }
+                                    return;
+                                }
+                            }
+
+                        });
+
+
+                        break;
+                    }
 
                 case "poweron":
                     if (!isHost) return true;
@@ -486,26 +530,40 @@ public class Mod : BaseUnityPlugin
                     break;
 
                 case "addhour":
-                {
-                    if (!isHost) return true;
-                    var tod = TimeOfDay.Instance;
-                    float num = tod.lengthOfHours;
-                    tod.globalTime += num;
-                    tod.timeUntilDeadline -= num;
-                    EffectDelegates.callFunc(tod, "MoveTimeOfDay", null);
-                    break;
-                }
+                    {
+                        if (!isHost) return true;
+                        var tod = TimeOfDay.Instance;
+                        float num = tod.lengthOfHours;
+                        tod.globalTime += num;
+                        tod.timeUntilDeadline -= num;
+                        EffectDelegates.callFunc(tod, "MoveTimeOfDay", null);
+                        break;
+                    }
                 case "remhour":
-                {
-                    if (!isHost) return true;
-                    var tod = TimeOfDay.Instance;
-                    float num = tod.lengthOfHours;
-                    tod.globalTime -= num;
-                    tod.timeUntilDeadline += num;
-                    EffectDelegates.callFunc(tod, "MoveTimeOfDay", null);
-                    break;
-                }
+                    {
+                        if (!isHost) return true;
+                        var tod = TimeOfDay.Instance;
+                        float num = tod.lengthOfHours;
 
+                        tod.globalTime -= num;
+                        tod.timeUntilDeadline += num;
+                        EffectDelegates.callFunc(tod, "MoveTimeOfDay", null);
+                        break;
+                    }
+                case "inverse":
+                    {
+                        int cur = int.Parse(values[1]);
+
+                        if ((int)StartOfRound.Instance.localPlayerController.playerClientId == cur)
+                        {
+                            var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
+                            Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                            Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
+
+                            StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
+                        }
+                    break;
+                    }
                 case "take":
 
                 {
