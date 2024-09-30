@@ -73,7 +73,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Clay Surgeon", "spawn_clay") { Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Butler", "spawn_butler"){ Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Jester", "spawn_jester"){Category = "Spawn Enemies"},
-                new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
+		new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
@@ -94,7 +94,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Old Bird at Crewmate", "cspawn_radmech") { Category = "Spawn Enemies" },
                 new("Spawn Clay Surgeon at Crewmate", "cspawn_clay") { Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Butler at Crewmate", "cspawn_butler") { Category = "Spawn Enemies"},//Tested on Dine
-                new("Spawn Jester at Crewmate", "cspawn_jester"){Category = "Spawn Enemies"},
+		new("Spawn Jester at Crewmate", "cspawn_jester"){Category = "Spawn Enemies"},
                 new("Spawn Maneater at Crewmate", "cspawn_eater"){Category = "Spawn Enemies"},
 
                 new("Give Binoculars", "give_binoculars") { Category = "Items"},
@@ -229,12 +229,12 @@ namespace CrowdControl.Games.Packs.LethalCompany
 
                 new("Return to Ship", "toship") { Category = "Player"},
                 new("Return Crewmate to Ship", "crewship") { Category = "Player"},
-                new("Inverse Teleport", "inverse"){Category = "Player"},
-                new("Inverse Teleport Random Crewmate", "cinverse"){Category ="Player" },
                 new("Teleport to Crewmate", "tocrew") { Category = "Player"},
                 new("Teleport Crewmate Here", "crewto") { Category = "Player"},
                 new("Spawn Dead Body", "body") { Category = "Player"},
                 new("Spawn Dead Crewmate", "crewbody") { Category = "Player"},
+		new("Inverse Teleport", "inverse"){Category = "Player"},
+                new("Inverse Teleport Random Crewmate", "cinverse"){Category ="Player" },
 
                 new("Play Bird Screech", "screech") { Category = "Sound"},
                 //new("Play Blob Sound", "blob") { Category = "Sound"},

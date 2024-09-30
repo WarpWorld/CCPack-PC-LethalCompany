@@ -1,545 +1,478 @@
-﻿//this project is a retrofit, it should NOT be used as part of any example - kat
+﻿/*
+ * ControlValley
+ * Stardew Valley Support for Twitch Crowd Control
+ * Copyright (C) 2021 TerribleTable
+ * LGPL v2.1
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ * USA
+ */
+
+using LethalCompanyTestMod;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading;
-using ConnectorLib.JSON;
-using Newtonsoft.Json;
 using UnityEngine;
-using Object = System.Object;
 
-namespace BepinControl;
 
-[SuppressMessage("ReSharper", "GrammarMistakeInComment")]
-public class ControlClient
+namespace ControlValley
 {
-    public static readonly string CV_HOST = "127.0.0.1";
-    public static readonly int CV_PORT = 51338;//Fix Port, Should be 51338 for Lethal Company.
-
-    private static readonly string[] CommonMetadata = new string[] { "health" };
-
-    private static readonly Dictionary<string, MetadataDelegate> Metadata = new()
+    public class ControlClient
     {
-        //{ "health", MetadataDelegates.Health }
-    };
+        public static readonly string CV_HOST = "127.0.0.1";
+        public static readonly int CV_PORT = 51338;
 
-    private static readonly Dictionary<string, EffectDelegate> Delegate = new()
-    {
-        { "heal_full", EffectDelegates.HealFull },
-        { "kill", EffectDelegates.Kill },
-        { "killcrew", EffectDelegates.KillCrewmate },
-        { "damage", EffectDelegates.Damage },
-        { "damagecrew", EffectDelegates.DamageCrew },
-        { "heal", EffectDelegates.Heal },
-        { "healcrew", EffectDelegates.HealCrew },
+        private Dictionary<string, CrowdDelegate> Delegate { get; set; }
+        private IPEndPoint Endpoint { get; set; }
+        private Queue<CrowdRequest> Requests { get; set; }
+        private bool Running { get; set; }
+        private bool Saving { get; set; }
+        private bool Spawn { get; set; }
 
-        { "launch", EffectDelegates.Launch },
-        { "fast", EffectDelegates.FastMove },
-        { "slow", EffectDelegates.SlowMove },
-        { "hyper", EffectDelegates.HyperMove },
-        { "freeze", EffectDelegates.Freeze },
-        { "drunk", EffectDelegates.Drunk },
+        private bool paused = false;
+        public static Socket Socket { get; set; }
 
-
-        { "jumpultra", EffectDelegates.UltraJump },
-        { "jumphigh", EffectDelegates.HighJump },
-        { "jumplow", EffectDelegates.LowJump },
-
-        { "ohko", EffectDelegates.OHKO },
-        { "invul", EffectDelegates.Invul },
-        { "drain", EffectDelegates.DrainStamins },
-        { "restore", EffectDelegates.RestoreStamins },
-        { "infstam", EffectDelegates.InfiniteStamina },
-        { "nostam", EffectDelegates.NoStamina },
-
-        { "spawn_pede", EffectDelegates.Spawn },
-        { "spawn_spider", EffectDelegates.Spawn },
-        { "spawn_hoard", EffectDelegates.Spawn },
-        { "spawn_flower", EffectDelegates.Spawn },
-        { "spawn_crawl", EffectDelegates.Spawn },
-        { "spawn_blob", EffectDelegates.Spawn },
-        { "spawn_spring", EffectDelegates.Spawn },
-        { "spawn_puff", EffectDelegates.Spawn },
-        { "spawn_dog", EffectDelegates.Spawn },
-        { "spawn_giant", EffectDelegates.Spawn },
-        { "spawn_levi", EffectDelegates.Spawn },
-        { "spawn_hawk", EffectDelegates.Spawn },
-        { "spawn_girl", EffectDelegates.Spawn },
-        { "spawn_mimic", EffectDelegates.Spawn },
-        { "spawn_cracker", EffectDelegates.Spawn },
-        { "spawn_landmine", EffectDelegates.Spawn },
-        { "webs", EffectDelegates.CreateWebs },
-        { "killenemies", EffectDelegates.KillEnemies },
-        { "spawn_radmech", EffectDelegates.Spawn },
-        { "spawn_clay", EffectDelegates.Spawn },
-        { "spawn_butler", EffectDelegates.Spawn },
-        { "spawn_jester", EffectDelegates.Spawn },
-        { "spawn_eater", EffectDelegates.Spawn },
-
-        { "cspawn_pede", EffectDelegates.CrewSpawn },
-        { "cspawn_spider", EffectDelegates.CrewSpawn },
-        { "cspawn_hoard", EffectDelegates.CrewSpawn },
-        { "cspawn_flower", EffectDelegates.CrewSpawn },
-        { "cspawn_crawl", EffectDelegates.CrewSpawn },
-        { "cspawn_blob", EffectDelegates.CrewSpawn },
-        { "cspawn_spring", EffectDelegates.CrewSpawn },
-        { "cspawn_puff", EffectDelegates.CrewSpawn },
-        { "cspawn_dog", EffectDelegates.CrewSpawn },
-        { "cspawn_giant", EffectDelegates.CrewSpawn },
-        { "cspawn_levi", EffectDelegates.CrewSpawn },
-        { "cspawn_hawk", EffectDelegates.CrewSpawn },
-        { "cspawn_girl", EffectDelegates.CrewSpawn },
-        { "cspawn_cracker", EffectDelegates.CrewSpawn },
-        { "cspawn_mimic", EffectDelegates.CrewSpawn },
-        { "cspawn_landmine", EffectDelegates.CrewSpawn },
-        { "cspawn_radmech", EffectDelegates.CrewSpawn },
-        { "cspawn_butler", EffectDelegates.CrewSpawn },
-        { "cspawn_jester", EffectDelegates.CrewSpawn },
-        { "cspawn_eater", EffectDelegates.CrewSpawn },
-
-        { "give_binoculars", EffectDelegates.GiveItem }, //binoculars
-        { "give_boombox", EffectDelegates.GiveItem }, //boombox
-        { "give_flashlight", EffectDelegates.GiveItem }, //flashlight
-        { "give_jetpack", EffectDelegates.GiveItem }, //jetpack
-        { "give_key", EffectDelegates.GiveItem }, //Key
-        { "give_lockpicker", EffectDelegates.GiveItem }, //Lockpicker
-        { "give_lungapparatus", EffectDelegates.GiveItem }, //Apparatus
-        { "give_mapdevice", EffectDelegates.GiveItem }, //Mapper
-        { "give_proflashlight", EffectDelegates.GiveItem }, //Pro-Flashlight
-        { "give_shovel", EffectDelegates.GiveItem }, //Shovel
-        { "give_stungrenade", EffectDelegates.GiveItem }, //Stun Grenade
-        { "give_extensionladder", EffectDelegates.GiveItem }, //Extension Ladder
-        { "give_tzpinhalant", EffectDelegates.GiveItem }, //TZP Inhalant
-        { "give_walkietalkie", EffectDelegates.GiveItem }, //Walkie Talkie
-        { "give_zapgun", EffectDelegates.GiveItem }, //Zap Gun
-        { "give_7ball", EffectDelegates.GiveItem }, //Magic 7 Ball
-        { "give_airhorn", EffectDelegates.GiveItem }, //Airhorn
-        { "give_bottlebin", EffectDelegates.GiveItem }, //Bottles
-        { "give_clownhorn", EffectDelegates.GiveItem }, //Clown Horn
-        { "give_goldbar", EffectDelegates.GiveItem }, //Gold Bar
-        { "give_stopsign", EffectDelegates.GiveItem }, //Stop Sign
-        { "give_radarbooster", EffectDelegates.GiveItem }, //Radar Booster
-        { "give_yieldsign", EffectDelegates.GiveItem }, //Yield Sign
-        { "give_shotgun", EffectDelegates.GiveItem }, //Shotgun
-        { "give_gunAmmo", EffectDelegates.GiveItem }, //Ammo
-        { "give_spraypaint", EffectDelegates.GiveItem }, //Spraypaint
-        { "give_giftbox", EffectDelegates.GiveItem }, //Gift Box
-        { "give_tragedymask", EffectDelegates.GiveItem }, //Tragedy Mask
-        { "give_comedymask", EffectDelegates.GiveItem }, //Comedy Mask
-        { "give_knife", EffectDelegates.GiveItem }, //Kitchen Knife
-        { "give_easteregg", EffectDelegates.GiveItem }, //Easter Egg
-        { "give_weedkiller", EffectDelegates.GiveItem }, //Weed Killer
-
-        { "cgive_binoculars", EffectDelegates.GiveCrewItem }, //binoculars
-        { "cgive_boombox", EffectDelegates.GiveCrewItem }, //boombox
-        { "cgive_flashlight", EffectDelegates.GiveCrewItem }, //flashlight
-        { "cgive_jetpack", EffectDelegates.GiveCrewItem }, //jetpack
-        { "cgive_key", EffectDelegates.GiveCrewItem }, //Key
-        { "cgive_lockpicker", EffectDelegates.GiveCrewItem }, //Lockpicker
-        { "cgive_lungapparatus", EffectDelegates.GiveCrewItem }, //Apparatus
-        { "cgive_mapdevice", EffectDelegates.GiveCrewItem }, //Mapper
-        { "cgive_proflashlight", EffectDelegates.GiveCrewItem }, //Pro-Flashlight
-        { "cgive_shovel", EffectDelegates.GiveCrewItem }, //Shovel
-        { "cgive_stungrenade", EffectDelegates.GiveCrewItem }, //Stun Grenade
-        { "cgive_extensionladder", EffectDelegates.GiveCrewItem }, //Extension Ladder
-        { "cgive_tzpinhalant", EffectDelegates.GiveCrewItem }, //TZP Inhalant
-        { "cgive_walkietalkie", EffectDelegates.GiveCrewItem }, //Walkie Talkie
-        { "cgive_zapgun", EffectDelegates.GiveCrewItem }, //Zap Gun
-        { "cgive_7ball", EffectDelegates.GiveCrewItem }, //Magic 7 Ball
-        { "cgive_airhorn", EffectDelegates.GiveCrewItem }, //Airhorn
-        { "cgive_bottlebin", EffectDelegates.GiveCrewItem }, //Bottles
-        { "cgive_clownhorn", EffectDelegates.GiveCrewItem }, //Clown Horn
-        { "cgive_goldbar", EffectDelegates.GiveCrewItem }, //Gold Bar
-        { "cgive_stopsign", EffectDelegates.GiveCrewItem }, //Stop Sign
-        { "cgive_radarbooster", EffectDelegates.GiveCrewItem }, //Radar Booster
-        { "cgive_yieldsign", EffectDelegates.GiveCrewItem }, //Yield Sign
-        { "cgive_shotgun", EffectDelegates.GiveCrewItem }, //Shotgun
-        { "cgive_gunAmmo", EffectDelegates.GiveCrewItem }, //Ammo
-        { "cgive_spraypaint", EffectDelegates.GiveCrewItem }, //Spraypaint
-        { "cgive_giftbox", EffectDelegates.GiveCrewItem }, //Gift Box
-        { "cgive_tragedymask", EffectDelegates.GiveCrewItem }, //Tragedy Mask
-        { "cgive_comedymask", EffectDelegates.GiveCrewItem }, //Comedy Mask
-        { "cgive_knife", EffectDelegates.GiveCrewItem }, //Kitchen Knife
-        { "cgive_easteregg", EffectDelegates.GiveCrewItem }, //Easter Egg
-        { "cgive_weedkiller", EffectDelegates.GiveCrewItem }, //Weed Killer
-
-        { "weather_-1", EffectDelegates.Weather },
-        { "weather_1", EffectDelegates.Weather },
-        { "weather_2", EffectDelegates.Weather },
-        { "weather_3", EffectDelegates.Weather },
-        { "weather_4", EffectDelegates.Weather },
-        { "weather_5", EffectDelegates.Weather },
-        { "weather_6", EffectDelegates.Weather },
-        { "lightning", EffectDelegates.Lightning },
-
-        { "takeitem", EffectDelegates.TakeItem },
-        { "dropitem", EffectDelegates.DropItem },
-        { "takecrewitem", EffectDelegates.TakeCrewItem },
-
-        { "buy_walkie", EffectDelegates.BuyItem },
-        { "buy_flashlight", EffectDelegates.BuyItem },
-        { "buy_shovel", EffectDelegates.BuyItem },
-        { "buy_lockpicker", EffectDelegates.BuyItem },
-        { "buy_proflashlight", EffectDelegates.BuyItem },
-        { "buy_stungrenade", EffectDelegates.BuyItem },
-        { "buy_boombox", EffectDelegates.BuyItem },
-        { "buy_inhaler", EffectDelegates.BuyItem },
-        { "buy_stungun", EffectDelegates.BuyItem },
-        { "buy_jetpack", EffectDelegates.BuyItem },
-        { "buy_extensionladder", EffectDelegates.BuyItem },
-        { "buy_radarbooster", EffectDelegates.BuyItem },
-        { "buy_spraypaint", EffectDelegates.BuyItem },
-        { "buy_weedkiller", EffectDelegates.BuyItem },
-
-        { "buy_cruiser", EffectDelegates.BuyCruiser },
-        { "turn_off_engine", EffectDelegates.TurnOffEngine },
-        { "destroy_vehicle", EffectDelegates.DestroyVehicle },
-        { "start_vehicle", EffectDelegates.TurnOnVehicle },
-        { "spring_chair", EffectDelegates.SpringChair },
-
-        { "charge", EffectDelegates.ChargeItem },
-        { "uncharge", EffectDelegates.UnchargeItem },
-
-        { "breakerson", EffectDelegates.BreakersOn },
-        { "breakersoff", EffectDelegates.BreakersOff },
-
-        { "toship", EffectDelegates.TeleportToShip },
-        { "crewship", EffectDelegates.TeleportCrewToShip },
-        { "inverse", EffectDelegates.InverseTeleport },
-        { "cinverse", EffectDelegates.InverseTeleportCrew },
-        { "body", EffectDelegates.SpawnBody },
-        { "crewbody", EffectDelegates.SpawnCrewBody },
-        { "nightvision", EffectDelegates.NightVision },
-        { "revive", EffectDelegates.Revive },
-        { "tocrew", EffectDelegates.TeleportToCrew },
-        { "crewto", EffectDelegates.TeleportCrewTo },
-
-        { "screech", EffectDelegates.Screech },
-        { "footstep", EffectDelegates.Footstep },
-        { "breathing", EffectDelegates.Breathing },
-        { "ghost", EffectDelegates.Ghost },
-        { "horn", EffectDelegates.PlayHorn },
-        { "blob", EffectDelegates.BlobSound },
-        { "highpitch", EffectDelegates.HighPitch },
-        { "lowpitch", EffectDelegates.LowPitch },
-
-        { "addhour", EffectDelegates.AddHour },
-        { "remhour", EffectDelegates.RemoveHour },
-        { "addday", EffectDelegates.AddDay },
-        { "remday", EffectDelegates.RemoveDay },
-
-        { "givecred_5", EffectDelegates.AddCredits },
-        { "givecred_50", EffectDelegates.AddCredits },
-        { "givecred_500", EffectDelegates.AddCredits },
-        { "givecred_-5", EffectDelegates.AddCredits },
-        { "givecred_-50", EffectDelegates.AddCredits },
-        { "givecred_-500", EffectDelegates.AddCredits },
-
-        { "givequota_5", EffectDelegates.AddQuota },
-        { "givequota_50", EffectDelegates.AddQuota },
-        { "givequota_500", EffectDelegates.AddQuota },
-        { "givequota_-5", EffectDelegates.AddQuota },
-        { "givequota_-50", EffectDelegates.AddQuota },
-        { "givequota_-500", EffectDelegates.AddQuota },
-
-        { "giveprofit_25", EffectDelegates.AddProfit },
-        { "giveprofit_50", EffectDelegates.AddProfit },
-        { "giveprofit_100", EffectDelegates.AddProfit },
-        { "giveprofit_-25", EffectDelegates.AddProfit },
-        { "giveprofit_-50", EffectDelegates.AddProfit },
-        { "giveprofit_-100", EffectDelegates.AddProfit },
-        { "addscrap", EffectDelegates.AddScrap },
-
-        { "shipleave", EffectDelegates.ShipLeave },
-        { "opendoors", EffectDelegates.OpenDoors },
-        { "closedoors", EffectDelegates.CloseDoors },
-    };
-
-    private IPEndPoint Endpoint { get; }
-    private Queue<SimpleJSONRequest> Requests { get; }
-    private bool Running { get; set; }
-
-    private bool paused;
-    public static Socket? Socket { get; set; }
-
-    public bool inGame = true;
-
-    public static readonly ControlClient Instance = new();
-
-    public bool Connected => Socket?.Connected ?? false;
-
-    private ControlClient()
-    {
-        Endpoint = new(IPAddress.Parse(CV_HOST), CV_PORT);
-        Requests = new();
-        Running = true;
-        Socket = null;
-    }
-
-    public bool isReady()
-    {
-        try
+        public bool inGame = true;
+        public static bool connect = false;
+        public ControlClient()
         {
-            //TestMod.mls.LogInfo($"landed: {StartOfRound.Instance.shipHasLanded}");
-            //TestMod.mls.LogInfo($"planet: {RoundManager.Instance.currentLevel.PlanetName}");
+            Endpoint = new IPEndPoint(IPAddress.Parse(CV_HOST), CV_PORT);
+            Requests = new Queue<CrowdRequest>();
+            Running = true;
+            Saving = false;
+            Spawn = true;
+            Socket = null;
+            connect = false;
 
-            if (!StartOfRound.Instance.shipHasLanded) return false;
-
-            if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("gordion")) return false;
-            if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("company")) return false;
-        }
-        catch (Exception e)
-        {
-            Mod.mls.LogError(e.ToString());
-            return false;
-        }
-
-        return true;
-    }
-
-    public bool HideEffect(string code)
-        => Send(new EffectUpdate(code, EffectStatus.NotVisible));
-
-    public bool ShowEffect(string code)
-        => Send(new EffectUpdate(code, EffectStatus.Visible));
-
-    public bool DisableEffect(string code)
-        => Send(new EffectUpdate(code, EffectStatus.NotSelectable));
-
-    public bool EnableEffect(string code)
-        => Send(new EffectUpdate(code, EffectStatus.Selectable));
-
-    private void ClientLoop()
-    {
-
-        Mod.mls.LogInfo("Connected to Crowd Control");
-
-        var timer = new Timer(timeUpdate, null, 0, 200);
-
-        try
-        {
-            while (Running)
+            Delegate = new Dictionary<string, CrowdDelegate>()
             {
-                SimpleJSONRequest? req = Recieve(this, Socket);
-                if (req?.IsKeepAlive ?? true)
-                {
-                    Thread.Sleep(0); //prevent a meltdown if this ever tight loops
-                    continue;
-                }
 
-                lock (Requests)
-                    Requests.Enqueue(req);
-            }
+                {"heal_full", CrowdDelegates.HealFull},
+                {"kill", CrowdDelegates.Kill},
+                {"killcrew", CrowdDelegates.KillCrewmate},
+                {"damage", CrowdDelegates.Damage},
+                {"damagecrew", CrowdDelegates.DamageCrew},
+                {"heal", CrowdDelegates.Heal},
+                {"healcrew", CrowdDelegates.HealCrew},
+
+                {"launch", CrowdDelegates.Launch},
+                {"fast", CrowdDelegates.FastMove},
+                {"slow", CrowdDelegates.SlowMove},
+                {"hyper", CrowdDelegates.HyperMove},
+                {"freeze", CrowdDelegates.Freeze},
+                {"drunk", CrowdDelegates.Drunk},
+
+
+                {"jumpultra", CrowdDelegates.UltraJump},
+                {"jumphigh", CrowdDelegates.HighJump},
+                {"jumplow", CrowdDelegates.LowJump},
+
+                {"ohko", CrowdDelegates.OHKO},
+                {"invul", CrowdDelegates.Invul},
+                {"drain", CrowdDelegates.DrainStamins},
+                {"restore", CrowdDelegates.RestoreStamins},
+                {"infstam", CrowdDelegates.InfiniteStamina},
+                {"nostam", CrowdDelegates.NoStamina},
+
+                {"spawn_pede", CrowdDelegates.Spawn},
+                {"spawn_spider", CrowdDelegates.Spawn},
+                {"spawn_hoard", CrowdDelegates.Spawn},
+                {"spawn_flower", CrowdDelegates.Spawn},
+                {"spawn_crawl", CrowdDelegates.Spawn},
+                {"spawn_blob", CrowdDelegates.Spawn},
+                {"spawn_spring", CrowdDelegates.Spawn},
+                {"spawn_puff", CrowdDelegates.Spawn},
+                {"spawn_dog", CrowdDelegates.Spawn},
+                {"spawn_giant", CrowdDelegates.Spawn},
+                {"spawn_levi", CrowdDelegates.Spawn},
+                {"spawn_hawk", CrowdDelegates.Spawn},
+                {"spawn_girl", CrowdDelegates.Spawn},
+                {"spawn_mimic", CrowdDelegates.Spawn},
+                {"spawn_cracker", CrowdDelegates.Spawn},
+                {"spawn_landmine", CrowdDelegates.Spawn},
+                {"webs", CrowdDelegates.CreateWebs},
+                {"killenemies", CrowdDelegates.KillEnemies},
+                {"spawn_radmech", CrowdDelegates.Spawn},
+                {"spawn_clay", CrowdDelegates.Spawn},
+                {"spawn_butler", CrowdDelegates.Spawn},
+                {"spawn_jester", CrowdDelegates.Spawn},
+                {"spawn_eater", CrowdDelegates.Spawn},
+
+                {"cspawn_pede", CrowdDelegates.CrewSpawn},
+                {"cspawn_spider", CrowdDelegates.CrewSpawn},
+                {"cspawn_hoard", CrowdDelegates.CrewSpawn},
+                {"cspawn_flower", CrowdDelegates.CrewSpawn},
+                {"cspawn_crawl", CrowdDelegates.CrewSpawn},
+                {"cspawn_blob", CrowdDelegates.CrewSpawn},
+                {"cspawn_spring", CrowdDelegates.CrewSpawn},
+                {"cspawn_puff", CrowdDelegates.CrewSpawn},
+                {"cspawn_dog", CrowdDelegates.CrewSpawn},
+                {"cspawn_giant", CrowdDelegates.CrewSpawn},
+                {"cspawn_levi", CrowdDelegates.CrewSpawn},
+                {"cspawn_hawk", CrowdDelegates.CrewSpawn},
+                {"cspawn_girl", CrowdDelegates.CrewSpawn},
+                {"cspawn_cracker", CrowdDelegates.CrewSpawn},
+                {"cspawn_mimic", CrowdDelegates.CrewSpawn},
+                {"cspawn_landmine", CrowdDelegates.CrewSpawn},
+                {"cspawn_radmech", CrowdDelegates.CrewSpawn},
+                {"cspawn_butler", CrowdDelegates.CrewSpawn},
+                {"cspawn_jester", CrowdDelegates.CrewSpawn},
+                {"cspawn_eater", CrowdDelegates.CrewSpawn},
+
+                { "give_binoculars", CrowdDelegates.GiveItem},//binoculars
+                { "give_boombox", CrowdDelegates.GiveItem},//boombox
+                { "give_flashlight", CrowdDelegates.GiveItem},//flashlight
+                { "give_jetpack", CrowdDelegates.GiveItem},//jetpack
+                { "give_key", CrowdDelegates.GiveItem},//Key
+                { "give_lockpicker", CrowdDelegates.GiveItem},//Lockpicker
+                { "give_lungapparatus", CrowdDelegates.GiveItem},//Apparatus
+                { "give_mapdevice", CrowdDelegates.GiveItem},//Mapper
+                { "give_proflashlight", CrowdDelegates.GiveItem},//Pro-Flashlight
+                { "give_shovel", CrowdDelegates.GiveItem},//Shovel
+                { "give_stungrenade", CrowdDelegates.GiveItem},//Stun Grenade
+                { "give_extensionladder", CrowdDelegates.GiveItem},//Extension Ladder
+                { "give_tzpinhalant", CrowdDelegates.GiveItem},//TZP Inhalant
+                { "give_walkietalkie", CrowdDelegates.GiveItem},//Walkie Talkie
+                { "give_zapgun", CrowdDelegates.GiveItem},//Zap Gun
+                { "give_7ball", CrowdDelegates.GiveItem},//Magic 7 Ball
+                { "give_airhorn", CrowdDelegates.GiveItem},//Airhorn
+                { "give_bottlebin", CrowdDelegates.GiveItem},//Bottles
+                { "give_clownhorn", CrowdDelegates.GiveItem},//Clown Horn
+                { "give_goldbar", CrowdDelegates.GiveItem},//Gold Bar
+                { "give_stopsign", CrowdDelegates.GiveItem},//Stop Sign
+                { "give_radarbooster", CrowdDelegates.GiveItem},//Radar Booster
+                { "give_yieldsign", CrowdDelegates.GiveItem},//Yield Sign
+                { "give_shotgun", CrowdDelegates.GiveItem},//Shotgun
+                { "give_gunAmmo", CrowdDelegates.GiveItem},//Ammo
+                { "give_spraypaint", CrowdDelegates.GiveItem},//Spraypaint
+                { "give_giftbox", CrowdDelegates.GiveItem},//Gift Box
+                { "give_tragedymask", CrowdDelegates.GiveItem},//Tragedy Mask
+                { "give_comedymask", CrowdDelegates.GiveItem},//Comedy Mask
+                { "give_knife", CrowdDelegates.GiveItem},//Kitchen Knife
+                { "give_easteregg", CrowdDelegates.GiveItem},//Easter Egg
+                { "give_weedkiller", CrowdDelegates.GiveItem},//Weed Killer
+                
+                { "cgive_binoculars", CrowdDelegates.GiveCrewItem},//binoculars
+                { "cgive_boombox", CrowdDelegates.GiveCrewItem},//boombox
+                { "cgive_flashlight", CrowdDelegates.GiveCrewItem},//flashlight
+                { "cgive_jetpack", CrowdDelegates.GiveCrewItem},//jetpack
+                { "cgive_key", CrowdDelegates.GiveCrewItem},//Key
+                { "cgive_lockpicker", CrowdDelegates.GiveCrewItem},//Lockpicker
+                { "cgive_lungapparatus", CrowdDelegates.GiveCrewItem},//Apparatus
+                { "cgive_mapdevice", CrowdDelegates.GiveCrewItem},//Mapper
+                { "cgive_proflashlight", CrowdDelegates.GiveCrewItem},//Pro-Flashlight
+                { "cgive_shovel", CrowdDelegates.GiveCrewItem},//Shovel
+                { "cgive_stungrenade", CrowdDelegates.GiveCrewItem},//Stun Grenade
+                { "cgive_extensionladder", CrowdDelegates.GiveCrewItem},//Extension Ladder
+                { "cgive_tzpinhalant", CrowdDelegates.GiveCrewItem},//TZP Inhalant
+                { "cgive_walkietalkie", CrowdDelegates.GiveCrewItem},//Walkie Talkie
+                { "cgive_zapgun", CrowdDelegates.GiveCrewItem},//Zap Gun
+                { "cgive_7ball", CrowdDelegates.GiveCrewItem},//Magic 7 Ball
+                { "cgive_airhorn", CrowdDelegates.GiveCrewItem},//Airhorn
+                { "cgive_bottlebin", CrowdDelegates.GiveCrewItem},//Bottles
+                { "cgive_clownhorn", CrowdDelegates.GiveCrewItem},//Clown Horn
+                { "cgive_goldbar", CrowdDelegates.GiveCrewItem},//Gold Bar
+                { "cgive_stopsign", CrowdDelegates.GiveCrewItem},//Stop Sign
+                { "cgive_radarbooster", CrowdDelegates.GiveCrewItem},//Radar Booster
+                { "cgive_yieldsign", CrowdDelegates.GiveCrewItem},//Yield Sign
+                { "cgive_shotgun", CrowdDelegates.GiveCrewItem},//Shotgun
+                { "cgive_gunAmmo", CrowdDelegates.GiveCrewItem},//Ammo
+                { "cgive_spraypaint", CrowdDelegates.GiveCrewItem},//Spraypaint
+                { "cgive_giftbox", CrowdDelegates.GiveCrewItem},//Gift Box
+                { "cgive_tragedymask", CrowdDelegates.GiveCrewItem},//Tragedy Mask
+                { "cgive_comedymask", CrowdDelegates.GiveCrewItem},//Comedy Mask
+                { "cgive_knife", CrowdDelegates.GiveCrewItem},//Kitchen Knife
+                { "cgive_easteregg", CrowdDelegates.GiveCrewItem},//Easter Egg
+                { "cgive_weedkiller", CrowdDelegates.GiveCrewItem},//Weed Killer
+
+                {"weather_-1", CrowdDelegates.Weather},
+                {"weather_1", CrowdDelegates.Weather},
+                {"weather_2", CrowdDelegates.Weather},
+                {"weather_3", CrowdDelegates.Weather},
+                {"weather_4", CrowdDelegates.Weather},
+                {"weather_5", CrowdDelegates.Weather},
+                {"weather_6", CrowdDelegates.Weather},
+                {"lightning", CrowdDelegates.Lightning},
+
+                {"takeitem", CrowdDelegates.TakeItem},
+                {"dropitem", CrowdDelegates.DropItem},
+                {"takecrewitem", CrowdDelegates.TakeCrewItem},
+
+                {"buy_walkie",  CrowdDelegates.BuyItem},
+                {"buy_flashlight",  CrowdDelegates.BuyItem},
+                {"buy_shovel",  CrowdDelegates.BuyItem},
+                {"buy_lockpicker",  CrowdDelegates.BuyItem},
+                {"buy_proflashlight",  CrowdDelegates.BuyItem},
+                {"buy_stungrenade",  CrowdDelegates.BuyItem},
+                {"buy_boombox",  CrowdDelegates.BuyItem},
+                {"buy_inhaler",  CrowdDelegates.BuyItem},
+                {"buy_stungun",  CrowdDelegates.BuyItem},
+                {"buy_jetpack",  CrowdDelegates.BuyItem},
+                {"buy_extensionladder",  CrowdDelegates.BuyItem},
+                {"buy_radarbooster",  CrowdDelegates.BuyItem},
+                {"buy_spraypaint",  CrowdDelegates.BuyItem},
+                {"buy_weedkiller",  CrowdDelegates.BuyItem},
+                
+                {"buy_cruiser", CrowdDelegates.BuyCruiser},
+                {"turn_off_engine", CrowdDelegates.TurnOffEngine},
+                {"destroy_vehicle", CrowdDelegates.DestroyVehicle},
+                {"start_vehicle", CrowdDelegates.TurnOnVehicle},
+                {"spring_chair", CrowdDelegates.SpringChair},
+
+                {"charge", CrowdDelegates.ChargeItem},
+                {"uncharge", CrowdDelegates.UnchargeItem},
+
+                {"breakerson", CrowdDelegates.BreakersOn},
+                {"breakersoff", CrowdDelegates.BreakersOff},
+
+                {"toship", CrowdDelegates.TeleportToShip},
+                {"crewship", CrowdDelegates.TeleportCrewToShip },
+                {"body", CrowdDelegates.SpawnBody},
+                {"crewbody", CrowdDelegates.SpawnCrewBody},
+                {"nightvision", CrowdDelegates.NightVision},
+                {"revive", CrowdDelegates.Revive},
+                {"tocrew", CrowdDelegates.TeleportToCrew},
+                {"crewto", CrowdDelegates.TeleportCrewTo},
+
+                {"screech", CrowdDelegates.Screech},
+                {"footstep", CrowdDelegates.Footstep},
+                {"breathing", CrowdDelegates.Breathing},
+                {"ghost", CrowdDelegates.Ghost},
+                {"horn", CrowdDelegates.PlayHorn},
+                {"blob", CrowdDelegates.BlobSound},
+                {"highpitch", CrowdDelegates.HighPitch},
+                {"lowpitch", CrowdDelegates.LowPitch},
+
+                {"addhour", CrowdDelegates.AddHour},
+                {"remhour", CrowdDelegates.RemoveHour},
+                {"addday", CrowdDelegates.AddDay},
+                {"remday", CrowdDelegates.RemoveDay},
+
+                {"givecred_5", CrowdDelegates.AddCredits},
+                {"givecred_50", CrowdDelegates.AddCredits},
+                {"givecred_500", CrowdDelegates.AddCredits},
+                {"givecred_-5", CrowdDelegates.AddCredits},
+                {"givecred_-50", CrowdDelegates.AddCredits},
+                {"givecred_-500", CrowdDelegates.AddCredits},
+
+                {"givequota_5", CrowdDelegates.AddQuota},
+                {"givequota_50", CrowdDelegates.AddQuota},
+                {"givequota_500", CrowdDelegates.AddQuota},
+                {"givequota_-5", CrowdDelegates.AddQuota},
+                {"givequota_-50", CrowdDelegates.AddQuota},
+                {"givequota_-500", CrowdDelegates.AddQuota},
+
+                {"giveprofit_25", CrowdDelegates.AddProfit},
+                {"giveprofit_50", CrowdDelegates.AddProfit},
+                {"giveprofit_100", CrowdDelegates.AddProfit},
+                {"giveprofit_-25", CrowdDelegates.AddProfit},
+                {"giveprofit_-50", CrowdDelegates.AddProfit},
+                {"giveprofit_-100", CrowdDelegates.AddProfit},
+                {"addscrap", CrowdDelegates.AddScrap},
+
+                {"shipleave", CrowdDelegates.ShipLeave},
+                {"opendoors", CrowdDelegates.OpenDoors},
+                {"closedoors", CrowdDelegates.CloseDoors},
+            };
         }
-        catch (Exception)
+
+        public static void HideEffect(string code)
         {
-            Mod.mls.LogInfo("Disconnected from Crowd Control");
-            Socket?.Close();
+            CrowdResponse res = new CrowdResponse(0, CrowdResponse.Status.STATUS_NOTVISIBLE);
+            res.type = 1;
+            res.code = code;
+            res.Send(Socket);
         }
-    }
 
-    public static readonly int RECV_BUF = 4096;
-    public static readonly int RECV_TIME = 5000000;
-
-    public SimpleJSONRequest? Recieve(ControlClient client, Socket socket)
-    {
-        byte[] buf = new byte[RECV_BUF];
-        string content = "";
-        int read = 0;
-
-        do
+        public static void ShowEffect(string code)
         {
-            if (!client.IsRunning()) return null;
-
-            if (socket.Poll(RECV_TIME, SelectMode.SelectRead))
-            {
-                read = socket.Receive(buf);
-                if (read < 0) return null;
-
-                content += Encoding.ASCII.GetString(buf);
-            }
-            else
-                KeepAlive();
-        } while (read == 0 || (read == RECV_BUF && buf[RECV_BUF - 1] != 0));
-
-        return SimpleJSONRequest.TryParse(content, out SimpleJSONRequest? result) ? result : null;
-    }
-
-    private static readonly EmptyResponse KEEPALIVE = new() { type = ResponseType.KeepAlive };
-
-    public bool KeepAlive() => Send(KEEPALIVE);
-
-    public bool Send(SimpleJSONResponse message)
-    {
-        byte[] tmpData = Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(message));
-        byte[] outData = new byte[tmpData.Length + 1];
-        Buffer.BlockCopy(tmpData, 0, outData, 0, tmpData.Length);
-        outData[tmpData.Length] = 0;
-        int bytesSent = Socket?.Send(outData) ?? -1;
-        return (bytesSent == outData.Length);
-    }
-
-    public void timeUpdate(Object state)
-    {
-        inGame = true;
-
-        if (!isReady()) inGame = false;
-
-        if (!inGame)
-        {
-            TimedThread.addTime(200);
-            paused = true;
+            CrowdResponse res = new CrowdResponse(0, CrowdResponse.Status.STATUS_VISIBLE);
+            res.type = 1;
+            res.code = code;
+            res.Send(Socket);
         }
-        else if (paused)
-        {
-            paused = false;
-            TimedThread.unPause();
-            TimedThread.tickTime(200);
-        }
-        else
-        {
-            TimedThread.tickTime(200);
-        }
-    }
 
-    public bool IsRunning() => Running;
-
-    public void NetworkLoop()
-    {
-        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-        while (Running)
+        public static void DisableEffect(string code)
         {
-            Mod.mls.LogInfo("Attempting to connect to Crowd Control");
+            CrowdResponse res = new CrowdResponse(0, CrowdResponse.Status.STATUS_NOTSELECTABLE);
+            res.type = 1;
+            res.code = code;
+            res.Send(Socket);
+        }
+
+        public static void EnableEffect(string code)
+        {
+            CrowdResponse res = new CrowdResponse(0, CrowdResponse.Status.STATUS_SELECTABLE);
+            res.type = 1;
+            res.code = code;
+            res.Send(Socket);
+        }
+        private void ClientLoop()
+        {
+
+            TestMod.mls.LogInfo("Connected to Crowd Control");
+            connect = true;
+
+            var timer = new Timer(timeUpdate, null, 0, 200);
 
             try
             {
-                Socket = new Socket(Endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                if (Socket.BeginConnect(Endpoint, null, null).AsyncWaitHandle.WaitOne(10000, true) && Socket.Connected)
-                    ClientLoop();
-                else
-                    Mod.mls.LogInfo("Failed to connect to Crowd Control");
-                Socket.Close();
-            }
-            catch (Exception e)
-            {
-                Mod.mls.LogInfo(e.GetType().Name);
-                Mod.mls.LogInfo("Failed to connect to Crowd Control");
-            }
-
-            Thread.Sleep(10000);
-        }
-    }
-
-    public void FixedUpdate()
-    {
-        //Log.Message(_game_status_update_timer);
-        _game_status_update_timer += Time.fixedDeltaTime;
-        if (_game_status_update_timer >= GAME_STATUS_UPDATE_INTERVAL)
-        {
-            UpdateGameState();
-            _game_status_update_timer = 0f;
-        }
-    }
-
-    public void RequestLoop()
-    {
-        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-        while (Running)
-        {
-            try
-            {
-                SimpleJSONRequest req;
-                lock (Requests)
+                while (Running)
                 {
-                    if (Requests.Count == 0)
-                        continue;
-                    req = Requests.Dequeue();
+                    CrowdRequest req = CrowdRequest.Recieve(this, Socket);
+                    if (req == null || req.IsKeepAlive()) continue;
+
+                    lock (Requests)
+                        Requests.Enqueue(req);
                 }
-
-                if (req is EffectRequest er)
-                {
-                    string? code = er.code;
-
-                    try
-                    {
-                        EffectResponse? res;
-                        if (code == null)
-                            res = new EffectResponse(er.ID, EffectStatus.Unavailable, "No effect code was sent.");
-                        else if (isReady())
-                            if (Delegate.TryGetValue(code, out EffectDelegate? del))
-                            {
-                                res = del(this, er);
-
-                                //we add the common metadata here, effects COULD return more meta
-                                //on a per-effect basis but we're not doing that in this example
-                                res.metadata = new();
-                                foreach (string key in CommonMetadata)
-                                    res.metadata.Add(key, Metadata[key].Invoke(this));
-                            }
-                            else
-                                res = new EffectResponse(er.ID, EffectStatus.Unavailable,
-                                    $"Unknown effect code: {code}");
-                        else
-                            res = new EffectResponse(er.ID, EffectStatus.Retry);
-
-                        Send(res);
-                    }
-                    catch (KeyNotFoundException)
-                    {
-                        Send(new EffectResponse(er.ID, EffectStatus.Unavailable, $"Request error for '{code}'"));
-                    }
-                }
-                else if (req.type == RequestType.GameUpdate) UpdateGameState(true);
             }
             catch (Exception)
             {
-                Mod.mls.LogInfo("Disconnected from Crowd Control");
-                Socket?.Close();
+                TestMod.mls.LogInfo("Disconnected from Crowd Control");
+                connect = false;
+                Socket.Close();
             }
         }
-    }
 
-    public void Stop() => Running = false;
-
-    private GameState? _last_game_state;
-
-    private const float GAME_STATUS_UPDATE_INTERVAL = 1f;
-    private float _game_status_update_timer = 0f;
-
-    [SuppressMessage("ReSharper", "RedundantIfElseBlock")]
-    private bool UpdateGameState(bool force = false)
-    {
-        try
+        public void timeUpdate(System.Object state)
         {
-            if (!StartOfRound.Instance.shipHasLanded) return UpdateGameState(GameState.WrongMode, force);
+            inGame = true;
 
-            if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("gordion")) UpdateGameState(GameState.SafeArea, force); ;
-            if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("company")) UpdateGameState(GameState.SafeArea, force);
+            if (StartOfRound.Instance == null || StartOfRound.Instance.allPlayersDead || StartOfRound.Instance.livingPlayers < 1) inGame = false;
+
+            if (Saving || !inGame)
+            {
+                BuffThread.addTime(200);
+                paused = true;
+            }
+            else if (paused)
+            {
+                paused = false;
+                BuffThread.unPause();
+                BuffThread.tickTime(200);
+            }
+            else
+            {
+                BuffThread.tickTime(200);
+            }
         }
-        catch (Exception e)
+
+        public bool CanSpawn() => Spawn;
+        public bool IsRunning() => Running;
+
+        public void NetworkLoop()
         {
-            Mod.mls.LogError(e.ToString());
-            return UpdateGameState(GameState.Error, force);
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            while (Running)
+            {
+
+                TestMod.mls.LogInfo("Attempting to connect to Crowd Control");
+
+                try
+                {
+                    Socket = new Socket(Endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    if (Socket.BeginConnect(Endpoint, null, null).AsyncWaitHandle.WaitOne(10000, true) && Socket.Connected)
+                        ClientLoop();
+                    else
+                        TestMod.mls.LogInfo("Failed to connect to Crowd Control");
+                    Socket.Close();
+                }
+                catch (Exception e)
+                {
+                    TestMod.mls.LogInfo("Failed to connect to Crowd Control");
+                }
+
+                Thread.Sleep(10000);
+            }
         }
 
-        return UpdateGameState(GameState.Ready, force);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool UpdateGameState(GameState newState, bool force) => UpdateGameState(newState, null, force);
-    private bool UpdateGameState(GameState newState, string? message = null, bool force = false)
-    {
-        if (force || (_last_game_state != newState))
+        public void RequestLoop()
         {
-            _last_game_state = newState;
-            return Send(new GameUpdate(newState, message));
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            while (Running)
+            {
+                try
+                {
+                    while (Saving || !inGame)
+                        Thread.Yield();
+
+                    CrowdRequest req = null;
+                    lock (Requests)
+                    {
+                        if (Requests.Count == 0)
+                            continue;
+                        req = Requests.Dequeue();
+                    }
+
+                    string code = req.GetReqCode();
+                    try
+                    {
+                        CrowdResponse res;
+                        if (!isReady())
+                            res = new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                        else
+                            res = Delegate[code](this, req);
+                        if (res == null)
+                        {
+                            new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, $"Request error for '{code}'").Send(Socket);
+                        }
+
+                        res.Send(Socket);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, $"Request error for '{code}'").Send(Socket);
+                    }
+                }
+                catch (Exception)
+                {
+                    TestMod.mls.LogInfo("Disconnected from Crowd Control");
+                    Socket.Close();
+                }
+            }
         }
-        return true;
+
+        public bool isReady()
+        {
+            try
+            {
+                //TestMod.mls.LogInfo($"landed: {StartOfRound.Instance.shipHasLanded}");
+                //TestMod.mls.LogInfo($"planet: {RoundManager.Instance.currentLevel.PlanetName}");
+
+                if (!StartOfRound.Instance.shipHasLanded) return false;
+
+                if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("gordion")) return false;
+                if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("company")) return false;
+            }
+            catch (Exception e)
+            {
+                TestMod.mls.LogError(e.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        public void Stop()
+        {
+            Running = false;
+        }
     }
 }

@@ -115,3 +115,12 @@ F:\CCPack-PC-LethalCompany\src\bin\Debug\CrowdControl.pdb
 F:\CCPack-PC-LethalCompany\src\bin\Debug\Newtonsoft.Json.dll
 F:\CCPack-PC-LethalCompany\src\bin\Debug\Newtonsoft.Json.xml
 F:\CCPack-PC-LethalCompany\src\obj\Debug\LethalCompany.csproj.CopyComplete
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\obj\Debug\LethalCompany.csproj.CoreCompileInputs.cache
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\obj\Debug\CrowdControl.dll
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\obj\Debug\CrowdControl.pdb
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\bin\Debug\CrowdControl.dll
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\bin\Debug\CrowdControl.pdb
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\bin\Debug\Newtonsoft.Json.dll
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\bin\Debug\Newtonsoft.Json.xml
+D:\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\CCPack-PC-LethalCompany-ce3a60be37af6bf675f53540b1326a5c0b20393e\src\obj\Debug\LethalCo.C96713F5.Up2Date
