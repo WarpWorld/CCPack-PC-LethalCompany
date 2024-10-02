@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.11";
+        private const string modVersion = "1.1.12";
 
-        public static string tsVersion = "1.1.11";
+        public static string tsVersion = "1.1.12";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -994,10 +994,6 @@ namespace LethalCompanyTestMod
                             int cur = int.Parse(values[1]);
                             int max = int.Parse(values[2]);
 
-                            new("Inverse Teleport", "inverse") { Category = "Player" },
-                new("Inverse Teleport Random Crewmate", "cinverse") { Category = "Player" },
-                new("Inverse Teleport", "inverse") { Category = "Player" },
-                new("Inverse Teleport Random Crewmate", "cinverse") { Category = "Player" },
                             TimeOfDay.Instance.quotaFulfilled = cur;
                             TimeOfDay.Instance.profitQuota = max;
 
