@@ -1335,27 +1335,6 @@ namespace ControlValley
                 found = true;
             }
             if (!found)
-                foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
-                {
-
-
-                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
-                    {
-                        try
-                        {
-                            if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
-                            if (enteredText[1] == "jester" && !playerRef.isInsideFactory || enteredText[1] == "butler" && !playerRef.isInsideFactory || enteredText[1] == "cracker" && !playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Outside Building");
-
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                    }
-                    found = true;
-                }
-
-            if (!found)
                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                 {
 
@@ -1374,6 +1353,23 @@ namespace ControlValley
                             {
 
                             }
+                        }
+                    }
+                }
+            if (!found)
+                foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
+                {
+
+
+                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                    {
+                        try
+                        {
+                            if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                        }
+                        catch (Exception e)
+                        {
+
                         }
                     }
                 }
@@ -1523,28 +1519,6 @@ namespace ControlValley
                     found = true;
                 }
                 if (!found)
-                    foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
-                    {
-
-
-                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
-                        {
-                            try
-                            {
-                                if (!player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
-                                if (enteredText[1] == "jester" && !player.isInsideFactory || enteredText[1] == "butler" && !player.isInsideFactory || enteredText[1] == "cracker" && !player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Outside Building");
-
-                            }
-                            catch (Exception e)
-                            {
-
-                            }
-                        }
-                        found = true;
-                    }
-
-
-                if (!found)
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
 
@@ -1552,7 +1526,7 @@ namespace ControlValley
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
                             found = true;
-                            if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
+                            if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
                             {
                                 try
                                 {
@@ -1566,8 +1540,23 @@ namespace ControlValley
                             }
                         }
                     }
+                if (!found)
+                    foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
+                    {
 
-                if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+
+                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        {
+                            try
+                            {
+                                if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+                    }
 
                 if (TestMod.isHost)
                 {
