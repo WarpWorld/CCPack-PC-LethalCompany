@@ -1363,6 +1363,7 @@ namespace ControlValley
 
                     if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                     {
+                        found = true;
                         try
                         {
                             if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
@@ -1544,9 +1545,9 @@ namespace ControlValley
                     foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                     {
 
-
                         if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
+                            found = true;
                             try
                             {
                                 if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
