@@ -289,6 +289,8 @@ namespace ControlValley
                 {"shipleave", CrowdDelegates.ShipLeave},
                 {"opendoors", CrowdDelegates.OpenDoors},
                 {"closedoors", CrowdDelegates.CloseDoors},
+                {"inverse", CrowdDelegates.InverseTeleport},
+                {"cinverse", CrowdDelegates.InverseTeleportCrew},
             };
         }
 
