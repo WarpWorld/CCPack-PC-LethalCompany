@@ -1507,7 +1507,7 @@ namespace ControlValley
             {
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             }
-
+            else
             {
                 PlayerControllerB player;
                 player = list[UnityEngine.Random.Range(0, list.Count)];

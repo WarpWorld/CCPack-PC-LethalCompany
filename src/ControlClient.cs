@@ -132,6 +132,7 @@ namespace ControlValley
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
                 {"cspawn_radmech", CrowdDelegates.CrewSpawn},
                 {"cspawn_butler", CrowdDelegates.CrewSpawn},
+                {"cspawn_clay", CrowdDelegates.CrewSpawn},
                 {"cspawn_jester", CrowdDelegates.CrewSpawn},
                 {"cspawn_eater", CrowdDelegates.CrewSpawn},
 

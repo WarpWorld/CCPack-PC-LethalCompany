@@ -233,7 +233,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Teleport Crewmate Here", "crewto") { Category = "Player"},
                 new("Spawn Dead Body", "body") { Category = "Player"},
                 new("Spawn Dead Crewmate", "crewbody") { Category = "Player"},
-		new("Inverse Teleport", "inverse"){Category = "Player"},
+		        new("Inverse Teleport", "inverse"){Category = "Player"},
                 new("Inverse Teleport Random Crewmate", "cinverse"){Category ="Player" },
 
                 new("Play Bird Screech", "screech") { Category = "Sound"},
