@@ -16,7 +16,7 @@ public class LethalCompany : SimpleTCPPack<SimpleTCPServerConnector>
 
     public override Game Game { get; } = new("Lethal Company", "LethalCompany", "PC", ConnectorType.SimpleTCPServerConnector);
 
-    public override EffectList Effects => new List<Effect>
+    public override EffectList Effects { get; } = new List<Effect>
     {
         new("Kill Player", "kill") { Category = "Health"},
         new("Kill Crewmate", "killcrew") { Category = "Health"},
