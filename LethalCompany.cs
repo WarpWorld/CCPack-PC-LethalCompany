@@ -73,7 +73,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Clay Surgeon", "spawn_clay") { Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Butler", "spawn_butler"){ Category = "Spawn Enemies"},//Tested on Dine
                 new("Spawn Jester", "spawn_jester"){Category = "Spawn Enemies"},
-		        new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
+                new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
@@ -203,7 +203,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Weather - Foggy", "weather_3") { Category = "Weather"},
                 new("Weather - Flooded", "weather_4") { Category = "Weather"},
                 new("Weather - Eclipsed", "weather_5") { Category = "Weather"},
-                //new("Random Lightning Strike", "lightning") { Category = "Weather"},
+                new("Random Lightning Strike", "lightning") { Category = "Weather"},
 
                 new("Give 5 Credits", "givecred_5") { Category = "Scrap/Money"},
                 new("Give 50 Credits", "givecred_50") { Category = "Scrap/Money"},

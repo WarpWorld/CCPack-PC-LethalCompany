@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.14";
+        private const string modVersion = "1.1.15";
 
-        public static string tsVersion = "1.1.14";
+        public static string tsVersion = "1.1.15";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -174,50 +174,6 @@ namespace LethalCompanyTestMod
                 DisplayTextSupplier = OnCCVersion
             });
 
-        }
-        [HarmonyPatch(typeof(StartOfRound), "StartGame")]
-        [HarmonyPostfix]
-        static void StartRound()
-        {
-            currentStart = StartOfRound.Instance;
-            EnemyAI[] spawnableObjects = Resources.FindObjectsOfTypeAll<EnemyAI>().ToArray();
-            foreach (var enemy in spawnableObjects)
-            {
-                SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
-                currEnemy.enemyType = enemy.enemyType;
-                currEnemy.rarity = 0;
-                bool containsItem = currentStart.currentLevel.Enemies.Contains(currEnemy);
-                if (containsItem)
-                {
-
-                }
-                else
-                {
-                    if (currEnemy.enemyType.isOutsideEnemy == false)
-                    {
-                        currentStart.currentLevel.Enemies.Add(currEnemy);
-                    }
-                }
-            }
-            foreach (var enemy in spawnableObjects)
-            {
-                SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
-                currEnemy.enemyType = enemy.enemyType;
-                currEnemy.rarity = 0;
-                bool containsItem = currentStart.currentLevel.OutsideEnemies.Contains(currEnemy);
-
-                if (containsItem)
-                {
-
-                }
-                else
-                {
-                    if (currEnemy.enemyType.isOutsideEnemy == true)
-                    {
-                        currentStart.currentLevel.OutsideEnemies.Add(currEnemy);
-                    }
-                }
-            }
         }
         [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.LoadNewLevel))]
         [HarmonyPrefix]
@@ -1012,8 +968,8 @@ namespace LethalCompanyTestMod
 
                                 StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
                             }
-                        break;
                         }
+                        break;
                     case "weather":
                         {
                             int give = int.Parse(values[1]);
@@ -1166,10 +1122,8 @@ namespace LethalCompanyTestMod
             GameObject obj = UnityEngine.Object.Instantiate(enemy.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
             obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
 
-            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
-
+            obj.gameObject.GetComponentInChildren<EnemyAI>().SetEnemyStunned(true, 6.0f);//Fix for some Enemies not being Stunned, Manually set the stunned flag
             return;
-
 
         }
 
@@ -1179,7 +1133,7 @@ namespace LethalCompanyTestMod
             GameObject obj = UnityEngine.Object.Instantiate(enemy.enemyType.enemyPrefab, player.transform.position + player.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
             obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
 
-            obj.gameObject.GetComponentInChildren<EnemyAI>().stunNormalizedTimer = 6.0f;
+            obj.gameObject.GetComponentInChildren<EnemyAI>().SetEnemyStunned(true, 6.0f);//Fix for some Enemies not being Stunned, Manually set the stunned flag
 
             return;
 

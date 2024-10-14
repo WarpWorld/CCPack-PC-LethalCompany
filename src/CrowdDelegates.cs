@@ -1296,7 +1296,8 @@ namespace ControlValley
         public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is dead");
+            SpawnableEnemyWithRarity enemyRef = null;
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is Dead");
 
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
@@ -1305,7 +1306,7 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "What");
             }
             bool found = false;
             if (enteredText[1] == "mimic")
@@ -1326,7 +1327,7 @@ namespace ControlValley
                 }
 
                 if (prefab == null)
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
             }
             if (enteredText[1] == "landmine")
@@ -1334,6 +1335,46 @@ namespace ControlValley
                 if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
                 found = true;
             }
+            if (!found)
+            {
+                foreach (var level in StartOfRound.Instance.levels)
+                {
+                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
+                    if (enemyRef != null)
+                    {
+                        if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                        {
+                            enemyRef.rarity = 0;
+                            if (!enemyRef.enemyType.isOutsideEnemy)
+                            {
+                                RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
+                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
+                            }
+                            if (enemyRef.enemyType.isOutsideEnemy)
+                            {
+                                RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
+                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
+                            }
+                        }
+                    }
+                }
+            }
+            if (!found)
+                foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
+                {
+                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                    {
+                        try
+                        {
+                            if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                            }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                    found = true;
+                }
+
             if (!found)
                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                 {
@@ -1356,24 +1397,7 @@ namespace ControlValley
                         }
                     }
                 }
-            if (!found)
-                foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
-                {
 
-
-                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
-                    {
-                        found = true;
-                        try
-                        {
-                            if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                    }
-                }
             if (found == false) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
 
             if (TestMod.isHost)
@@ -1476,13 +1500,13 @@ namespace ControlValley
                 }
             }
 
-
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS, "");
         }
 
         public static CrowdResponse CrewSpawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
+            SpawnableEnemyWithRarity enemyRef = null;
 
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
@@ -1491,7 +1515,7 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "");
             }
 
             List<PlayerControllerB> list = new List<PlayerControllerB>();
@@ -1507,7 +1531,7 @@ namespace ControlValley
             {
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             }
-            else
+
             {
                 PlayerControllerB player;
                 player = list[UnityEngine.Random.Range(0, list.Count)];
@@ -1519,6 +1543,51 @@ namespace ControlValley
                     if (player.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
                     found = true;
                 }
+
+                if (!found)
+                {
+                    foreach (var level in StartOfRound.Instance.levels)
+                    {
+                        enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
+                        if (enemyRef != null)
+                        {
+                            if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                            {
+                                enemyRef.rarity = 0;
+                                if (!enemyRef.enemyType.isOutsideEnemy)
+                                {
+                                    RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
+                                }
+                                if(enemyRef.enemyType.isOutsideEnemy)
+                                {
+                                    RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!found)
+                    foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
+                    {
+
+
+                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        {
+                            try
+                            {
+                                if (!player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Inside");
+                                if (enteredText[1] == "jester" && !player.isInsideFactory || enteredText[1] == "butler" && !player.isInsideFactory || enteredText[1] == "cracker" && !player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Outside Building");
+
+                            }
+                            catch (Exception e)
+                            {
+
+                            }
+                        }
+                        found = true;
+                    }
+
+
                 if (!found)
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
@@ -1527,7 +1596,8 @@ namespace ControlValley
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
                             found = true;
-                            if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
+                            TestMod.mls.LogInfo("Found Monster: " + enteredText[1]);
+                            if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
                             {
                                 try
                                 {
@@ -1541,23 +1611,8 @@ namespace ControlValley
                             }
                         }
                     }
-                if (!found)
-                    foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
-                    {
 
-                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
-                        {
-                            found = true;
-                            try
-                            {
-                                if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
-                            }
-                            catch (Exception e)
-                            {
-
-                            }
-                        }
-                    }
+                if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is inside ship");
 
                 if (TestMod.isHost)
                 {
@@ -1656,9 +1711,8 @@ namespace ControlValley
                 }
             }
 
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS, "");
         }
-
         #endregion
 
         #region Items
