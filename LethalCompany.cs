@@ -203,7 +203,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Weather - Foggy", "weather_3") { Category = "Weather"},
                 new("Weather - Flooded", "weather_4") { Category = "Weather"},
                 new("Weather - Eclipsed", "weather_5") { Category = "Weather"},
-                new("Random Lightning Strike", "lightning") { Category = "Weather"},
+                //new("Random Lightning Strike", "lightning") { Category = "Weather"},
 
                 new("Give 5 Credits", "givecred_5") { Category = "Scrap/Money"},
                 new("Give 50 Credits", "givecred_50") { Category = "Scrap/Money"},
