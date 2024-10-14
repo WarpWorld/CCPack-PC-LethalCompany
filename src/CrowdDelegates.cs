@@ -775,9 +775,10 @@ namespace ControlValley
         #region Players
         public static CrowdResponse HyperMove(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
-
+            if(playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -789,9 +790,11 @@ namespace ControlValley
 
         public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -804,9 +807,11 @@ namespace ControlValley
 
         public static CrowdResponse Drunk(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 10;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
 
@@ -816,9 +821,11 @@ namespace ControlValley
 
         public static CrowdResponse SlowMove(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -830,9 +837,11 @@ namespace ControlValley
 
         public static CrowdResponse Freeze(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -846,9 +855,11 @@ namespace ControlValley
         public static CrowdResponse UltraJump(ControlClient client, CrowdRequest req)
         {
 
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -859,9 +870,11 @@ namespace ControlValley
 
         public static CrowdResponse HighJump(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -872,9 +885,11 @@ namespace ControlValley
 
         public static CrowdResponse LowJump(ControlClient client, CrowdRequest req)
         {
+            var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
 
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
