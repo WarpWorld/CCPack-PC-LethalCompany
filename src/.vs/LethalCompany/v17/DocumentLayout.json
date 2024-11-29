@@ -58,8 +58,7 @@
               "RelativeToolTip": "ControlClient.cs",
               "ViewState": "AQIAAP4AAAAAAAAAAADwvwsBAAAkAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-29T17:34:04.825Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T17:34:04.825Z"
             },
             {
               "$type": "Document",
@@ -71,21 +70,19 @@
               "RelativeToolTip": "Mod.cs",
               "ViewState": "AQIAADgBAAAAAAAAAAAewEgBAACFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-29T17:35:03.38Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T17:35:03.38Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "LethalCompany",
+              "Title": "LethalCompany.csproj",
               "DocumentMoniker": "C:\\Users\\KatDevsGames\\source\\repos\\CrowdControl.Packs\\PC\\LethalCompany\\src\\LethalCompany.csproj",
               "RelativeDocumentMoniker": "LethalCompany.csproj",
               "ToolTip": "C:\\Users\\KatDevsGames\\source\\repos\\CrowdControl.Packs\\PC\\LethalCompany\\src\\LethalCompany.csproj",
               "RelativeToolTip": "LethalCompany.csproj",
               "ViewState": "AQIAAEEAAAAAAAAAAAAAAFUAAAA2AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2024-08-29T18:39:46.418Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T18:39:46.418Z"
             },
             {
               "$type": "Document",
@@ -97,8 +94,7 @@
               "RelativeToolTip": "EffectDelegates.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-29T17:34:16.463Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T17:34:16.463Z"
             },
             {
               "$type": "Document",
@@ -110,8 +106,7 @@
               "RelativeToolTip": "Patches\\PlayerControllerBPatch.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAD8AAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-29T17:35:03.327Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T17:35:03.327Z"
             },
             {
               "$type": "Document",
@@ -121,7 +116,7 @@
               "RelativeDocumentMoniker": "TimedThread.cs",
               "ToolTip": "C:\\Users\\KatDevsGames\\source\\repos\\CrowdControl.Packs\\PC\\LethalCompany\\src\\TimedThread.cs",
               "RelativeToolTip": "TimedThread.cs",
-              "ViewState": "AQIAAGsBAAAAAAAAAAAWwHoBAAAPAAAA",
+              "ViewState": "AgIAAGsBAAAAAAAAAAAWwHoBAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-08-29T17:35:03.394Z",
               "EditorCaption": ""
