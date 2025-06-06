@@ -36,6 +36,8 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
+using System.Reflection.Emit;
+using System.Diagnostics.Eventing.Reader;
 
 namespace LethalCompanyTestMod
 {
@@ -167,7 +169,22 @@ namespace LethalCompanyTestMod
         {
             //mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost.ToString());
             isHost = RoundManager.Instance.NetworkManager.IsHost;
-
+            EnemyAI[] spawnableEnemies2 = Resources.FindObjectsOfTypeAll<EnemyAI>();
+            foreach (var enemy in spawnableEnemies2)
+            {
+                SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+                currEnemy.enemyType = enemy.enemyType;
+                currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
+                currEnemy.rarity = 0;
+                bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
+                if (exists) { }
+                else
+                {
+                    if (currEnemy.enemyType.isOutsideEnemy) { RoundManager.Instance.currentLevel.OutsideEnemies.Add(currEnemy); }
+                    else { RoundManager.Instance.currentLevel.Enemies.Add(currEnemy); }
+                }
+            }
+            TestMod.mls.LogInfo("Patched Enemy Spawns");
             verwait = 30;
 
 
@@ -214,7 +231,6 @@ namespace LethalCompanyTestMod
                 enemyRaritys.TryGetValue(enemy, out rare);
                 enemy.rarity = rare;
             }
-
             // make a dictionary of the outside enemy rarities
             foreach (var enemy in newLevel.OutsideEnemies)
             {
@@ -1085,6 +1101,27 @@ namespace LethalCompanyTestMod
                     }
                     break;
                 }
+                else
+                {
+                    foreach (var level in currentStart.levels)
+                    {
+                        var enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()));
+                        if (enemyRef != null)
+                        {
+                            try
+                            {
+                                foundEnemy = true;
+                                foundEnemyName = enemyRef.enemyType.enemyName;
+                                SpawnEnemy(enemyRef, 1, true);
+                            }
+                            catch
+                            {
+
+                            }
+                            break;
+                        }
+                    }
+                }
             }
             if (!foundEnemy)
             {
@@ -1115,8 +1152,28 @@ namespace LethalCompanyTestMod
                         }
                         break;
                     }
-                }
+                    else
+                    {
+                        foreach (var level in currentStart.levels)
+                        {
+                            var enemyRef = level.OutsideEnemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()));
+                            if (enemyRef != null)
+                            {
+                                try
+                                {
+                                    foundEnemy = true;
+                                    foundEnemyName = enemyRef.enemyType.enemyName;
+                                    SpawnEnemy(enemyRef, 1, false);
+                                }
+                                catch 
+                                {
+                                
+                                }
+                            }
+                        }
+                    }
 
+                } 
             }
         }
 

@@ -113,6 +113,8 @@ namespace ControlValley
                 {"spawn_butler", CrowdDelegates.Spawn},
                 {"spawn_jester", CrowdDelegates.Spawn},
                 {"spawn_eater", CrowdDelegates.Spawn},
+                {"spawn_snake", CrowdDelegates.Spawn},
+                {"spawn_kiwi", CrowdDelegates.Spawn},
 
                 {"cspawn_pede", CrowdDelegates.CrewSpawn},
                 {"cspawn_spider", CrowdDelegates.CrewSpawn},

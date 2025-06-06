@@ -1351,30 +1351,6 @@ namespace ControlValley
                 found = true;
             }
             if (!found)
-            {
-                foreach (var level in StartOfRound.Instance.levels)
-                { 
-                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                    if (enemyRef != null)
-                    {
-                        if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
-                        {
-                            enemyRef.rarity = 0;
-                            if (!enemyRef.enemyType.isOutsideEnemy)
-                            {
-                                RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
-                            }
-                            if (enemyRef.enemyType.isOutsideEnemy)
-                            {
-                                RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
-                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
-                            }
-                        }
-                    }
-                }
-            }
-            if (!found)
                 foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
                     if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester")
@@ -1412,7 +1388,30 @@ namespace ControlValley
                         }
                     }
                 }
-
+            if (!found)
+            {
+                foreach (var level in StartOfRound.Instance.levels)
+                {
+                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
+                    if (enemyRef != null)
+                    {
+                        if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                        {
+                            enemyRef.rarity = 0;
+                            if (!enemyRef.enemyType.isOutsideEnemy)
+                            {
+                                RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
+                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
+                            }
+                            if (enemyRef.enemyType.isOutsideEnemy)
+                            {
+                                RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
+                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
+                            }
+                        }
+                    }
+                }
+            }
             if (found == false) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
 
             if (TestMod.isHost)
@@ -1559,28 +1558,7 @@ namespace ControlValley
                     found = true;
                 }
 
-                if (!found)
-                {
-                    foreach (var level in StartOfRound.Instance.levels)
-                    {
-                        enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                        if (enemyRef != null)
-                        {
-                            if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
-                            {
-                                enemyRef.rarity = 0;
-                                if (!enemyRef.enemyType.isOutsideEnemy)
-                                {
-                                    RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                                }
-                                if(enemyRef.enemyType.isOutsideEnemy)
-                                {
-                                    RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
-                                }
-                            }
-                        }
-                    }
-                }
+
                 if (!found)
                     foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                     {
@@ -1626,7 +1604,28 @@ namespace ControlValley
                             }
                         }
                     }
-
+                if (!found)
+                {
+                    foreach (var level in StartOfRound.Instance.levels)
+                    {
+                        enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
+                        if (enemyRef != null)
+                        {
+                            if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                            {
+                                enemyRef.rarity = 0;
+                                if (!enemyRef.enemyType.isOutsideEnemy)
+                                {
+                                    RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
+                                }
+                                if (enemyRef.enemyType.isOutsideEnemy)
+                                {
+                                    RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
+                                }
+                            }
+                        }
+                    }
+                }
                 if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is inside ship");
 
                 if (TestMod.isHost)

@@ -1,5 +1,3 @@
-C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache
-C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\LethalCompany.csproj.CoreCompileInputs.cache
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\CrowdControl.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\CrowdControl.pdb
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\0Harmony.dll
@@ -19,6 +17,8 @@ C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\UnityEngi
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\UnityEngine.PhysicsModule.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\UnityEngine.TextRenderingModule.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\bin\Debug\UnityEngine.UI.dll
+C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\LethalCompany.csproj.AssemblyReference.cache
+C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\LethalCompany.csproj.CoreCompileInputs.cache
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\LethalCo.C96713F5.Up2Date
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\CrowdControl.dll
 C:\Users\mrfaw\Documents\GitHub\CCPack-PC-LethalCompany2\src\obj\Debug\CrowdControl.pdb
