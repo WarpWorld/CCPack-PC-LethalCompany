@@ -45,9 +45,9 @@ namespace LethalCompanyTestMod
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.15";
+        private const string modVersion = "1.1.14";
 
-        public static string tsVersion = "1.1.15";
+        public static string tsVersion = "1.1.14";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -150,6 +150,11 @@ namespace LethalCompanyTestMod
         static void startRound()
         {
             currentStart = StartOfRound.Instance;
+            EnemyAI[] spawnableEnemies = Resources.FindObjectsOfTypeAll<EnemyAI>();
+            foreach (var enemy in spawnableEnemies)
+            {
+                TestMod.mls.LogInfo("Enemy Name: "+enemy.enemyType.enemyName);
+            }
             //foreach(Item item in currentStart.allItemsList.itemsList)
             //{
                // mls.LogInfo(item.name);
@@ -183,7 +188,6 @@ namespace LethalCompanyTestMod
             // avoid setting manually in case there is a missed path that executes even if not host
             //isHost = true;
             // doesn't need to be returned early as a result of above mentioned
-
             currentRound = RoundManager.Instance;
             if (!levelEnemySpawns.ContainsKey(newLevel))
             {

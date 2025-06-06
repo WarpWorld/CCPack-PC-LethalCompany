@@ -1344,7 +1344,7 @@ namespace ControlValley
                 if (prefab == null)
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
-            }
+            }    
             if (enteredText[1] == "landmine")
             {
                 if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
@@ -1353,7 +1353,7 @@ namespace ControlValley
             if (!found)
             {
                 foreach (var level in StartOfRound.Instance.levels)
-                {
+                { 
                     enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
                     if (enemyRef != null)
                     {
@@ -1377,7 +1377,7 @@ namespace ControlValley
             if (!found)
                 foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
-                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester")
                     {
                         try
                         {
