@@ -42,6 +42,7 @@ namespace LethalCompanyTestMod
     [BepInPlugin(modGUID, modName, modVersion)]
     public class TestMod : BaseUnityPlugin
     {
+        // for code diffs: https://1a3.uk/games/lethal-company/diffs/
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
@@ -150,14 +151,14 @@ namespace LethalCompanyTestMod
         static void startRound()
         {
             currentStart = StartOfRound.Instance;
-            EnemyAI[] spawnableEnemies = Resources.FindObjectsOfTypeAll<EnemyAI>();
-            foreach (var enemy in spawnableEnemies)
-            {
-                TestMod.mls.LogInfo("Enemy Name: "+enemy.enemyType.enemyName);
-            }
+            //EnemyAI[] spawnableEnemies = Resources.FindObjectsOfTypeAll<EnemyAI>();
+            //foreach (var enemy in spawnableEnemies)
+            //{
+            //TestMod.mls.LogInfo("Enemy Name: "+enemy.enemyType.enemyName);
+            //}
             //foreach(Item item in currentStart.allItemsList.itemsList)
             //{
-               // mls.LogInfo(item.name);
+            // mls.LogInfo(item.name);
             //}//Test code, used for printing all item names in the list on round start (Landing ship)
         }
         [HarmonyPatch(typeof(RoundManager), "Start")]
