@@ -164,6 +164,7 @@ namespace LethalCompanyTestMod
             //}//Test code, used for printing all item names in the list on round start (Landing ship)
         }
         [HarmonyPatch(typeof(RoundManager), "Start")]
+        [HarmonyPriority(300)]//patch earlier than LLL so it enables on Custom levels?
         [HarmonyPrefix]
         static void setIsHost()
         {
