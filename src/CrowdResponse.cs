@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
-using LethalCompanyTestMod;
+using BepinControl;
 using Newtonsoft.Json;
 
 namespace ControlValley

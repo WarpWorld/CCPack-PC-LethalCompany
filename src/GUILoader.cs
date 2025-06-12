@@ -9,7 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Windows;
 
-namespace LethalCompanyTestMod.Component
+namespace BepinControl.Component
 {
     internal class GUILoader : MonoBehaviour
     {
@@ -88,7 +88,7 @@ namespace LethalCompanyTestMod.Component
 
         private void Awake()
         {
-            TestMod.mls.LogInfo("GUILoader loaded.");      
+            LethalCompanyControl.mls.LogInfo("GUILoader loaded.");      
             openCloseMenu = new KeyboardShortcut(KeyCode.Insert);
             isMenuOpen = false;
             // this isn't pygame.. only need the screenwidth and height
@@ -148,7 +148,7 @@ namespace LethalCompanyTestMod.Component
 
         public void OnDestroy()
         {
-            TestMod.mls.LogInfo("The GUILoader was destroyed :(");
+            LethalCompanyControl.mls.LogInfo("The GUILoader was destroyed :(");
         }
 
 

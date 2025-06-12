@@ -1,3 +1,4 @@
+using BepinControl;
 using GameNetcodeStuff;
 using HarmonyLib;
 using System;
@@ -13,16 +14,16 @@ namespace LethalCompanyTestMod.Patches
         [HarmonyPrefix]
         static void getNightVision(ref PlayerControllerB __instance)
         {
-            TestMod.playerRef = __instance;
-            TestMod.nightVision = TestMod.playerRef.nightVision.enabled;
+            LethalCompanyControl.playerRef = __instance;
+            LethalCompanyControl.nightVision = LethalCompanyControl.playerRef.nightVision.enabled;
             // store nightvision values
-            TestMod.nightVisionIntensity = TestMod.playerRef.nightVision.intensity;
-            TestMod.nightVisionColor = TestMod.playerRef.nightVision.color;
-            TestMod.nightVisionRange = TestMod.playerRef.nightVision.range;
+            LethalCompanyControl.nightVisionIntensity = LethalCompanyControl.playerRef.nightVision.intensity;
+            LethalCompanyControl.nightVisionColor = LethalCompanyControl.playerRef.nightVision.color;
+            LethalCompanyControl.nightVisionRange = LethalCompanyControl.playerRef.nightVision.range;
 
-            TestMod.playerRef.nightVision.color = UnityEngine.Color.green;
-            TestMod.playerRef.nightVision.intensity = 1000f;
-            TestMod.playerRef.nightVision.range = 10000f;
+            LethalCompanyControl.playerRef.nightVision.color = UnityEngine.Color.green;
+            LethalCompanyControl.playerRef.nightVision.intensity = 1000f;
+            LethalCompanyControl.playerRef.nightVision.range = 10000f;
         }
 
         [HarmonyPatch("SetNightVisionEnabled")]
@@ -31,36 +32,36 @@ namespace LethalCompanyTestMod.Patches
         {
             //instead of enabling/disabling nightvision, set the variables
 
-            if (TestMod.nightVision)
+            if (LethalCompanyControl.nightVision)
             {
-                TestMod.playerRef.nightVision.color = UnityEngine.Color.green;
-                TestMod.playerRef.nightVision.intensity = 1000f;
-                TestMod.playerRef.nightVision.range = 10000f;
+                LethalCompanyControl.playerRef.nightVision.color = UnityEngine.Color.green;
+                LethalCompanyControl.playerRef.nightVision.intensity = 1000f;
+                LethalCompanyControl.playerRef.nightVision.range = 10000f;
             }
             else
             {
-                TestMod.playerRef.nightVision.color = TestMod.nightVisionColor;
-                TestMod.playerRef.nightVision.intensity = TestMod.nightVisionIntensity;
-                TestMod.playerRef.nightVision.range = TestMod.nightVisionRange;
+                LethalCompanyControl.playerRef.nightVision.color = LethalCompanyControl.nightVisionColor;
+                LethalCompanyControl.playerRef.nightVision.intensity = LethalCompanyControl.nightVisionIntensity;
+                LethalCompanyControl.playerRef.nightVision.range = LethalCompanyControl.nightVisionRange;
             }
 
             // should always be on
-            TestMod.playerRef.nightVision.enabled = true;
+            LethalCompanyControl.playerRef.nightVision.enabled = true;
         }
         
         [HarmonyPatch("AllowPlayerDeath")]
         [HarmonyPrefix]
         static bool OverrideDeath()
         {
-            if (!TestMod.isHost) { return true; }
-            return !TestMod.enableGod;
+            if (!LethalCompanyControl.isHost) { return true; }
+            return !LethalCompanyControl.enableGod;
         }
 
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         static void InfiniteSprint(ref float ___sprintMeter)
         {
-            if (TestMod.infSprint && TestMod.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
+            if (LethalCompanyControl.infSprint && LethalCompanyControl.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
         }
     }
 }

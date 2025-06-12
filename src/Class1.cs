@@ -24,7 +24,7 @@ using BepInEx.Configuration;
 using System.Reflection;
 using Unity.Netcode;
 using static System.Net.Mime.MediaTypeNames;
-using LethalCompanyTestMod.Component;
+using BepinControl.Component;
 using Steamworks.Ugc;
 using System.Threading;
 using ControlValley;
@@ -39,10 +39,10 @@ using static TerminalApi.Events.Events;
 using System.Reflection.Emit;
 using System.Diagnostics.Eventing.Reader;
 
-namespace LethalCompanyTestMod
+namespace BepinControl
 {
     [BepInPlugin(modGUID, modName, modVersion)]
-    public class TestMod : BaseUnityPlugin
+    public class LethalCompanyControl : BaseUnityPlugin
     {
         // for code diffs: https://1a3.uk/games/lethal-company/diffs/
         // Mod Details
@@ -82,7 +82,7 @@ namespace LethalCompanyTestMod
         private static bool hasGUISynced = false;
         internal static bool isHost = false;
 
-        internal static TestMod Instance = null;
+        internal static LethalCompanyControl Instance = null;
         private ControlClient client = null;
 
         public static bool test = false;
@@ -100,7 +100,8 @@ namespace LethalCompanyTestMod
             mls = BepInEx.Logging.Logger.CreateLogSource("Crowd Control");
             // Plugin startup logic
             mls.LogInfo($"Loaded {modGUID}. Patching.");
-            harmony.PatchAll(typeof(TestMod));
+            harmony.PatchAll(typeof(LethalCompanyControl));
+            harmony.PatchAll(typeof(GUILoader));
             mls.LogInfo($"Initializing Crowd Control");
 
             try
@@ -128,7 +129,6 @@ namespace LethalCompanyTestMod
             infSprint = false;
 
             Events.TerminalBeginUsing += new TerminalEventHandler(OnBeginUsing);
-
         }
 
         private void OnBeginUsing(object sender, TerminalEventArgs e)
@@ -152,11 +152,12 @@ namespace LethalCompanyTestMod
         [HarmonyPrefix]
         static void startRound()
         {
+            LethalCompanyControl.PatchMonsterSpawns();
             currentStart = StartOfRound.Instance;
             //EnemyAI[] spawnableEnemies = Resources.FindObjectsOfTypeAll<EnemyAI>();
             //foreach (var enemy in spawnableEnemies)
             //{
-            //TestMod.mls.LogInfo("Enemy Name: "+enemy.enemyType.enemyName);
+            //LethalCompanyControl.mls.LogInfo("Enemy Name: "+enemy.enemyType.enemyName);
             //}
             //foreach(Item item in currentStart.allItemsList.itemsList)
             //{
@@ -166,16 +167,16 @@ namespace LethalCompanyTestMod
         [HarmonyPatch(typeof(RoundManager), "Start")]
         [HarmonyPriority(300)]//patch earlier than LLL so it enables on Custom levels?
         [HarmonyPrefix]
-        static void setIsHost()
+        public static void PatchMonsterSpawns()
         {
-            //mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost.ToString());
-            isHost = RoundManager.Instance.NetworkManager.IsHost;
             EnemyAI[] spawnableEnemies2 = Resources.FindObjectsOfTypeAll<EnemyAI>();
             foreach (var enemy in spawnableEnemies2)
             {
                 SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
                 currEnemy.enemyType = enemy.enemyType;
+                currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
                 currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
+                currEnemy.enemyType.name = enemy.enemyType.name;
                 currEnemy.rarity = 0;
                 bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
                 if (exists) { }
@@ -185,7 +186,32 @@ namespace LethalCompanyTestMod
                     else { RoundManager.Instance.currentLevel.Enemies.Add(currEnemy); }
                 }
             }
-            TestMod.mls.LogInfo("Patched Enemy Spawns");
+            LethalCompanyControl.mls.LogInfo("Crowd Control has Patched Enemy Spawns.");
+        }
+        [HarmonyPatch(typeof(RoundManager), "Start")]
+        [HarmonyPrefix]
+        public static void SetIsHost()
+        {
+            //mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost.ToString());
+            isHost = RoundManager.Instance.NetworkManager.IsHost;
+            //EnemyAI[] spawnableEnemies2 = Resources.FindObjectsOfTypeAll<EnemyAI>();
+            //foreach (var enemy in spawnableEnemies2)
+            //{
+            //    SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+            //    currEnemy.enemyType = enemy.enemyType;
+            //    currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
+            //    currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
+            //    currEnemy.enemyType.name = enemy.enemyType.name;
+            //   currEnemy.rarity = 0;
+            //    bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
+            //    if (exists) { }
+             //   else
+            //    {
+            //        if (currEnemy.enemyType.isOutsideEnemy) { RoundManager.Instance.currentLevel.OutsideEnemies.Add(currEnemy); }
+            //        else { RoundManager.Instance.currentLevel.Enemies.Add(currEnemy); }
+            //    }
+            //}
+            //LethalCompanyControl.mls.LogInfo("Crowd Control has Patched Enemy Spawns.");
             verwait = 30;
 
 
@@ -208,6 +234,7 @@ namespace LethalCompanyTestMod
             //isHost = true;
             // doesn't need to be returned early as a result of above mentioned
             currentRound = RoundManager.Instance;
+            LethalCompanyControl.PatchMonsterSpawns();
             if (!levelEnemySpawns.ContainsKey(newLevel))
             {
                 List<SpawnableEnemyWithRarity> spawns = new List<SpawnableEnemyWithRarity>();
@@ -350,7 +377,7 @@ namespace LethalCompanyTestMod
 
                 text = text.Replace("/cc_", "");
 
-                //TestMod.mls.LogInfo(text);
+                //LethalCompanyControl.mls.LogInfo(text);
 
                 string[] values = text.Split('_');
 
@@ -378,9 +405,9 @@ namespace LethalCompanyTestMod
                         {
                             if (!isHost) return true;
 
-                            //TestMod.mls.LogInfo($"client spawn received");
+                            //LethalCompanyControl.mls.LogInfo($"client spawn received");
 
-                            TestMod.ActionQueue.Enqueue(() =>
+                            LethalCompanyControl.ActionQueue.Enqueue(() =>
                             {
                                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                                 {
@@ -389,8 +416,8 @@ namespace LethalCompanyTestMod
                                     {
                                         try
                                         {
-                                            //TestMod.mls.LogInfo($"client spawning {values[1]}");
-                                            TestMod.SpawnEnemy(outsideEnemy, 1, false);
+                                            //LethalCompanyControl.mls.LogInfo($"client spawning {values[1]}");
+                                            LethalCompanyControl.SpawnEnemy(outsideEnemy, 1, false);
 
                                         }
                                         catch (Exception e)
@@ -407,8 +434,8 @@ namespace LethalCompanyTestMod
                                     {
                                         try
                                         {
-                                            //TestMod.mls.LogInfo($"client spawning {values[1]}");
-                                            TestMod.SpawnEnemy(outsideEnemy, 1, false);
+                                            //LethalCompanyControl.mls.LogInfo($"client spawning {values[1]}");
+                                            LethalCompanyControl.SpawnEnemy(outsideEnemy, 1, false);
 
                                         }
                                         catch (Exception e)
@@ -440,7 +467,7 @@ namespace LethalCompanyTestMod
                             if (player == null) return true;
 
 
-                            TestMod.ActionQueue.Enqueue(() =>
+                            LethalCompanyControl.ActionQueue.Enqueue(() =>
                             {
                                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                                 {
@@ -461,7 +488,7 @@ namespace LethalCompanyTestMod
                                         if (prefab == null)
                                             return;
 
-                                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);
                                         HauntedMaskItem component = gameObject.GetComponent<HauntedMaskItem>();
 
                                         GameObject obj = UnityEngine.Object.Instantiate(component.mimicEnemy.enemyPrefab, player.transform.position + player.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
@@ -486,7 +513,7 @@ namespace LethalCompanyTestMod
                                     {
                                         try
                                         {
-                                            TestMod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+                                            LethalCompanyControl.SpawnCrewEnemy(player, outsideEnemy, 1, false);
 
                                         }
                                         catch (Exception e)
@@ -503,7 +530,7 @@ namespace LethalCompanyTestMod
                                     {
                                         try
                                         {
-                                            TestMod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+                                            LethalCompanyControl.SpawnCrewEnemy(player, outsideEnemy, 1, false);
 
                                         }
                                         catch (Exception e)
@@ -631,7 +658,7 @@ namespace LethalCompanyTestMod
                             if (dist.magnitude < 6.0f) pos = test;
 
 
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), TestMod.currentStart.propsContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), LethalCompanyControl.currentStart.propsContainer);
 
                             break;
                         }
@@ -691,7 +718,7 @@ namespace LethalCompanyTestMod
 
 
                             Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);//Fix Item Giving for Non Host, Oops
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);//Fix Item Giving for Non Host, Oops
                             gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
                             gameObject.GetComponent<NetworkObject>().Spawn(false);
 
@@ -885,14 +912,14 @@ namespace LethalCompanyTestMod
                             {
                                 try
                                 {
-                                    //TestMod.mls.LogInfo($"trying pitch {i}");
+                                    //LethalCompanyControl.mls.LogInfo($"trying pitch {i}");
 
 
-                                    //TestMod.mls.LogInfo($"pitch target {SoundManager.Instance.playerVoicePitchTargets[i]}");
+                                    //LethalCompanyControl.mls.LogInfo($"pitch target {SoundManager.Instance.playerVoicePitchTargets[i]}");
 
                                     SoundManager.Instance.playerVoicePitchTargets[i] = cur;
 
-                                    //TestMod.mls.LogInfo($"pitch value {SoundManager.Instance.playerVoicePitches[i]}");
+                                    //LethalCompanyControl.mls.LogInfo($"pitch value {SoundManager.Instance.playerVoicePitches[i]}");
 
                                     SoundManager.Instance.playerVoicePitches[i] = cur;
 
@@ -901,12 +928,12 @@ namespace LethalCompanyTestMod
                                         if (StartOfRound.Instance.allPlayerScripts[i].currentVoiceChatAudioSource != null)
                                             StartOfRound.Instance.allPlayerScripts[i].currentVoiceChatAudioSource.pitch = cur;
                                         SoundManager.Instance.SetPlayerPitch(cur, i);
-                                        //TestMod.mls.LogInfo($"set pitch {i} to {cur}");
+                                        //LethalCompanyControl.mls.LogInfo($"set pitch {i} to {cur}");
                                     }
                                 }
                                 catch (Exception e)
                                 {
-                                    TestMod.mls.LogError(e.ToString());
+                                    LethalCompanyControl.mls.LogError(e.ToString());
                                 }
                             }
                         }
@@ -1053,7 +1080,7 @@ namespace LethalCompanyTestMod
                             }
                             catch (Exception ex)
                             {
-                                TestMod.mls.LogError(ex.ToString());
+                                LethalCompanyControl.mls.LogError(ex.ToString());
                             }
                         }
                         break;
@@ -1061,7 +1088,7 @@ namespace LethalCompanyTestMod
             }
             catch (Exception ex)
             {
-                TestMod.mls.LogError(ex.ToString());
+                LethalCompanyControl.mls.LogError(ex.ToString());
             }
 
             return false;

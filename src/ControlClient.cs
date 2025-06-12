@@ -20,7 +20,7 @@
  * USA
  */
 
-using LethalCompanyTestMod;
+using BepinControl;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -137,6 +137,8 @@ namespace ControlValley
                 {"cspawn_clay", CrowdDelegates.CrewSpawn},
                 {"cspawn_jester", CrowdDelegates.CrewSpawn},
                 {"cspawn_eater", CrowdDelegates.CrewSpawn},
+                {"cspawn_snake", CrowdDelegates.CrewSpawn},
+                {"cspawn_kiwi", CrowdDelegates.CrewSpawn},
 
                 { "give_binoculars", CrowdDelegates.GiveItem},//binoculars
                 { "give_boombox", CrowdDelegates.GiveItem},//boombox
@@ -331,7 +333,7 @@ namespace ControlValley
         private void ClientLoop()
         {
 
-            TestMod.mls.LogInfo("Connected to Crowd Control");
+            LethalCompanyControl.mls.LogInfo("Connected to Crowd Control");
             connect = true;
 
             var timer = new Timer(timeUpdate, null, 0, 200);
@@ -349,7 +351,7 @@ namespace ControlValley
             }
             catch (Exception)
             {
-                TestMod.mls.LogInfo("Disconnected from Crowd Control");
+                LethalCompanyControl.mls.LogInfo("Disconnected from Crowd Control");
                 connect = false;
                 Socket.Close();
             }
@@ -387,7 +389,7 @@ namespace ControlValley
             while (Running)
             {
 
-                TestMod.mls.LogInfo("Attempting to connect to Crowd Control");
+                LethalCompanyControl.mls.LogInfo("Attempting to connect to Crowd Control");
 
                 try
                 {
@@ -396,12 +398,12 @@ namespace ControlValley
                     if (Socket.BeginConnect(Endpoint, null, null).AsyncWaitHandle.WaitOne(10000, true) && Socket.Connected)
                         ClientLoop();
                     else
-                        TestMod.mls.LogInfo("Failed to connect to Crowd Control");
+                        LethalCompanyControl.mls.LogInfo("Failed to connect to Crowd Control");
                     Socket.Close();
                 }
                 catch (Exception e)
                 {
-                    TestMod.mls.LogInfo("Failed to connect to Crowd Control");
+                    LethalCompanyControl.mls.LogInfo("Failed to connect to Crowd Control");
                 }
 
                 Thread.Sleep(10000);
@@ -448,7 +450,7 @@ namespace ControlValley
                 }
                 catch (Exception)
                 {
-                    TestMod.mls.LogInfo("Disconnected from Crowd Control");
+                    LethalCompanyControl.mls.LogInfo("Disconnected from Crowd Control");
                     Socket.Close();
                 }
             }
@@ -468,7 +470,7 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                TestMod.mls.LogError(e.ToString());
+                LethalCompanyControl.mls.LogError(e.ToString());
                 return false;
             }
 

@@ -2,7 +2,7 @@
 using ControlValley;
 using DunGen;
 using GameNetcodeStuff;
-using LethalCompanyTestMod;
+using BepinControl;
 using Newtonsoft.Json.Linq;
 using Steamworks.Data;
 using System;
@@ -72,7 +72,7 @@ namespace ControlValley
                 }
                 else
                 {
-                    TestMod.test = true;
+                    LethalCompanyControl.test = true;
 
                     //StartOfRound.Instance.ChangeLevel(6);
                 }
@@ -81,7 +81,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
 
@@ -100,9 +100,9 @@ namespace ControlValley
                 if (playerRef.health <= 0 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
-                        if (TestMod.isHost)
+                        if (LethalCompanyControl.isHost)
                         {
                             playerRef.KillPlayer(playerRef.transform.up * 100.0f, true, CauseOfDeath.Inertia, 0);
                         }
@@ -116,7 +116,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -148,7 +148,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_kill_{(int)player.playerClientId}</size>");
                     });
@@ -157,7 +157,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -178,7 +178,7 @@ namespace ControlValley
                 if (playerRef.health <= 20 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         int dmg = 25;
                         if (playerRef.health < 25) dmg = playerRef.health - 1;
@@ -190,7 +190,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -223,7 +223,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_damage_{(int)player.playerClientId}</size>");
@@ -235,7 +235,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -258,7 +258,7 @@ namespace ControlValley
                 else
                 {
 
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.health = Mathf.Clamp(playerRef.health + 25, 0, 100);
 
@@ -277,7 +277,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
 
@@ -311,7 +311,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_heal_{(int)player.playerClientId}</size>");
@@ -323,7 +323,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -421,7 +421,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.PlayFootstepServer();
                         playerRef.movementAudio.PlayOneShot(StartOfRound.Instance.footstepSurfaces[0].clips[0], 4.0f);
@@ -433,7 +433,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -470,7 +470,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         foreach (var level in StartOfRound.Instance.levels)
@@ -532,7 +532,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -569,7 +569,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         foreach (var level in StartOfRound.Instance.levels)
@@ -631,7 +631,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -668,7 +668,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         foreach (var level in StartOfRound.Instance.levels)
@@ -730,7 +730,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -744,7 +744,7 @@ namespace ControlValley
             if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
-            TestMod.ActionQueue.Enqueue(() =>
+            LethalCompanyControl.ActionQueue.Enqueue(() =>
             {
                 HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.5</size>");
             });
@@ -761,7 +761,7 @@ namespace ControlValley
             if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
-            TestMod.ActionQueue.Enqueue(() =>
+            LethalCompanyControl.ActionQueue.Enqueue(() =>
             {
                 HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_0.65</size>");
             });
@@ -911,7 +911,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
 
                             StartOfRound.Instance.ReviveDeadPlayers();
@@ -924,7 +924,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -945,7 +945,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
 
                             StartOfRound.Instance.ForcePlayerIntoShip();
@@ -957,7 +957,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
             return new CrowdResponse(req.GetReqID(), status, message);
         }
@@ -989,7 +989,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_ship_{(int)player.playerClientId}</size>");
@@ -1001,7 +1001,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1034,7 +1034,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             playerRef.TeleportPlayer(player.transform.position);
 
@@ -1045,7 +1045,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1078,7 +1078,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_tele_{(int)player.playerClientId}_{(int)playerRef.playerClientId}</size>");
 
@@ -1089,7 +1089,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1110,7 +1110,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
 
                             //playerRef.SpawnDeadBody((int)playerRef.playerClientId, playerRef.transform.up * 2.0f + playerRef.transform.forward * 5.0f, 0, playerRef);
@@ -1125,7 +1125,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1160,7 +1160,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
 
                             msgid++;
@@ -1173,7 +1173,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1191,7 +1191,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         int layerMask = ~LayerMask.GetMask(new string[]
                         {
@@ -1221,7 +1221,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1241,7 +1241,7 @@ namespace ControlValley
                 }
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
                         Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
@@ -1255,7 +1255,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1288,7 +1288,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_inverse_{(int)player.playerClientId}</size>");
 
@@ -1299,7 +1299,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1395,18 +1395,18 @@ namespace ControlValley
                     enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
                     if (enemyRef != null)
                     {
-                        if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                        if (!LethalCompanyControl.currentLevel.Enemies.Contains(enemyRef))
                         {
                             enemyRef.rarity = 0;
                             if (!enemyRef.enemyType.isOutsideEnemy)
                             {
                                 RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
+                                LethalCompanyControl.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
                             }
                             if (enemyRef.enemyType.isOutsideEnemy)
                             {
                                 RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
-                                TestMod.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
+                                LethalCompanyControl.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
                             }
                         }
                     }
@@ -1414,10 +1414,10 @@ namespace ControlValley
             }
             if (found == false) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
 
-            if (TestMod.isHost)
+            if (LethalCompanyControl.isHost)
             {
 
-                TestMod.ActionQueue.Enqueue(() =>
+                LethalCompanyControl.ActionQueue.Enqueue(() =>
                 {
 
                     if (enteredText[1] == "mimic")
@@ -1436,7 +1436,7 @@ namespace ControlValley
                         if (prefab == null)
                             return;
 
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, playerRef.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);
                         HauntedMaskItem component = gameObject.GetComponent<HauntedMaskItem>();
 
                         GameObject obj = UnityEngine.Object.Instantiate(component.mimicEnemy.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
@@ -1470,12 +1470,12 @@ namespace ControlValley
 
                             try
                             {
-                                TestMod.SpawnEnemy(outsideEnemy, 1, false);
+                                LethalCompanyControl.SpawnEnemy(outsideEnemy, 1, false);
 
                             }
                             catch (Exception e)
                             {
-                                TestMod.mls.LogWarning("Monster is Not Present Outside on Moon, Aborting");
+                                LethalCompanyControl.mls.LogWarning("Monster is Not Present Outside on Moon, Aborting");
 
                             }
                             return;
@@ -1487,12 +1487,12 @@ namespace ControlValley
                         {
                             try
                             {
-                                TestMod.SpawnEnemy(outsideEnemy, 1, true);
+                                LethalCompanyControl.SpawnEnemy(outsideEnemy, 1, true);
 
                             }
                             catch (Exception e)
                             {
-                                TestMod.mls.LogWarning("Monster is Not Present Inside on Moon, Aborting");
+                                LethalCompanyControl.mls.LogWarning("Monster is Not Present Inside on Moon, Aborting");
                             }
                             return;
                         }
@@ -1503,14 +1503,14 @@ namespace ControlValley
             {
                 try
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_cspawn_{enteredText[1]}_{(int)playerRef.playerClientId}</size>");
                     });
                 }
                 catch (Exception e)
                 {
-                    TestMod.mls.LogError(e.ToString());
+                    LethalCompanyControl.mls.LogError(e.ToString());
                 }
             }
 
@@ -1589,7 +1589,7 @@ namespace ControlValley
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
                             found = true;
-                            TestMod.mls.LogInfo("Found Monster: " + enteredText[1]);
+                            LethalCompanyControl.mls.LogInfo("Found Monster: " + enteredText[1]);
                             if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech" || enteredText[1].ToLower().Contains("bush"))
                             {
                                 try
@@ -1611,7 +1611,7 @@ namespace ControlValley
                         enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
                         if (enemyRef != null)
                         {
-                            if (!TestMod.currentLevel.Enemies.Contains(enemyRef))
+                            if (!LethalCompanyControl.currentLevel.Enemies.Contains(enemyRef))
                             {
                                 enemyRef.rarity = 0;
                                 if (!enemyRef.enemyType.isOutsideEnemy)
@@ -1628,10 +1628,10 @@ namespace ControlValley
                 }
                 if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is inside ship");
 
-                if (TestMod.isHost)
+                if (LethalCompanyControl.isHost)
                 {
 
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                         {
@@ -1652,7 +1652,7 @@ namespace ControlValley
                                 if (prefab == null)
                                     return;
 
-                                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                                GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, player.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);
                                 HauntedMaskItem component = gameObject.GetComponent<HauntedMaskItem>();
 
                                 GameObject obj = UnityEngine.Object.Instantiate(component.mimicEnemy.enemyPrefab, player.transform.position + player.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
@@ -1686,7 +1686,7 @@ namespace ControlValley
                             {
                                 try
                                 {
-                                    TestMod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+                                    LethalCompanyControl.SpawnCrewEnemy(player, outsideEnemy, 1, false);
 
                                 }
                                 catch (Exception e)
@@ -1703,7 +1703,7 @@ namespace ControlValley
                             {
                                 try
                                 {
-                                    TestMod.SpawnCrewEnemy(player, outsideEnemy, 1, false);
+                                    LethalCompanyControl.SpawnCrewEnemy(player, outsideEnemy, 1, false);
 
                                 }
                                 catch (Exception e)
@@ -1718,7 +1718,7 @@ namespace ControlValley
                 }
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_cspawn_{enteredText[1]}_{(int)player.playerClientId}</size>");
                     });
@@ -1742,7 +1742,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.DespawnHeldObject();
                     });
@@ -1752,7 +1752,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1784,7 +1784,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled || player.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_take_{(int)player.playerClientId}</size>");
                     });
@@ -1794,7 +1794,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1812,7 +1812,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.DiscardHeldObject();
                     });
@@ -1822,7 +1822,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1841,7 +1841,7 @@ namespace ControlValley
                 else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge == 0) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.currentlyHeldObjectServer.insertedBattery.charge = 0;
                         playerRef.currentlyHeldObjectServer.SyncBatteryServerRpc((int)playerRef.currentlyHeldObjectServer.insertedBattery.charge);
@@ -1853,7 +1853,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1872,7 +1872,7 @@ namespace ControlValley
                 else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge >= 0.96f) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         playerRef.currentlyHeldObjectServer.insertedBattery.charge = 1.0f;
                         playerRef.currentlyHeldObjectServer.SyncBatteryServerRpc((int)playerRef.currentlyHeldObjectServer.insertedBattery.charge);
@@ -1883,7 +1883,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -1928,10 +1928,10 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
                 }
 
-                if (!TestMod.isHost)
+                if (!LethalCompanyControl.isHost)
                 {
                     givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         msgid++;
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)playerRef.playerClientId}_{msgid}</size>");
@@ -1943,10 +1943,10 @@ namespace ControlValley
                 else
                 {
                     givedelay = 20;
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, playerRef.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);
                         gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
                         int Value = UnityEngine.Random.Range(0, 100);
                         gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
@@ -2003,7 +2003,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2058,9 +2058,9 @@ namespace ControlValley
 
                 player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (!TestMod.isHost)
+                if (!LethalCompanyControl.isHost)
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         msgid++;
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)player.playerClientId}_{msgid}</size>");
@@ -2078,10 +2078,10 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
-                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, TestMod.currentStart.propsContainer);
+                        GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(StartOfRound.Instance.allItemsList.itemsList[give].spawnPrefab, player.transform.position, Quaternion.identity, LethalCompanyControl.currentStart.propsContainer);
                         gameObject.GetComponent<GrabbableObject>().fallTime = 0f; 
                         int Value = UnityEngine.Random.Range(0, 100);
                         gameObject.GetComponent<GrabbableObject>().scrapValue = Value;
@@ -2098,7 +2098,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2137,7 +2137,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
@@ -2156,7 +2156,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2192,7 +2192,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         terminal.BuyVehicleServerRpc(0, terminal.groupCredits, false);
                         HUDManager.Instance.DisplayTip("Crowd Control", req.viewer + " sent a pod with a " + veh.vehicleDisplayName);
@@ -2203,7 +2203,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2241,7 +2241,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             if (Veh1)
                             {
@@ -2259,7 +2259,7 @@ namespace ControlValley
                 catch (Exception e)
                 {
                     status = CrowdResponse.Status.STATUS_RETRY;
-                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                    LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2296,7 +2296,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             if (Veh1)
                             {
@@ -2312,7 +2312,7 @@ namespace ControlValley
                 catch (Exception e)
                 {
                     status = CrowdResponse.Status.STATUS_RETRY;
-                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                    LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2349,7 +2349,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             if (Veh1)
                             {
@@ -2365,7 +2365,7 @@ namespace ControlValley
                 catch (Exception e)
                 {
                     status = CrowdResponse.Status.STATUS_RETRY;
-                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                    LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2402,7 +2402,7 @@ namespace ControlValley
                     if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             if (Veh1)
                             {
@@ -2418,7 +2418,7 @@ namespace ControlValley
                 catch (Exception e)
                 {
                     status = CrowdResponse.Status.STATUS_RETRY;
-                    TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                    LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2455,7 +2455,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         TimeOfDay.Instance.DisableAllWeather(true);
 
@@ -2483,7 +2483,7 @@ namespace ControlValley
                         catch (Exception ex) { }
                         StartOfRound.Instance.currentLevel.currentWeather = (LevelWeatherType)give;
 
-                        //TestMod.mls.LogInfo("weather changed");
+                        //LethalCompanyControl.mls.LogInfo("weather changed");
 
                         try
                         {
@@ -2507,8 +2507,8 @@ namespace ControlValley
                         catch (Exception ex) { }
                         //callFunc(RoundManager.Instance, "SetToCurrentWeatherLevel", null);
 
-                        //TestMod.mls.LogInfo($"round manager: {RoundManager.Instance}");
-                        //TestMod.mls.LogInfo($"tod: {TimeOfDay.Instance}");
+                        //LethalCompanyControl.mls.LogInfo($"round manager: {RoundManager.Instance}");
+                        //LethalCompanyControl.mls.LogInfo($"tod: {TimeOfDay.Instance}");
 
                         try
                         {
@@ -2527,7 +2527,7 @@ namespace ControlValley
                         }
                         catch (Exception ex)
                         {
-                            TestMod.mls.LogError(ex.ToString());
+                            LethalCompanyControl.mls.LogError(ex.ToString());
                         }
 
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_weather_{(int)give}</size>");
@@ -2539,7 +2539,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2577,9 +2577,9 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    if (TestMod.isHost)
+                    if (LethalCompanyControl.isHost)
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             terminal.groupCredits += give;
                             terminal.SyncGroupCreditsServerRpc(terminal.groupCredits, terminal.numberOfItemsInDropship);
@@ -2593,7 +2593,7 @@ namespace ControlValley
                     }
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_credits_{give}</size>");
                         });
@@ -2604,7 +2604,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2639,7 +2639,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         tod.profitQuota += give;
                         if (give > 0)
@@ -2670,7 +2670,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2701,8 +2701,8 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                //TestMod.mls.LogInfo($"playerref: {playerRef}");
-                //TestMod.mls.LogInfo($"TimeOfDay: {tod}");
+                //LethalCompanyControl.mls.LogInfo($"playerref: {playerRef}");
+                //LethalCompanyControl.mls.LogInfo($"TimeOfDay: {tod}");
 
                 if (give > 0 && tod.quotaFulfilled >= tod.profitQuota) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
                 if (give < 0 && tod.quotaFulfilled <= 0) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
@@ -2712,7 +2712,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         //DepositItemsDesk desk = UnityEngine.Object.FindObjectOfType<DepositItemsDesk>();
                         Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
@@ -2756,7 +2756,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2776,7 +2776,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         RoundManager.Instance.SpawnScrapInLevel();
@@ -2788,7 +2788,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2810,9 +2810,9 @@ namespace ControlValley
                 if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    if (TestMod.isHost)
+                    if (LethalCompanyControl.isHost)
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             float num = tod.lengthOfHours;
                             tod.globalTime += num;
@@ -2822,7 +2822,7 @@ namespace ControlValley
                     }
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_addhour</size>");
                         });
@@ -2835,7 +2835,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2854,9 +2854,9 @@ namespace ControlValley
                 if (!StartOfRound.Instance.currentLevel.planetHasTime || tod.globalTime <= tod.lengthOfHours || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    if (TestMod.isHost)
+                    if (LethalCompanyControl.isHost)
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             float num = tod.lengthOfHours;
                             tod.globalTime -= num;
@@ -2866,7 +2866,7 @@ namespace ControlValley
                     }
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_remhour</size>");
                         });
@@ -2878,7 +2878,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2897,7 +2897,7 @@ namespace ControlValley
                 if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         TimeOfDay.Instance.timeUntilDeadline += TimeOfDay.Instance.totalTime;
                         TimeOfDay.Instance.UpdateProfitQuotaCurrentTime();
@@ -2913,7 +2913,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2932,7 +2932,7 @@ namespace ControlValley
                 if (TimeOfDay.Instance.timeUntilDeadline <= TimeOfDay.Instance.totalTime || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         TimeOfDay.Instance.timeUntilDeadline -= TimeOfDay.Instance.totalTime;
                         TimeOfDay.Instance.UpdateProfitQuotaCurrentTime();
@@ -2948,7 +2948,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -2970,7 +2970,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         StartOfRound.Instance.SetDoorsClosedServerRpc(true);
                         HangarShipDoor hangarShipDoor = UnityEngine.Object.FindObjectOfType<HangarShipDoor>();
@@ -2984,7 +2984,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3003,7 +3003,7 @@ namespace ControlValley
                 if (!StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         StartOfRound.Instance.SetDoorsClosedServerRpc(false);
 
@@ -3019,7 +3019,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3038,7 +3038,7 @@ namespace ControlValley
                 if (TimeOfDay.Instance.votedShipToLeaveEarlyThisRound || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         TimeOfDay.Instance.votesForShipToLeaveEarly = 998;
                         TimeOfDay.Instance.SetShipLeaveEarlyServerRpc();
@@ -3049,7 +3049,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3071,16 +3071,16 @@ namespace ControlValley
                 if (breakerBox == null || breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    if (TestMod.isHost)
+                    if (LethalCompanyControl.isHost)
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             RoundManager.Instance.PowerSwitchOnClientRpc();
                         });
                     }
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_poweron</size>");
                         });
@@ -3091,7 +3091,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3117,7 +3117,7 @@ namespace ControlValley
                 if (!found || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         for (int i = 0; i < array.Length; i++)
                         {
@@ -3134,7 +3134,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3153,16 +3153,16 @@ namespace ControlValley
                 if (breakerBox == null || !breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    if (TestMod.isHost)
+                    if (LethalCompanyControl.isHost)
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             RoundManager.Instance.PowerSwitchOffClientRpc();
                         });
                     }
                     else
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_poweroff</size>");
                         });
@@ -3173,7 +3173,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3193,7 +3193,7 @@ namespace ControlValley
                 if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
                         Vector3 pos = playerRef.transform.forward * 5.0f;
                         int r = UnityEngine.Random.Range(-30, 30);
@@ -3209,7 +3209,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3228,7 +3228,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         GameObject gameObject = new GameObject();
@@ -3247,7 +3247,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3255,7 +3255,7 @@ namespace ControlValley
 
         public static void SpawnAnMakeWebs(SpawnableEnemyWithRarity source)
         {
-            //TestMod.mls.LogInfo($"Creating Webs");
+            //LethalCompanyControl.mls.LogInfo($"Creating Webs");
 
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -3296,7 +3296,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         foreach (var level in StartOfRound.Instance.levels)
@@ -3358,7 +3358,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3377,7 +3377,7 @@ namespace ControlValley
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                    LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         DressGirlAI[] array = UnityEngine.Object.FindObjectsByType<DressGirlAI>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
@@ -3402,7 +3402,7 @@ namespace ControlValley
             catch (Exception e)
             {
                 status = CrowdResponse.Status.STATUS_RETRY;
-                TestMod.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
+                LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
             return new CrowdResponse(req.GetReqID(), status, message);
@@ -3414,7 +3414,7 @@ namespace ControlValley
             if (req.duration > 0) dur = req.duration / 1000;
 
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (TestMod.nightVision) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (LethalCompanyControl.nightVision) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
             if (BuffThread.isRunning(BuffType.NIGHT_VISION)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 

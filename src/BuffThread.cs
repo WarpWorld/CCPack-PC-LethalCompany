@@ -1,4 +1,4 @@
-﻿using LethalCompanyTestMod;
+﻿using BepinControl;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -59,7 +59,7 @@ namespace ControlValley
                     }
                 case BuffType.LOW_PITCH:
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_0.65</size>");
                         });
@@ -67,7 +67,7 @@ namespace ControlValley
                     }
                 case BuffType.HIGH_PITCH:
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.5</size>");
                         });
@@ -76,7 +76,7 @@ namespace ControlValley
                 case BuffType.NIGHT_VISION:
                     {
                         var playerRef = StartOfRound.Instance.localPlayerController;
-                        TestMod.nightVision = true;
+                        LethalCompanyControl.nightVision = true;
                         break;
                     }
                 case BuffType.FREEZE:
@@ -140,7 +140,7 @@ namespace ControlValley
                 case BuffType.HIGH_PITCH:
                 case BuffType.LOW_PITCH:
                     {
-                        TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                         {
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.0</size>");
                         });
@@ -149,7 +149,7 @@ namespace ControlValley
                 case BuffType.NIGHT_VISION:
                     {
                         var playerRef = StartOfRound.Instance.localPlayerController;
-                        TestMod.nightVision = false;
+                        LethalCompanyControl.nightVision = false;
                         break;
                     }
                 case BuffType.HYPER_MOVE:
@@ -172,7 +172,7 @@ namespace ControlValley
                 case BuffType.INVUL:
                 case BuffType.OHKO:
                 {
-                    TestMod.ActionQueue.Enqueue(() =>
+                        LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
 
                         var playerRef = StartOfRound.Instance.localPlayerController;
@@ -301,7 +301,7 @@ namespace ControlValley
             }
             catch(Exception e)
             {
-                TestMod.mls.LogInfo(e.ToString());
+                LethalCompanyControl.mls.LogInfo(e.ToString());
             }
         }
 
@@ -322,7 +322,7 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                TestMod.mls.LogInfo(e.ToString());
+                LethalCompanyControl.mls.LogInfo(e.ToString());
             }
         }
 
@@ -345,7 +345,7 @@ namespace ControlValley
             }
             catch(Exception e)
             {
-                TestMod.mls.LogInfo(e.ToString());
+                LethalCompanyControl.mls.LogInfo(e.ToString());
             }
         }    
         
@@ -366,7 +366,7 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                TestMod.mls.LogInfo(e.ToString());
+                LethalCompanyControl.mls.LogInfo(e.ToString());
             }
         }
 
@@ -395,7 +395,7 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                TestMod.mls.LogInfo(e.ToString());
+                LethalCompanyControl.mls.LogInfo(e.ToString());
             }
         }
     }
