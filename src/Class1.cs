@@ -177,7 +177,7 @@ namespace BepinControl
                 currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
                 currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
                 currEnemy.enemyType.name = enemy.enemyType.name;
-                //LethalCompanyControl.mls.LogInfo("Enemy Name: " + enemy.enemyType.name + ", Alternate Name: " + enemy.enemyType.enemyName);//maybe better to scan for .name instead of enemyName, as .name is no spaces, enemyName has spaces.
+                LethalCompanyControl.mls.LogInfo("Enemy Name: " + enemy.enemyType.name + ", Alternate Name: " + enemy.enemyType.enemyName);//maybe better to scan for .name instead of enemyName, as .name is no spaces, enemyName has spaces.
                 currEnemy.rarity = 0;
                 bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
                 if (exists) { }
@@ -601,7 +601,6 @@ namespace BepinControl
                             HUDManager.Instance.UpdateHealthUI(playerRef.health, true);
                             break;
                         }
-
                     case "landmine":
                         {
 

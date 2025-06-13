@@ -18,6 +18,7 @@ using UnityEngine;
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.GraphicsBuffer;
+using Zeekerss.Core.Singletons;
 
 
 
@@ -1456,6 +1457,11 @@ namespace ControlValley
                         UnityEngine.Object.Destroy(gameObject);
                         return;
                     }
+                    if (enteredText[1] == "bush")
+                    {
+                        Singleton<MoldSpreadManager>.Instance.GenerateMold(playerRef.transform.position + playerRef.transform.forward * 5.0f, 2);//Generate a Vain Shroud pair so we can spawn the fox
+                    }
+
                     if (enteredText[1] == "landmine")
                     {
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_landmine_{(int)playerRef.playerClientId}</size>");
@@ -1669,14 +1675,16 @@ namespace ControlValley
                                 return;
                             }
 
-
+                            if (enteredText[1] == "bush")
+                            {
+                                Singleton<MoldSpreadManager>.Instance.GenerateMold(playerRef.transform.position + playerRef.transform.forward * 5.0f, 2);//2 vain shrouds to spawn the fox, these spawn everytime they run the spawn fox
+                            }
                             if (enteredText[1] == "landmine")
                             {
                                 HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_landmine_{(int)player.playerClientId}</size>");
 
                                 return;
                             }
-
 
                             if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                             {

@@ -76,6 +76,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
                 new("Spawn Tulip Snake", "spawn_snake"){Category = "Spawn Enemies"},
                 new("Spawn Sapsucker", "spawn_kiwi"){Category = "Spawn Enemies"},
+                new("Spawn Kidnapper Fox", "spawn_bush"){Category = "Spawn Enemies"},
 
                 new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
                 new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
@@ -100,6 +101,7 @@ namespace CrowdControl.Games.Packs.LethalCompany
                 new("Spawn Maneater at Crewmate", "cspawn_eater"){Category = "Spawn Enemies"},
                 new("Spawn Tulip Snake at Crewmate", "cspawn_snake"){Category = "Spawn Enemies"},
                 new("Spawn Sapsucker at Crewmate", "cspawn_kiwi"){Category = "Spawn Enemies"},
+                new("Spawn Kidnapper Fox at Crewmate", "cspawn_bush"){Category = "Spawn Enemies"},
 
                 new("Give Binoculars", "give_binoculars") { Category = "Items"},
                 new("Give Boombox", "give_boombox") { Category = "Items"},
