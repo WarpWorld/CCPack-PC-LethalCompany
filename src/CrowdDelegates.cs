@@ -1564,13 +1564,11 @@ namespace ControlValley
                     {
 
 
-                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester")
                         {
                             try
                             {
                                 if (!player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Inside");
-                                if (enteredText[1] == "jester" && !player.isInsideFactory || enteredText[1] == "butler" && !player.isInsideFactory || enteredText[1] == "cracker" && !player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Outside Building");
-
                             }
                             catch (Exception e)
                             {
@@ -1584,8 +1582,6 @@ namespace ControlValley
                 if (!found)
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
-
-
                         if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                         {
                             found = true;

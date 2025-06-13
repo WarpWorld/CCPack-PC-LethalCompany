@@ -177,6 +177,7 @@ namespace BepinControl
                 currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
                 currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
                 currEnemy.enemyType.name = enemy.enemyType.name;
+                //LethalCompanyControl.mls.LogInfo("Enemy Name: " + enemy.enemyType.name + ", Alternate Name: " + enemy.enemyType.enemyName);
                 currEnemy.rarity = 0;
                 bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
                 if (exists) { }
@@ -194,24 +195,6 @@ namespace BepinControl
         {
             //mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost.ToString());
             isHost = RoundManager.Instance.NetworkManager.IsHost;
-            //EnemyAI[] spawnableEnemies2 = Resources.FindObjectsOfTypeAll<EnemyAI>();
-            //foreach (var enemy in spawnableEnemies2)
-            //{
-            //    SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
-            //    currEnemy.enemyType = enemy.enemyType;
-            //    currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
-            //    currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
-            //    currEnemy.enemyType.name = enemy.enemyType.name;
-            //   currEnemy.rarity = 0;
-            //    bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
-            //    if (exists) { }
-             //   else
-            //    {
-            //        if (currEnemy.enemyType.isOutsideEnemy) { RoundManager.Instance.currentLevel.OutsideEnemies.Add(currEnemy); }
-            //        else { RoundManager.Instance.currentLevel.Enemies.Add(currEnemy); }
-            //    }
-            //}
-            //LethalCompanyControl.mls.LogInfo("Crowd Control has Patched Enemy Spawns.");
             verwait = 30;
 
 
