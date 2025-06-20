@@ -1,10 +1,9 @@
-using BepinControl;
 using GameNetcodeStuff;
 using HarmonyLib;
 using System;
 using UnityEngine;
 
-namespace LethalCompanyTestMod.Patches
+namespace BepinControl.Patches
 {
     [HarmonyPatch(typeof(PlayerControllerB))]
     public class PlayerControllerBPatch
