@@ -1,10 +1,8 @@
-﻿
-using ControlValley;
+﻿using ControlValley;
 using DunGen;
 using GameNetcodeStuff;
 using BepinControl;
 using Newtonsoft.Json.Linq;
-using Steamworks.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1312,7 +1310,6 @@ namespace ControlValley
         public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            SpawnableEnemyWithRarity enemyRef = null;
             if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is Dead");
 
             string[] enteredText = req.code.Split('_');
@@ -1389,30 +1386,6 @@ namespace ControlValley
                         }
                     }
                 }
-            if (!found)
-            {
-                foreach (var level in StartOfRound.Instance.levels)
-                {
-                    enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                    if (enemyRef != null)
-                    {
-                        if (!LethalCompanyControl.currentLevel.Enemies.Contains(enemyRef))
-                        {
-                            enemyRef.rarity = 0;
-                            if (!enemyRef.enemyType.isOutsideEnemy)
-                            {
-                                RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                                LethalCompanyControl.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Indoor Enemies List");
-                            }
-                            if (enemyRef.enemyType.isOutsideEnemy)
-                            {
-                                RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
-                                LethalCompanyControl.mls.LogInfo("added " + enemyRef.enemyType.enemyName + " To The Outdoor Enemies List");
-                            }
-                        }
-                    }
-                }
-            }
             if (found == false) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
 
             if (LethalCompanyControl.isHost)
@@ -1522,7 +1495,6 @@ namespace ControlValley
         public static CrowdResponse CrewSpawn(ControlClient client, CrowdRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            SpawnableEnemyWithRarity enemyRef = null;
 
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
@@ -1602,28 +1574,6 @@ namespace ControlValley
                             }
                         }
                     }
-                if (!found)
-                {
-                    foreach (var level in StartOfRound.Instance.levels)
-                    {
-                        enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enteredText[1]));
-                        if (enemyRef != null)
-                        {
-                            if (!LethalCompanyControl.currentLevel.Enemies.Contains(enemyRef))
-                            {
-                                enemyRef.rarity = 0;
-                                if (!enemyRef.enemyType.isOutsideEnemy)
-                                {
-                                    RoundManager.Instance.currentLevel.Enemies.Add(enemyRef);
-                                }
-                                if (enemyRef.enemyType.isOutsideEnemy)
-                                {
-                                    RoundManager.Instance.currentLevel.OutsideEnemies.Add(enemyRef);
-                                }
-                            }
-                        }
-                    }
-                }
                 if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is inside ship");
 
                 if (LethalCompanyControl.isHost)

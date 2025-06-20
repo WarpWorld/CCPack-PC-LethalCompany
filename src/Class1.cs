@@ -15,8 +15,6 @@ using UnityEngine.Assertions;
 using UnityEngine.Assertions.Must;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
-using Steamworks;
-using Steamworks.Data;
 using System.Collections;
 using System.Security.AccessControl;
 using GameNetcodeStuff;
@@ -25,7 +23,6 @@ using System.Reflection;
 using Unity.Netcode;
 using static System.Net.Mime.MediaTypeNames;
 using BepinControl.Component;
-using Steamworks.Ugc;
 using System.Threading;
 using ControlValley;
 using System.Runtime.InteropServices;
@@ -37,7 +34,6 @@ using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
 using System.Reflection.Emit;
-using System.Diagnostics.Eventing.Reader;
 
 namespace BepinControl
 {
