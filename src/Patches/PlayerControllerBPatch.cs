@@ -1,64 +1,66 @@
 using GameNetcodeStuff;
 using HarmonyLib;
+using System;
 using UnityEngine;
 
-namespace BepinControl.Patches;
-
-[HarmonyPatch(typeof(PlayerControllerB))]
-public class PlayerControllerBPatch
+namespace BepinControl.Patches
 {
-
-    [HarmonyPatch("Start")]
-    [HarmonyPrefix]
-    static void getNightVision(ref PlayerControllerB __instance)
+    [HarmonyPatch(typeof(PlayerControllerB))]
+    public class PlayerControllerBPatch
     {
-        Mod.playerRef = __instance;
-        Mod.nightVision = Mod.playerRef.nightVision.enabled;
-        // store nightvision values
-        Mod.nightVisionIntensity = Mod.playerRef.nightVision.intensity;
-        Mod.nightVisionColor = Mod.playerRef.nightVision.color;
-        Mod.nightVisionRange = Mod.playerRef.nightVision.range;
 
-        Mod.playerRef.nightVision.color = UnityEngine.Color.green;
-        Mod.playerRef.nightVision.intensity = 1000f;
-        Mod.playerRef.nightVision.range = 10000f;
-    }
-
-    [HarmonyPatch("SetNightVisionEnabled")]
-    [HarmonyPostfix]
-    static void updateNightVision()
-    {
-        //instead of enabling/disabling nightvision, set the variables
-
-        if (Mod.nightVision)
+        [HarmonyPatch("Start")]
+        [HarmonyPrefix]
+        static void getNightVision(ref PlayerControllerB __instance)
         {
-            Mod.playerRef.nightVision.color = UnityEngine.Color.green;
-            Mod.playerRef.nightVision.intensity = 1000f;
-            Mod.playerRef.nightVision.range = 10000f;
-        }
-        else
-        {
-            Mod.playerRef.nightVision.color = Mod.nightVisionColor;
-            Mod.playerRef.nightVision.intensity = Mod.nightVisionIntensity;
-            Mod.playerRef.nightVision.range = Mod.nightVisionRange;
+            LethalCompanyControl.playerRef = __instance;
+            LethalCompanyControl.nightVision = LethalCompanyControl.playerRef.nightVision.enabled;
+            // store nightvision values
+            LethalCompanyControl.nightVisionIntensity = LethalCompanyControl.playerRef.nightVision.intensity;
+            LethalCompanyControl.nightVisionColor = LethalCompanyControl.playerRef.nightVision.color;
+            LethalCompanyControl.nightVisionRange = LethalCompanyControl.playerRef.nightVision.range;
+
+            LethalCompanyControl.playerRef.nightVision.color = UnityEngine.Color.green;
+            LethalCompanyControl.playerRef.nightVision.intensity = 1000f;
+            LethalCompanyControl.playerRef.nightVision.range = 10000f;
         }
 
-        // should always be on
-        Mod.playerRef.nightVision.enabled = true;
-    }
+        [HarmonyPatch("SetNightVisionEnabled")]
+        [HarmonyPostfix]
+        static void updateNightVision()
+        {
+            //instead of enabling/disabling nightvision, set the variables
+
+            if (LethalCompanyControl.nightVision)
+            {
+                LethalCompanyControl.playerRef.nightVision.color = UnityEngine.Color.green;
+                LethalCompanyControl.playerRef.nightVision.intensity = 1000f;
+                LethalCompanyControl.playerRef.nightVision.range = 10000f;
+            }
+            else
+            {
+                LethalCompanyControl.playerRef.nightVision.color = LethalCompanyControl.nightVisionColor;
+                LethalCompanyControl.playerRef.nightVision.intensity = LethalCompanyControl.nightVisionIntensity;
+                LethalCompanyControl.playerRef.nightVision.range = LethalCompanyControl.nightVisionRange;
+            }
+
+            // should always be on
+            LethalCompanyControl.playerRef.nightVision.enabled = true;
+        }
         
-    [HarmonyPatch("AllowPlayerDeath")]
-    [HarmonyPrefix]
-    static bool OverrideDeath()
-    {
-        if (!Mod.isHost) { return true; }
-        return !Mod.enableGod;
-    }
+        [HarmonyPatch("AllowPlayerDeath")]
+        [HarmonyPrefix]
+        static bool OverrideDeath()
+        {
+            if (!LethalCompanyControl.isHost) { return true; }
+            return !LethalCompanyControl.enableGod;
+        }
 
-    [HarmonyPatch("Update")]
-    [HarmonyPostfix]
-    static void InfiniteSprint(ref float ___sprintMeter)
-    {
-        if (Mod.infSprint && Mod.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
+        [HarmonyPatch("Update")]
+        [HarmonyPostfix]
+        static void InfiniteSprint(ref float ___sprintMeter)
+        {
+            if (LethalCompanyControl.infSprint && LethalCompanyControl.isHost) { Mathf.Clamp(___sprintMeter += 0.02f, 0f, 1f); }
+        }
     }
 }
