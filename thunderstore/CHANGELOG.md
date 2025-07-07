@@ -1,12 +1,16 @@
-**1.1.14** :
-Actually Fix Monster Spawns for all Levels. (Please Note: LethalLevelLoader Moons are not 100% tested, so use with warning that some spawns may not work)
-Inverse Teleporting Players and Crewmates
-Player State Check fixes for timed effects
-Add Tulip Snake, add Sapsucker Spawns.
+**1.1.14** :  
+```
+Actually Fix Monster Spawns for all Levels.  
+(Please Note: LethalLevelLoader Moons are not 100% tested, so use with warning that some spawns may not work)  
+Inverse Teleporting Players and Crewmates  
+Player State Check fixes for timed effects  
+Add Tulip Snake, add Sapsucker Spawns  
+```
 
-**1.1.13** :
+**1.1.13** :  
+```
 More Fixes
-
+```
 **1.1.11** :
 ```
 Fix Incompatibility with LethalLevelLoader
