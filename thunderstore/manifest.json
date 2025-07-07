@@ -1,10 +1,10 @@
 {
     "name": "CrowdControl_LethalCompany",
-    "version_number": "1.1.11",
+    "version_number": "1.1.14",
     "website_url": "https://crowdcontrol.live/",
     "description": "Crowd Control is a mod that allows your livestream viewers on any platform to interact with your game. Twitch, YouTube, TikTok and more!",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100",
-        "NotAtomicBomb-TerminalApi-1.5.4"
+        "NotAtomicBomb-TerminalApi-1.5.5"
     ]
 }
