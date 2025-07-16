@@ -1723,7 +1723,7 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1765,7 +1765,7 @@ namespace ControlValley
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled || player.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1793,7 +1793,7 @@ namespace ControlValley
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1822,7 +1822,6 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
-                else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge == 0) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1912,8 +1911,7 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
                 }
 
-                if (playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
-                else
+                
                 if (!LethalCompanyControl.isHost)
                 {
                     givedelay = 20;
@@ -2037,8 +2035,7 @@ namespace ControlValley
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             }
 
-            if (playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
-            else
+            
             try
             {
                 PlayerControllerB player;
