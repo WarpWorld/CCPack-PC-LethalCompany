@@ -54,6 +54,7 @@ namespace BepinControl
         public static PlayerControllerB playerRef;
         public static bool speedHack;
         public static float nightVisionIntensity;
+        public static float oldJetpackRefSpeed;
         public static float nightVisionRange;
         public static UnityEngine.Color nightVisionColor;
 

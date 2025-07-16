@@ -43,6 +43,7 @@ public class LethalCompany : SimpleTCPPack<SimpleTCPServerConnector>
         new("Fast Player", "fast") { Category = "Player", Duration = 30},
         new("Slow Player", "slow") { Category = "Player", Duration = 30},
         new("Freeze Player", "freeze") { Category = "Player", Duration = 5},
+        new("Fast Player Jetpacks", "fastjetpack") { Category = "Player", Duration = 30},
 
         new("Drunk Player", "drunk") { Category = "Player", Duration = 10, Price = 500, Description = "Gives the player a drunk effect."},
 

@@ -777,13 +777,27 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
             if (req.duration > 0) dur = req.duration / 1000;
-            if(playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
             new Thread(new BuffThread(req.GetReqID(), BuffType.HYPER_MOVE, dur * 1000).Run).Start();
+            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+        }
+        public static CrowdResponse FastJetpack(ControlClient client, CrowdRequest req)
+        {
+            var playerRef = StartOfRound.Instance.localPlayerController;
+            int dur = 30;
+            if (req.duration > 0) dur = req.duration / 1000;
+            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+
+            new Thread(new BuffThread(req.GetReqID(), BuffType.FASTJETPACK, dur * 1000).Run).Start();
             return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
         }
 
@@ -794,6 +808,7 @@ namespace ControlValley
             if (req.duration > 0) dur = req.duration / 1000;
 
             if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (BuffThread.isRunning(BuffType.FASTJETPACK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
@@ -1351,7 +1366,7 @@ namespace ControlValley
             if (!found)
                 foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
-                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester")
+                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester" || enteredText[1] == "cracker")
                     {
                         try
                         {
@@ -1550,7 +1565,7 @@ namespace ControlValley
                     {
 
 
-                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester")
+                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester" || enteredText[1] ==  "cracker")
                         {
                             try
                             {
