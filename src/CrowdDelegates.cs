@@ -1343,7 +1343,7 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
 
             }    
-            if (enteredText[1] == "landmine")
+            if (enteredText[1] == "landmine" ||enteredText[1] ==  "turretcont" ||enteredText[1] == "spiketrap")
             {
                 if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
                 found = true;
@@ -1437,6 +1437,18 @@ namespace ControlValley
 
                         return;
                     }
+                    if (enteredText[1] == "turret")
+                    {
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_turret_{(int)playerRef.playerClientId}</size>");
+
+                        return;
+                    }
+                    if (enteredText[1] == "spiketrap")
+                    {
+                        HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_spiketrap_{(int)playerRef.playerClientId}</size>");
+
+                        return;
+                    }
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
 
@@ -1526,7 +1538,7 @@ namespace ControlValley
 
                 bool found = false;
 
-                if (enteredText[1] == "landmine")
+                if (enteredText[1] == "landmine" || enteredText[1] == "turretcont" || enteredText[1] == "spiketrap")
                 {
                     if (player.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
                     found = true;
@@ -1628,7 +1640,18 @@ namespace ControlValley
 
                                 return;
                             }
+                            if (enteredText[1] == "turret")
+                            {
+                                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_turret_{(int)player.playerClientId}</size>");
 
+                                return;
+                            }
+                            if (enteredText[1] == "spiketrap")
+                            {
+                                HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_spiketrap_{(int)player.playerClientId}</size>");
+
+                                return;
+                            }
                             if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
                             {
                                 try
@@ -1685,8 +1708,7 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1728,7 +1750,7 @@ namespace ControlValley
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled || player.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled || player.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1756,7 +1778,7 @@ namespace ControlValley
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null || playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1875,6 +1897,8 @@ namespace ControlValley
                     return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
                 }
 
+                if (playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
+                else
                 if (!LethalCompanyControl.isHost)
                 {
                     givedelay = 20;
@@ -1998,7 +2022,8 @@ namespace ControlValley
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
             }
 
-
+            if (playerRef.currentlyHeldObject.itemProperties.itemName.ToLower().Contains("jetpack") && playerRef.startedJetpackControls) status = CrowdResponse.Status.STATUS_RETRY;
+            else
             try
             {
                 PlayerControllerB player;
