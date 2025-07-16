@@ -1,39 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Logging;
-using DunGen;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Assertions.Must;
-using UnityEngine.SceneManagement;
-using Random = UnityEngine.Random;
 using System.Collections;
-using System.Security.AccessControl;
 using GameNetcodeStuff;
-using BepInEx.Configuration;
-using System.Reflection;
 using Unity.Netcode;
-using static System.Net.Mime.MediaTypeNames;
-using BepinControl.Component;
 using System.Threading;
 using ControlValley;
-using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
-using System.Security.Cryptography;
-using TerminalApi;
 using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
-using System.Reflection.Emit;
+using System.Linq;
 
 namespace BepinControl
 {
@@ -44,9 +24,9 @@ namespace BepinControl
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.14";
+        private const string modVersion = "1.1.15";
 
-        public static string tsVersion = "1.1.14";
+        public static string tsVersion = "1.1.15";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -55,6 +35,9 @@ namespace BepinControl
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
         public static Dictionary<SpawnableEnemyWithRarity, int> enemyRaritys;
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
+        public static Dictionary<string, GameObject> loadedMapHazards;
+        public static List<TerminalAccessibleObject> levelSecDoors;
+        public static List<SpikeRoofTrap> levelSpikeTraps;
         public static ManualLogSource mls;
 
         public static SelectableLevel currentLevel;
@@ -68,10 +51,10 @@ namespace BepinControl
         public static bool enableGod;
         public static bool nightVision;
         public static bool infSprint;
-
         public static PlayerControllerB playerRef;
         public static bool speedHack;
         public static float nightVisionIntensity;
+        public static float oldJetpackRefSpeed;
         public static float nightVisionRange;
         public static UnityEngine.Color nightVisionColor;
 
@@ -97,7 +80,6 @@ namespace BepinControl
             // Plugin startup logic
             mls.LogInfo($"Loaded {modGUID}. Patching.");
             harmony.PatchAll(typeof(LethalCompanyControl));
-            harmony.PatchAll(typeof(GUILoader));
             mls.LogInfo($"Initializing Crowd Control");
 
             try
@@ -192,7 +174,6 @@ namespace BepinControl
             //mls.LogInfo("Host Status: " + RoundManager.Instance.NetworkManager.IsHost.ToString());
             isHost = RoundManager.Instance.NetworkManager.IsHost;
             verwait = 30;
-
 
 
 
@@ -599,7 +580,6 @@ namespace BepinControl
                         }
                     case "landmine":
                         {
-
                             int id = int.Parse(values[1]);
 
                             PlayerControllerB player = null;
@@ -637,7 +617,84 @@ namespace BepinControl
 
 
                             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
 
+                            break;
+                        }
+                    case "turret":
+                        {
+
+                            int id = int.Parse(values[1]);
+                            PlayerControllerB player = null;
+                            foreach (var playero in StartOfRound.Instance.allPlayerScripts)
+                            {
+                                if (playero != null && playero.isActiveAndEnabled && !playero.isPlayerDead && (int)playero.playerClientId == id && playero.isPlayerControlled)
+                                    player = playero;
+                            }
+
+                            if (player == null) return true;
+
+                            GameObject prefab = null;
+                            GameObject[] MapHazards = Resources.FindObjectsOfTypeAll<GameObject>();
+                            foreach (var hazard in MapHazards)
+                            {
+                                if (hazard.name.ToLower().Contains("turretcont"))
+                                {
+                                    prefab = hazard;
+                                    break;
+                                }
+                            }
+                            if (prefab == null) return true;
+
+                            Vector3 pos = player.transform.position + player.transform.forward * 5.0f - player.transform.up * 0.5f;
+                            Vector3 test = RoundManager.Instance.GetNavMeshPosition(pos, default(UnityEngine.AI.NavMeshHit), 5f, -1);
+                            Vector3 dist = (test - pos);
+
+                            if (dist.magnitude < 6.0f) pos = test;
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
+                            break;
+                        }
+                    case "spiketrap":
+                        {
+
+                            int id = int.Parse(values[1]);
+
+                            PlayerControllerB player = null;
+
+                            foreach (var playero in StartOfRound.Instance.allPlayerScripts)
+                            {
+                                if (playero != null && playero.isActiveAndEnabled && !playero.isPlayerDead && (int)playero.playerClientId == id && playero.isPlayerControlled)
+                                    player = playero;
+                            }
+
+                            if (player == null) return true;
+
+                            GameObject prefab = null;
+
+                            foreach (var obj in Resources.FindObjectsOfTypeAll<GameObject>())
+                            {
+                                switch(obj.name)
+                                {
+                                    case "SpikeRoofTrapHazard":
+                                        prefab = obj;
+                                        break;
+                                }
+                            }    
+
+                            if (prefab == null)
+                                return true;
+
+                            Vector3 pos = player.transform.position + player.transform.forward * 5.0f - player.transform.up * 0.5f;
+
+                            Vector3 test = RoundManager.Instance.GetNavMeshPosition(pos, default(UnityEngine.AI.NavMeshHit), 5f, -1);
+                            Vector3 dist = (test - pos);
+
+                            if (dist.magnitude < 6.0f) pos = test;
+
+
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            var netObj = gameObject.GetComponentInChildren<NetworkObject>();netObj.Spawn(destroyWithScene:true);
                             break;
                         }
 

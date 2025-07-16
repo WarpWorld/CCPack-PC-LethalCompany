@@ -1,3 +1,8 @@
+**1.1.15** :
+```
+Fix Landmines respawning when leaving / landing on a new level
+Add Spawn Turret, Spawn Spike Trap at Players / Crewmates
+```
 **1.1.14** :  
 ```
 Actually Fix Monster Spawns for all Levels.  

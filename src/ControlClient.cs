@@ -77,6 +77,7 @@ namespace ControlValley
                 {"hyper", CrowdDelegates.HyperMove},
                 {"freeze", CrowdDelegates.Freeze},
                 {"drunk", CrowdDelegates.Drunk},
+                {"fastjetpack", CrowdDelegates.FastJetpack},
 
 
                 {"jumpultra", CrowdDelegates.UltraJump},
@@ -106,6 +107,8 @@ namespace ControlValley
                 {"spawn_mimic", CrowdDelegates.Spawn},
                 {"spawn_cracker", CrowdDelegates.Spawn},
                 {"spawn_landmine", CrowdDelegates.Spawn},
+                {"spawn_turret", CrowdDelegates.Spawn},
+                {"spawn_spiketrap", CrowdDelegates.Spawn},
                 {"webs", CrowdDelegates.CreateWebs},
                 {"killenemies", CrowdDelegates.KillEnemies},
                 {"spawn_radmech", CrowdDelegates.Spawn},
@@ -132,6 +135,8 @@ namespace ControlValley
                 {"cspawn_cracker", CrowdDelegates.CrewSpawn},
                 {"cspawn_mimic", CrowdDelegates.CrewSpawn},
                 {"cspawn_landmine", CrowdDelegates.CrewSpawn},
+                {"cspawn_turret", CrowdDelegates.CrewSpawn},
+                {"cspawn_spiketrap", CrowdDelegates.CrewSpawn},
                 {"cspawn_radmech", CrowdDelegates.CrewSpawn},
                 {"cspawn_butler", CrowdDelegates.CrewSpawn},
                 {"cspawn_clay", CrowdDelegates.CrewSpawn},
