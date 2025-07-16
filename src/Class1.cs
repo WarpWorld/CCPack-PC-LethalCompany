@@ -1046,11 +1046,13 @@ namespace BepinControl
 
                             if ((int)StartOfRound.Instance.localPlayerController.playerClientId == cur)
                             {
+                                var playerRef = StartOfRound.Instance.localPlayerController;
                                 var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
                                 Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
                                 Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
 
                                 StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
+                                if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
                             }
                         }
                         break;

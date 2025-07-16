@@ -1262,6 +1262,7 @@ namespace ControlValley
                         Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
 
                         playerRef.TeleportPlayer(inBoxPredictable);
+                        if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
 
                     });
                 }
