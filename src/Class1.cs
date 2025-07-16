@@ -176,7 +176,6 @@ namespace BepinControl
 
 
 
-
             AddCommand("crowdcontrol", new CommandInfo
             {
                 Category = "other",
@@ -240,42 +239,6 @@ namespace BepinControl
                 AnimationCurve prob = new AnimationCurve();
                 enemyPropCurves.TryGetValue(enemy, out prob);
                 enemy.enemyType.probabilityCurve = prob;
-            }
-            foreach (var obj in Resources.FindObjectsOfTypeAll<GameObject>())
-            {
-                switch (obj.name)
-                {
-                    case "SpikeRoofTrapHazard":
-                        if(!loadedMapHazards.ContainsKey(obj.name))
-                            loadedMapHazards["Spike Trap"] = obj;
-                        break;
-                    case "TurretContainer":
-                        if(!loadedMapHazards.ContainsKey(obj.name))
-                        loadedMapHazards["Turret"] = obj;
-                        break;
-                    // Find all landmine containers (Not the actual mine objects which happen to have the same name)
-                    case "Landmine" when obj.transform.Find("Landmine"):
-                        if(!loadedMapHazards.ContainsKey(obj.name))
-                        loadedMapHazards["Landmine"] = obj;
-                        break;
-                }
-            }
-            levelSecDoors.Clear();
-            levelSpikeTraps.Clear();
-            foreach (var obj in FindObjectsOfType<GameObject>())
-            {
-                foreach (var component in obj.GetComponents<Component>())
-                {
-                    switch (component)
-                    {
-                        case TerminalAccessibleObject { isBigDoor: true } securityDoor:
-                            levelSecDoors.Add(securityDoor);
-                            break;
-                        case SpikeRoofTrap spikeTrap:
-                            levelSpikeTraps.Add(spikeTrap);
-                            break;
-                    }
-                }
             }
             HUDManager.Instance.AddTextToChatOnServer("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
@@ -729,7 +692,7 @@ namespace BepinControl
                             if (dist.magnitude < 6.0f) pos = test;
 
 
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
                             var netObj = gameObject.GetComponentInChildren<NetworkObject>();netObj.Spawn(destroyWithScene:true);
                             break;
                         }
