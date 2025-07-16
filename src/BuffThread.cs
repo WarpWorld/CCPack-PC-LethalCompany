@@ -24,6 +24,8 @@ namespace ControlValley
         HIGH_PITCH,
         LOW_PITCH,
         DRUNK,
+        FASTJETPACK,
+        SLOWJETPACK,
     }
     public class Buff
     {
@@ -122,6 +124,19 @@ namespace ControlValley
                     playerRef.jumpForce = 5.0f;
                     break;
                 }
+                case BuffType.FASTJETPACK:
+                {
+                    var playerRef = StartOfRound.Instance.localPlayerController;
+                    foreach(JetpackItem Jetpack in UnityEngine.Object.FindObjectsByType<JetpackItem>(FindObjectsSortMode.None))
+                    {
+                        if (Jetpack != null && Jetpack.playerHeldBy == playerRef)
+                        {
+                            LethalCompanyControl.oldJetpackRefSpeed = Jetpack.jetpackAcceleration;
+                            Jetpack.jetpackAcceleration = Jetpack.jetpackAcceleration * 3;
+                        }
+                    }
+                    break;
+                }
             }
         }
 
@@ -167,6 +182,18 @@ namespace ControlValley
                 {
                     var playerRef = StartOfRound.Instance.localPlayerController;
                     playerRef.jumpForce = 13.0f;
+                    break;
+                }
+                case BuffType.FASTJETPACK:
+                {
+                    var playerRef = StartOfRound.Instance.localPlayerController;
+                    foreach (JetpackItem Jetpack in UnityEngine.Object.FindObjectsByType<JetpackItem>(FindObjectsSortMode.None))
+                    {
+                        if (Jetpack != null && Jetpack.playerHeldBy == playerRef)
+                        {
+                            Jetpack.jetpackAcceleration = LethalCompanyControl.oldJetpackRefSpeed;
+                        }
+                    }
                     break;
                 }
                 case BuffType.INVUL:
