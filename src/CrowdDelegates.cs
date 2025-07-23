@@ -17,6 +17,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.GraphicsBuffer;
 using Zeekerss.Core.Singletons;
+using UnityEngine.AI;
 
 
 
@@ -929,6 +930,7 @@ namespace ControlValley
                         {
 
                             StartOfRound.Instance.ReviveDeadPlayers();
+                            HUDManager.Instance.HideHUD(false);
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_revive</size>");
 
                         });
@@ -1257,10 +1259,10 @@ namespace ControlValley
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
-                        var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
+                        playerRef.beamOutParticle.Play();
+                        var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                         Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
-                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
-
+                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position,10,RoundManager.Instance.navHit, randomSeed: randomSeed,playerRef.playerMask);
                         playerRef.TeleportPlayer(inBoxPredictable);
                         if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
 

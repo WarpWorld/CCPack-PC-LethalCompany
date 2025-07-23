@@ -13,7 +13,6 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
-using System.Linq;
 
 namespace BepinControl
 {
@@ -24,9 +23,9 @@ namespace BepinControl
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.15";
+        private const string modVersion = "1.1.16";
 
-        public static string tsVersion = "1.1.15";
+        public static string tsVersion = "1.1.16";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -37,9 +36,12 @@ namespace BepinControl
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
         public static Dictionary<string, GameObject> loadedMapHazards;
         public static List<TerminalAccessibleObject> levelSecDoors;
-        public static List<SpikeRoofTrap> levelSpikeTraps;
+        public static List<SpikeRoofTrap> levelSpikeTraps; 
+        private static List<GameObject> spawnedHazards = new List<GameObject>();
         public static ManualLogSource mls;
-
+        public static GameObject SpikeHazardObj;
+        public static GameObject TurretObj;
+        public static GameObject LandminePrefab;
         public static SelectableLevel currentLevel;
         public static EnemyVent[] currentLevelVents;
         public static RoundManager currentRound;
@@ -248,6 +250,23 @@ namespace BepinControl
             return true;
         }
 
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.DespawnPropsAtEndOfRound))]
+        [HarmonyPostfix]
+        public static void DespawnAllProps(RoundManager __instance)
+        {
+            foreach (var hazard in spawnedHazards)
+            {
+                if(hazard != null && hazard.gameObject.GetComponent<NetworkObject>().IsSpawned)
+                {
+                    hazard.gameObject.GetComponent<NetworkObject>().Despawn();
+                }
+                else
+                {
+                    UnityEngine.Object.Destroy(hazard); // Fallback for non-NetworkObject cases
+                }
+            }
+            spawnedHazards.Clear();
+        }
         [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
         [HarmonyPrefix]
         static void updateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
@@ -601,6 +620,7 @@ namespace BepinControl
                                 if (((UnityEngine.Object)val).name == "Landmine")
                                 {
                                     prefab = val;
+                                    LandminePrefab = val;
                                     break;
                                 }
                             }
@@ -615,10 +635,12 @@ namespace BepinControl
 
                             if (dist.magnitude < 6.0f) pos = test;
 
-
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), LethalCompanyControl.currentStart.propsContainer);
-                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
-
+                            //SpawnMapHazard(player, 1, 1, player.isInsideFactory, pos);
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
+                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), mapObjectContainer.transform);//link to mapObjectsContainer, since its what normal objects use and should clear each round
+                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
                     case "turret":
@@ -641,6 +663,7 @@ namespace BepinControl
                                 if (hazard.name.ToLower().Contains("turretcont"))
                                 {
                                     prefab = hazard;
+                                    TurretObj = hazard;
                                     break;
                                 }
                             }
@@ -651,8 +674,12 @@ namespace BepinControl
                             Vector3 dist = (test - pos);
 
                             if (dist.magnitude < 6.0f) pos = test;
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            //SpawnMapHazard(player, 2, 1, player.isInsideFactory, pos);
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
+                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
                     case "spiketrap":
@@ -678,13 +705,13 @@ namespace BepinControl
                                 {
                                     case "SpikeRoofTrapHazard":
                                         prefab = obj;
+                                        SpikeHazardObj = obj;
                                         break;
                                 }
                             }    
 
                             if (prefab == null)
                                 return true;
-
                             Vector3 pos = player.transform.position + player.transform.forward * 5.0f - player.transform.up * 0.5f;
 
                             Vector3 test = RoundManager.Instance.GetNavMeshPosition(pos, default(UnityEngine.AI.NavMeshHit), 5f, -1);
@@ -692,9 +719,11 @@ namespace BepinControl
 
                             if (dist.magnitude < 6.0f) pos = test;
 
-
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");//I think we need to do this, since we link it to the current round
+                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             var netObj = gameObject.GetComponentInChildren<NetworkObject>();netObj.Spawn(destroyWithScene:true);
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
 
@@ -1266,6 +1295,24 @@ namespace BepinControl
 
 
         }
+        [ServerRpc(RequireOwnership = false)]
+        public static void SpawnMapHazardServerRpc(PlayerControllerB player, int mapObj,bool isInside, Vector3 Pos)
+        {
+            SpawnMapHazard(player, mapObj, 1, isInside, Pos);
+        }
+        public static void SpawnMapHazard(PlayerControllerB player, int mapObj, int amount, bool inside, Vector3 pos)
+        {
+            GameObject MapObj2 = null;
+            switch(mapObj)
+            {
+                case 1: MapObj2 = LandminePrefab; break;
+                case 2: MapObj2 = TurretObj; break;
+                case 3: MapObj2 = SpikeHazardObj; break;
+            }
+            GameObject obj = UnityEngine.Object.Instantiate(MapObj2, pos, Quaternion.Euler(Vector3.zero));//Spawn Hazard
+            obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+        }
+
     }
 
 }
