@@ -635,9 +635,7 @@ namespace BepinControl
 
                             if (dist.magnitude < 6.0f) pos = test;
 
-                            //SpawnMapHazard(player, 1, 1, player.isInsideFactory, pos);
                             var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
-                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
                             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), mapObjectContainer.transform);//link to mapObjectsContainer, since its what normal objects use and should clear each round
                             gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
                             spawnedHazards.Add(gameObject);
@@ -674,9 +672,7 @@ namespace BepinControl
                             Vector3 dist = (test - pos);
 
                             if (dist.magnitude < 6.0f) pos = test;
-                            //SpawnMapHazard(player, 2, 1, player.isInsideFactory, pos);
                             var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
-                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
                             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
                             spawnedHazards.Add(gameObject);
@@ -720,7 +716,6 @@ namespace BepinControl
                             if (dist.magnitude < 6.0f) pos = test;
 
                             var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");//I think we need to do this, since we link it to the current round
-                            //SpawnMapHazard(player, 3, 1, playerRef.isInsideFactory, pos);
                             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             var netObj = gameObject.GetComponentInChildren<NetworkObject>();netObj.Spawn(destroyWithScene:true);
                             spawnedHazards.Add(gameObject);
@@ -1076,7 +1071,8 @@ namespace BepinControl
                             if ((int)StartOfRound.Instance.localPlayerController.playerClientId == cur)
                             {
                                 var playerRef = StartOfRound.Instance.localPlayerController;
-                                var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
+                                playerRef.beamOutParticle.Play();//untested
+                                var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                                 Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
                                 Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
 
@@ -1294,23 +1290,6 @@ namespace BepinControl
             return;
 
 
-        }
-        [ServerRpc(RequireOwnership = false)]
-        public static void SpawnMapHazardServerRpc(PlayerControllerB player, int mapObj,bool isInside, Vector3 Pos)
-        {
-            SpawnMapHazard(player, mapObj, 1, isInside, Pos);
-        }
-        public static void SpawnMapHazard(PlayerControllerB player, int mapObj, int amount, bool inside, Vector3 pos)
-        {
-            GameObject MapObj2 = null;
-            switch(mapObj)
-            {
-                case 1: MapObj2 = LandminePrefab; break;
-                case 2: MapObj2 = TurretObj; break;
-                case 3: MapObj2 = SpikeHazardObj; break;
-            }
-            GameObject obj = UnityEngine.Object.Instantiate(MapObj2, pos, Quaternion.Euler(Vector3.zero));//Spawn Hazard
-            obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
         }
 
     }
