@@ -13,6 +13,7 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
+using static UnityEngine.GraphicsBuffer;
 
 namespace BepinControl
 {
@@ -1273,7 +1274,6 @@ namespace BepinControl
 
             GameObject obj = UnityEngine.Object.Instantiate(enemy.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
             obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
             obj.gameObject.GetComponentInChildren<EnemyAI>().SetEnemyStunned(true, 6.0f);//Fix for some Enemies not being Stunned, Manually set the stunned flag
             return;
 
