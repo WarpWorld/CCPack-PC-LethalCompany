@@ -1258,7 +1258,6 @@ namespace ControlValley
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
-                        playerRef.beamOutParticle.Play();//untested
                         var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                         Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
                         Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position,10,RoundManager.Instance.navHit, randomSeed: randomSeed,playerRef.playerMask);
