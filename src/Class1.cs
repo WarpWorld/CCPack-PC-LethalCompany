@@ -49,7 +49,7 @@ namespace BepinControl
         public static StartOfRound currentStart;
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
-
+        
         public static bool noClipEnabled;
         public static bool enableGod;
         public static bool nightVision;
@@ -103,7 +103,6 @@ namespace BepinControl
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
-
 
             noClipEnabled = false;
             enableGod = false;
@@ -1073,11 +1072,10 @@ namespace BepinControl
                             {
                                 var playerRef = StartOfRound.Instance.localPlayerController;
                                 var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
-                                Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                                Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;//inside nodes only, but mineshaft counts upstairs, so y check 
                                 Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
-
                                 StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
-                                if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
+                                playerRef.isInsideFactory = true;playerRef.isInHangarShipRoom = false;playerRef.isInElevator = false;//all bools referring to player, so fine to go on one line as readable.
                             }
                         }
                         break;

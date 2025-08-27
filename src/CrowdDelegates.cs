@@ -1260,9 +1260,9 @@ namespace ControlValley
                     {
                         var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                         Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
-                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position,10,RoundManager.Instance.navHit, randomSeed: randomSeed,playerRef.playerMask);
+                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position,10,RoundManager.Instance.navHit, randomSeed: randomSeed);
                         playerRef.TeleportPlayer(inBoxPredictable);
-                        if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
+                        playerRef.isInsideFactory = true; playerRef.isInHangarShipRoom = false; playerRef.isInElevator = false;//all bools referring to player, so fine to go on one line as readable.
 
                     });
                 }
