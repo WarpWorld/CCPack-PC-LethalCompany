@@ -1,3 +1,7 @@
+**1.1.16**
+```
+Landmines, Turrets, and Spike traps now despawn on round end properly. 
+```
 **1.1.15** :
 ```
 Fix Landmines respawning when leaving / landing on a new level

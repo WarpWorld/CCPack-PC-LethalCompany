@@ -13,7 +13,7 @@ using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
 using static TerminalApi.Events.Events;
-using System.Linq;
+using static UnityEngine.GraphicsBuffer;
 
 namespace BepinControl
 {
@@ -24,9 +24,9 @@ namespace BepinControl
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.15";
+        private const string modVersion = "1.1.16";
 
-        public static string tsVersion = "1.1.15";
+        public static string tsVersion = "1.1.16";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -37,16 +37,19 @@ namespace BepinControl
         public static Dictionary<SpawnableEnemyWithRarity, AnimationCurve> enemyPropCurves;
         public static Dictionary<string, GameObject> loadedMapHazards;
         public static List<TerminalAccessibleObject> levelSecDoors;
-        public static List<SpikeRoofTrap> levelSpikeTraps;
+        public static List<SpikeRoofTrap> levelSpikeTraps; 
+        private static List<GameObject> spawnedHazards = new List<GameObject>();
         public static ManualLogSource mls;
-
+        public static GameObject SpikeHazardObj;
+        public static GameObject TurretObj;
+        public static GameObject LandminePrefab;
         public static SelectableLevel currentLevel;
         public static EnemyVent[] currentLevelVents;
         public static RoundManager currentRound;
         public static StartOfRound currentStart;
         // plan for more in the future
         private static SpawnableEnemyWithRarity jesterRef;
-
+        
         public static bool noClipEnabled;
         public static bool enableGod;
         public static bool nightVision;
@@ -100,7 +103,6 @@ namespace BepinControl
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
-
 
             noClipEnabled = false;
             enableGod = false;
@@ -248,6 +250,23 @@ namespace BepinControl
             return true;
         }
 
+        [HarmonyPatch(typeof(RoundManager), nameof(RoundManager.DespawnPropsAtEndOfRound))]
+        [HarmonyPostfix]
+        public static void DespawnAllProps(RoundManager __instance)
+        {
+            foreach (var hazard in spawnedHazards)
+            {
+                if(hazard != null && hazard.gameObject.GetComponent<NetworkObject>().IsSpawned)
+                {
+                    hazard.gameObject.GetComponent<NetworkObject>().Despawn();
+                }
+                else
+                {
+                    UnityEngine.Object.Destroy(hazard); // Fallback for non-NetworkObject cases
+                }
+            }
+            spawnedHazards.Clear();
+        }
         [HarmonyPatch(typeof(RoundManager), "AdvanceHourAndSpawnNewBatchOfEnemies")]
         [HarmonyPrefix]
         static void updateCurrentLevelInfo(ref EnemyVent[] ___allEnemyVents, ref SelectableLevel ___currentLevel)
@@ -601,6 +620,7 @@ namespace BepinControl
                                 if (((UnityEngine.Object)val).name == "Landmine")
                                 {
                                     prefab = val;
+                                    LandminePrefab = val;
                                     break;
                                 }
                             }
@@ -615,10 +635,10 @@ namespace BepinControl
 
                             if (dist.magnitude < 6.0f) pos = test;
 
-
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), LethalCompanyControl.currentStart.propsContainer);
-                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
-
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(-90, 0, 0), mapObjectContainer.transform);//link to mapObjectsContainer, since its what normal objects use and should clear each round
+                            gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
                     case "turret":
@@ -641,6 +661,7 @@ namespace BepinControl
                                 if (hazard.name.ToLower().Contains("turretcont"))
                                 {
                                     prefab = hazard;
+                                    TurretObj = hazard;
                                     break;
                                 }
                             }
@@ -651,8 +672,10 @@ namespace BepinControl
                             Vector3 dist = (test - pos);
 
                             if (dist.magnitude < 6.0f) pos = test;
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             gameObject.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);//spawn the network obj so we can have all players synced //fixes bugs with this.
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
                     case "spiketrap":
@@ -678,13 +701,13 @@ namespace BepinControl
                                 {
                                     case "SpikeRoofTrapHazard":
                                         prefab = obj;
+                                        SpikeHazardObj = obj;
                                         break;
                                 }
                             }    
 
                             if (prefab == null)
                                 return true;
-
                             Vector3 pos = player.transform.position + player.transform.forward * 5.0f - player.transform.up * 0.5f;
 
                             Vector3 test = RoundManager.Instance.GetNavMeshPosition(pos, default(UnityEngine.AI.NavMeshHit), 5f, -1);
@@ -692,9 +715,10 @@ namespace BepinControl
 
                             if (dist.magnitude < 6.0f) pos = test;
 
-
-                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), LethalCompanyControl.currentStart.propsContainer);
+                            var mapObjectContainer = GameObject.FindGameObjectWithTag("MapPropsContainer");//I think we need to do this, since we link it to the current round
+                            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab, pos, Quaternion.Euler(0, 0, 0), mapObjectContainer.transform);
                             var netObj = gameObject.GetComponentInChildren<NetworkObject>();netObj.Spawn(destroyWithScene:true);
+                            spawnedHazards.Add(gameObject);
                             break;
                         }
 
@@ -1047,12 +1071,11 @@ namespace BepinControl
                             if ((int)StartOfRound.Instance.localPlayerController.playerClientId == cur)
                             {
                                 var playerRef = StartOfRound.Instance.localPlayerController;
-                                var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
-                                Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
+                                var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
+                                Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;//inside nodes only, but mineshaft counts upstairs, so y check 
                                 Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
-
                                 StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
-                                if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
+                                playerRef.isInsideFactory = true;playerRef.isInHangarShipRoom = false;playerRef.isInElevator = false;//all bools referring to player, so fine to go on one line as readable.
                             }
                         }
                         break;
@@ -1248,7 +1271,6 @@ namespace BepinControl
 
             GameObject obj = UnityEngine.Object.Instantiate(enemy.enemyType.enemyPrefab, playerRef.transform.position + playerRef.transform.forward * 5.0f, Quaternion.Euler(Vector3.zero));
             obj.gameObject.GetComponentInChildren<NetworkObject>().Spawn(destroyWithScene: true);
-
             obj.gameObject.GetComponentInChildren<EnemyAI>().SetEnemyStunned(true, 6.0f);//Fix for some Enemies not being Stunned, Manually set the stunned flag
             return;
 
@@ -1266,6 +1288,7 @@ namespace BepinControl
 
 
         }
+
     }
 
 }
