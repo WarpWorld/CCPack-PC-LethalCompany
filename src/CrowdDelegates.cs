@@ -17,6 +17,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.EventSystems.EventTrigger;
 using static UnityEngine.GraphicsBuffer;
 using Zeekerss.Core.Singletons;
+using UnityEngine.AI;
 
 
 
@@ -929,6 +930,7 @@ namespace ControlValley
                         {
 
                             StartOfRound.Instance.ReviveDeadPlayers();
+                            HUDManager.Instance.HideHUD(false);
                             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_revive</size>");
 
                         });
@@ -1167,7 +1169,6 @@ namespace ControlValley
             try
             {
                 var player = list[UnityEngine.Random.Range(0, StartOfRound.Instance.connectedPlayersAmount)]; //test fixing Crew bodies?
-
                 if (player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
                 else
                 {
@@ -1257,12 +1258,11 @@ namespace ControlValley
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
                     {
-                        var randomSeed = new System.Random(StartOfRound.Instance.timeSinceRoundStarted.GetHashCode());
+                        var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                         Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;
-                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
-
+                        Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position,10,RoundManager.Instance.navHit, randomSeed: randomSeed);
                         playerRef.TeleportPlayer(inBoxPredictable);
-                        if (playerRef.transform.position.y > -70f) playerRef.isInsideFactory = true;
+                        playerRef.isInsideFactory = true; playerRef.isInHangarShipRoom = false; playerRef.isInElevator = false;//all bools referring to player, so fine to go on one line as readable.
 
                     });
                 }
