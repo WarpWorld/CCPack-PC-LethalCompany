@@ -1,4 +1,5 @@
-﻿using ConnectorLib.SimpleTCP;
+﻿using System.Diagnostics.CodeAnalysis;
+using ConnectorLib.SimpleTCP;
 using CrowdControl.Common;
 using ConnectorType = CrowdControl.Common.ConnectorType;
 
@@ -10,6 +11,7 @@ public class LethalCompany : SimpleTCPPack<SimpleTCPServerConnector>
 
     public override ushort Port => 51338;
 
+    [SuppressMessage("PackMetadata", "CC1007:Message Format Property")]
     public override ISimpleTCPPack.MessageFormatType MessageFormat => ISimpleTCPPack.MessageFormatType.CrowdControlLegacy;
 
     public LethalCompany(UserRecord player, Func<CrowdControlBlock, bool> responseHandler, Action<object> statusUpdateHandler) : base(player, responseHandler, statusUpdateHandler) { }
