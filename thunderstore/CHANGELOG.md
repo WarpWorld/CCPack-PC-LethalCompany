@@ -1,3 +1,8 @@
+**1.1.17** :
+```
+Fixes for v80
+```
+
 **1.1.16** :
 ```
 Landmines, Turrets, and Spike traps now despawn on round end properly. 
