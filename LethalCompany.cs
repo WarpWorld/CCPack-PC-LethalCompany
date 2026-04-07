@@ -81,7 +81,12 @@ public class LethalCompany : SimpleTCPPack<SimpleTCPServerConnector>
         new("Spawn Maneater", "spawn_eater"){Category = "Spawn Enemies"},
         new("Spawn Tulip Snake", "spawn_snake"){Category = "Spawn Enemies"},
         new("Spawn Sapsucker", "spawn_kiwi"){Category = "Spawn Enemies"},
-
+        new("Spawn Cadaver Growths", "spawn_growths"){Category = "Spawn Enemies"},
+        new("Spawn Cadaver Bloom", "spawn_bloom"){Category = "Spawn Enemies"},
+        new("Spawn Kidnapper Fox", "spawn_bush"){Category = "Spawn Enemies"},
+        new("Spawn Feiopar", "spawn_pum"){Category = "Spawn Enemies"},
+        new("Spawn Stingray", "spawn_ray"){Category = "Spawn Enemies"},
+        
         new("Spawn Centipede at Crewmate", "cspawn_pede") { Category = "Spawn Enemies"},
         new("Spawn Nutcracker at Crewmate", "cspawn_cracker") { Category = "Spawn Enemies"},
         new("Spawn Bunker Spider at Crewmate", "cspawn_spider") { Category = "Spawn Enemies"},
@@ -107,6 +112,11 @@ public class LethalCompany : SimpleTCPPack<SimpleTCPServerConnector>
         new("Spawn Maneater at Crewmate", "cspawn_eater"){Category = "Spawn Enemies"},
         new("Spawn Tulip Snake at Crewmate", "cspawn_snake"){Category = "Spawn Enemies"},
         new("Spawn Sapsucker at Crewmate", "cspawn_kiwi"){Category = "Spawn Enemies"},
+        new("Spawn Cadaver Growths at Crewmate", "cspawn_growths"){Category = "Spawn Enemies"},
+        new("Spawn Cadaver Bloom at Crewmate", "cspawn_bloom"){Category = "Spawn Enemies"},
+        new("Spawn Kidnapper Fox at Crewmate", "cspawn_bush"){Category = "Spawn Enemies"},
+        new("Spawn Feiopar at Crewmate", "cspawn_pum"){Category = "Spawn Enemies"},
+        new("Spawn Stingray at Crewmate", "cspawn_ray"){Category = "Spawn Enemies"},
 
         new("Give Binoculars", "give_binoculars") { Category = "Items"},
         new("Give Boombox", "give_boombox") { Category = "Items"},
