@@ -24,9 +24,9 @@ namespace BepinControl
         // Mod Details
         private const string modGUID = "WarpWorld.CrowdControl";
         private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.16";
+        private const string modVersion = "1.1.17";
 
-        public static string tsVersion = "1.1.16";
+        public static string tsVersion = "1.1.17";
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
 
         private readonly Harmony harmony = new Harmony(modGUID);
@@ -278,10 +278,30 @@ namespace BepinControl
 
         public static Queue<Action> ActionQueue = new Queue<Action>();
 
+        [HarmonyPatch(typeof(GameNetworkManager), "OnApplicationQuit")]
+        public class OnApplicationQuitPatch
+        {
+            static void Prefix()
+            {
+                try
+                {
+                    ControlClient.connect = false;
+                    Instance?.client?.Stop();
+                    mls.LogInfo("ControlClient stopped successfully.");
+                }
+                catch (Exception ex)
+                {
+                    mls.LogError($"Error during application quit: {ex}");
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(RoundManager), "Update")]
         [HarmonyPrefix]
         static void roundUpdate()
         {
+            ControlClient.UpdateReadyState();
+
             if (CrowdDelegates.givedelay > 0) CrowdDelegates.givedelay--;
             if (verwait > 0) verwait--;
 

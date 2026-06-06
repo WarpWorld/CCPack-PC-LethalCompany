@@ -37,6 +37,10 @@ namespace ControlValley
     {
         public static readonly string CV_HOST = "127.0.0.1";
         public static readonly int CV_PORT = 51338;
+        public static readonly object SocketSendLock = new object();
+
+        private static ControlClient activeClient;
+        private static volatile bool gameReady;
 
         private Dictionary<string, CrowdDelegate> Delegate { get; set; }
         private IPEndPoint Endpoint { get; set; }
@@ -50,8 +54,14 @@ namespace ControlValley
 
         public bool inGame = true;
         public static bool connect = false;
+        private volatile bool keepAliveRunning;
+        private Thread keepAliveThread;
+
+        public static bool GameReady => gameReady;
+
         public ControlClient()
         {
+            activeClient = this;
             Endpoint = new IPEndPoint(IPAddress.Parse(CV_HOST), CV_PORT);
             Requests = new Queue<CrowdRequest>();
             Running = true;
@@ -335,38 +345,146 @@ namespace ControlValley
             res.code = code;
             res.Send(Socket);
         }
+        private void StartKeepAliveLoop()
+        {
+            keepAliveRunning = true;
+            keepAliveThread = new Thread(KeepAliveLoop)
+            {
+                IsBackground = true,
+                Name = "CrowdControl-KeepAlive"
+            };
+            keepAliveThread.Start();
+        }
+
+        private void StopKeepAliveLoop()
+        {
+            keepAliveRunning = false;
+        }
+
+        private void KeepAliveLoop()
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+            while (keepAliveRunning && Running)
+            {
+                try
+                {
+                    Socket socket = Socket;
+                    if (socket != null && socket.Connected)
+                        CrowdResponse.KeepAlive(socket);
+                }
+                catch (Exception)
+                {
+                }
+
+                Thread.Sleep(1000);
+            }
+        }
+
         private void ClientLoop()
         {
-
             LethalCompanyControl.mls.LogInfo("Connected to Crowd Control");
             connect = true;
 
             var timer = new Timer(timeUpdate, null, 0, 200);
+            StartKeepAliveLoop();
 
             try
             {
                 while (Running)
                 {
-                    CrowdRequest req = CrowdRequest.Recieve(this, Socket);
-                    if (req == null || req.IsKeepAlive()) continue;
+                    try
+                    {
+                        if (Socket != null && Socket.Connected)
+                        {
+                            CrowdRequest req = CrowdRequest.Recieve(this, Socket);
+                            if (req == null || req.IsKeepAlive()) continue;
 
-                    lock (Requests)
-                        Requests.Enqueue(req);
+                            lock (Requests)
+                                Requests.Enqueue(req);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        break;
+                    }
+                    catch (SocketException)
+                    {
+                        break;
+                    }
+                    catch (ThreadAbortException)
+                    {
+                        Thread.ResetAbort();
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
+            {
+                LethalCompanyControl.mls.LogInfo($"Critical Error: {e}");
+            }
+            finally
             {
                 LethalCompanyControl.mls.LogInfo("Disconnected from Crowd Control");
                 connect = false;
-                Socket.Close();
+                gameReady = false;
+
+                StopKeepAliveLoop();
+
+                try
+                {
+                    timer.Dispose();
+                }
+                catch (Exception)
+                {
+                }
+
+                CloseSocket();
             }
+        }
+
+        private static void CloseSocket()
+        {
+            lock (SocketSendLock)
+            {
+                try
+                {
+                    if (Socket == null)
+                        return;
+
+                    if (Socket.Connected)
+                    {
+                        Socket.Shutdown(SocketShutdown.Both);
+                        Socket.Close();
+                    }
+
+                    Socket.Dispose();
+                }
+                catch (Exception)
+                {
+                }
+                finally
+                {
+                    Socket = null;
+                }
+            }
+        }
+
+        public static void UpdateReadyState()
+        {
+            gameReady = activeClient != null && activeClient.EvaluateReady();
         }
 
         public void timeUpdate(System.Object state)
         {
-            inGame = true;
-
-            if (StartOfRound.Instance == null || StartOfRound.Instance.allPlayersDead || StartOfRound.Instance.livingPlayers < 1) inGame = false;
+            inGame = GameReady;
 
             if (Saving || !inGame)
             {
@@ -393,8 +511,8 @@ namespace ControlValley
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             while (Running)
             {
-
                 LethalCompanyControl.mls.LogInfo("Attempting to connect to Crowd Control");
+                connect = false;
 
                 try
                 {
@@ -404,11 +522,22 @@ namespace ControlValley
                         ClientLoop();
                     else
                         LethalCompanyControl.mls.LogInfo("Failed to connect to Crowd Control");
-                    Socket.Close();
+
+                    CloseSocket();
                 }
                 catch (Exception e)
                 {
-                    LethalCompanyControl.mls.LogInfo("Failed to connect to Crowd Control");
+                    if (Running)
+                    {
+                        LethalCompanyControl.mls.LogInfo($"{e.GetType().Name}: {e.Message}");
+                        LethalCompanyControl.mls.LogInfo("Failed to connect to Crowd Control");
+                    }
+                    else
+                    {
+                        LethalCompanyControl.mls.LogInfo($"Crowd Control network loop ended during shutdown: {e.GetType().Name}");
+                    }
+                    connect = false;
+                    CloseSocket();
                 }
 
                 Thread.Sleep(10000);
@@ -429,7 +558,10 @@ namespace ControlValley
                     lock (Requests)
                     {
                         if (Requests.Count == 0)
+                        {
+                            Thread.Sleep(5);
                             continue;
+                        }
                         req = Requests.Dequeue();
                     }
 
@@ -437,13 +569,14 @@ namespace ControlValley
                     try
                     {
                         CrowdResponse res;
-                        if (!isReady())
+                        if (!GameReady)
                             res = new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
                         else
                             res = Delegate[code](this, req);
                         if (res == null)
                         {
                             new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, $"Request error for '{code}'").Send(Socket);
+                            continue;
                         }
 
                         res.Send(Socket);
@@ -456,22 +589,20 @@ namespace ControlValley
                 catch (Exception)
                 {
                     LethalCompanyControl.mls.LogInfo("Disconnected from Crowd Control");
-                    Socket.Close();
+                    connect = false;
+                    CloseSocket();
                 }
             }
         }
 
-        public bool isReady()
+        private bool EvaluateReady()
         {
             try
             {
-                //TestMod.mls.LogInfo($"landed: {StartOfRound.Instance.shipHasLanded}");
-                //TestMod.mls.LogInfo($"planet: {RoundManager.Instance.currentLevel.PlanetName}");
-
+                if (StartOfRound.Instance == null || StartOfRound.Instance.allPlayersDead || StartOfRound.Instance.livingPlayers < 1)
+                    return false;
                 if (!StartOfRound.Instance.shipHasLanded) return false;
-                if (!RoundManager.Instance.currentLevel.spawnEnemiesAndScrap) return false;//stop effects running on any moon designated as "Company". Mainly used for Oxyde, and Galetry Modded Moons, but also blocks company spawns.
-                //if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("gordion")) return false;
-                //if (RoundManager.Instance.currentLevel.PlanetName.ToLower().Contains("company")) return false;
+                if (!RoundManager.Instance.currentLevel.spawnEnemiesAndScrap) return false;
             }
             catch (Exception e)
             {
@@ -485,6 +616,8 @@ namespace ControlValley
         public void Stop()
         {
             Running = false;
+            StopKeepAliveLoop();
+            CloseSocket();
         }
     }
 }

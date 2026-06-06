@@ -28,9 +28,9 @@ namespace ControlValley
                 if (socket.Poll(RECV_TIME, SelectMode.SelectRead))
                 {
                     read = socket.Receive(buf);
-                    if (read < 0) return null;
+                    if (read <= 0) return null;
 
-                    content += Encoding.ASCII.GetString(buf);
+                    content += Encoding.ASCII.GetString(buf, 0, read);
                 }
                 else
                     CrowdResponse.KeepAlive(socket);
