@@ -400,6 +400,12 @@ namespace ControlValley
                             CrowdRequest req = CrowdRequest.Recieve(this, Socket);
                             if (req == null || req.IsKeepAlive()) continue;
 
+                            if (req.IsGameState())
+                            {
+                                new GameStateResponse(req.id, GetGameState()).Send(Socket);
+                                continue;
+                            }
+
                             lock (Requests)
                                 Requests.Enqueue(req);
                         }
@@ -480,6 +486,12 @@ namespace ControlValley
         public static void UpdateReadyState()
         {
             gameReady = activeClient != null && activeClient.EvaluateReady();
+        }
+
+        public static int GetGameState()
+        {
+            UpdateReadyState();
+            return gameReady ? (int)CrowdResponse.GameState.Ready : (int)CrowdResponse.GameState.BadPlayerState;
         }
 
         public void timeUpdate(System.Object state)
