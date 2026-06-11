@@ -81,5 +81,10 @@ namespace ControlValley
         {
             return id == 0 && type == "255";
         }
+
+        public bool IsGameState()
+        {
+            return type == "253";
+        }
     }
 }
