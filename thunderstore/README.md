@@ -6,7 +6,7 @@ If you have any questions or need help with this setup, please head over to our 
 
 
 ### Effect List
-Effect List can be found here: https://crowdcontrol.live/game/LethalCompany/
+Effect List can be found here: https://crowdcontrol.live/games/lethalcompany
 
 
 ### Setup
