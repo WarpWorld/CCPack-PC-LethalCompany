@@ -1,23 +1,46 @@
-# Crowd Control - Lethal Company
+# Lethal Company
 
-Crowd Control is an application that allows live streamers to enhance their gaming broadcasts by enabling real-time interaction between viewers and the game being played. Through Crowd Control, viewers can directly influence the gameplay experience, creating a dynamic and engaging environment that brings the audience closer to the action.
+This pack uses a BepInEx Crowd Control plugin. The repository includes an
+installable BepInEx layout in `mod` and a Thunderstore package description in
+`thunderstore`.
 
-Crowd Control supports multiple platforms, such as Twitch, YouTube, Discord and more.
+## Requirements
 
-# Getting Started
+- Lethal Company.
+- Crowd Control with the **Lethal Company** pack selected.
+- BepInEx 5.4.2100 and TerminalApi 1.5.6, as declared in the Thunderstore
+  manifest. The bundled `mod` layout includes BepInEx files and
+  `CrowdControl.dll`.
 
-To get started using this project you will need to check the ``readme.md`` in the src folder.
+## Installation and setup
 
-You can load the ``LethalCompany.cs`` in our SDK which can be found on our [Developer Page](https://developer.crowdcontrol.live/sdk/).
+1. Close Lethal Company.
+2. Overlay the contents of `mod` onto the game directory, preserving the
+   `BepInEx` directory and placing `winhttp.dll` beside the game executable.
+3. Start Crowd Control and select Lethal Company.
+4. Launch the game, host or join a lobby, and wait until the game is playable.
 
-Follow instructions on that page to learn how to add effects to your CS file and how to activate them.
+For the published setup workflow, see
+<https://crowdcontrol.live/guides/lethalcompany/>.
 
-# Notes
+## Connection behavior
 
-Keep in mind updating your local CS file and mod will not make these effects live on the Crowd Control Interact/Twitch extension. If you add new effects and wish for them to get added to the existing pack on our service you will need to reach out in the #cc-developer channel in our [Discord](https://warp.world/discord).
+The plugin connects to the local Crowd Control server at
+`127.0.0.1:51338`. The game host has authority for many effect handlers. In a
+multiplayer game, every player should install the same mod, as required by the
+included Thunderstore documentation.
 
+## Troubleshooting
 
-## Links
-[Crowd Control](https://crowdcontrol.live)
+- **The game does not load the plugin:** confirm that `winhttp.dll` is beside
+  the executable and `BepInEx\plugins\CrowdControl.dll` exists after copying.
+- **No effects or connection:** start the Crowd Control desktop app, verify
+  the Lethal Company pack is selected, then relaunch the game.
+- **Multiplayer effects fail:** ensure every player has the mod installed and
+  that the session host is present. Compatibility with unrelated mods is
+  limited; try a clean mod-manager profile.
 
-[Developer Page](https://developer.crowdcontrol.live/)
+## Repository layout
+
+- `LethalCompany.cs` defines the pack.
+- `mod/`, `src/`, and `thunderstore/` contain the game-side, supporting, and package source.
