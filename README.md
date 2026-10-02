@@ -1,5 +1,13 @@
 # Lethal Company
 
+## Pack metadata
+- **Game display name:** Lethal Company
+- **Crowd Control game ID:** `LethalCompany`
+- **Connector type:** `SimpleTCPServerConnector`
+- **Endpoint port:** `51338`
+- **Mod framework:** BepInEx `5.4.2100`
+
+
 This pack uses a BepInEx Crowd Control plugin. The repository includes an
 installable BepInEx layout in `mod` and a Thunderstore package description in
 `thunderstore`.
