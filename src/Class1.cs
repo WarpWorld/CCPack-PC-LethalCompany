@@ -278,6 +278,31 @@ namespace BepinControl
 
         public static Queue<Action> ActionQueue = new Queue<Action>();
 
+        // Effect delegates run on the CC request thread, but FindObjectOfType/FindObjectsByType
+        // walk Unity's native object list and crash the game (access violation in
+        // Scripting::FindObjectsOfType) when they race the main thread. Look these up on the
+        // main thread instead and let the delegates read the cached references.
+        internal static volatile Terminal cachedTerminal;
+        internal static volatile BreakerBox cachedBreakerBox;
+        internal static volatile VehicleController cachedVehicle;
+        internal static volatile EnemyAI[] cachedEnemies = new EnemyAI[0];
+        private static int sceneCacheDelay = 0;
+
+        static void refreshSceneCache()
+        {
+            if (sceneCacheDelay > 0)
+            {
+                sceneCacheDelay--;
+                return;
+            }
+            sceneCacheDelay = 15;
+
+            cachedTerminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            cachedBreakerBox = UnityEngine.Object.FindObjectOfType<BreakerBox>();
+            cachedVehicle = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            cachedEnemies = UnityEngine.Object.FindObjectsByType<EnemyAI>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        }
+
         [HarmonyPatch(typeof(GameNetworkManager), "OnApplicationQuit")]
         public class OnApplicationQuitPatch
         {
@@ -304,6 +329,8 @@ namespace BepinControl
 
             if (CrowdDelegates.givedelay > 0) CrowdDelegates.givedelay--;
             if (verwait > 0) verwait--;
+
+            refreshSceneCache();
 
             if (ActionQueue.Count > 0)
             {

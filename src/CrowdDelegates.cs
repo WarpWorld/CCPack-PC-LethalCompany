@@ -2159,7 +2159,7 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
 
 
-            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            Terminal terminal = LethalCompanyControl.cachedTerminal;
             var veh = terminal.buyableVehicles[0];
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
@@ -2202,7 +2202,7 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
             string[] enteredText = req.code.Split('_');
             bool found = false;
-            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            VehicleController Veh1 = LethalCompanyControl.cachedVehicle;
             if (enteredText.Length == 2)
             {
             }
@@ -2257,7 +2257,7 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
             string[] enteredText = req.code.Split('_');
-            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            VehicleController Veh1 = LethalCompanyControl.cachedVehicle;
             if (enteredText.Length == 2)
             {
             }
@@ -2310,7 +2310,7 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
             string[] enteredText = req.code.Split('_');
-            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            VehicleController Veh1 = LethalCompanyControl.cachedVehicle;
             if (enteredText.Length == 3)
             {
             }
@@ -2363,7 +2363,7 @@ namespace ControlValley
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
             string[] enteredText = req.code.Split('_');
-            VehicleController Veh1 = UnityEngine.Object.FindObjectOfType<VehicleController>();
+            VehicleController Veh1 = LethalCompanyControl.cachedVehicle;
             if (enteredText.Length == 2)
             {
             }
@@ -2551,7 +2551,7 @@ namespace ControlValley
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
 
-            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            Terminal terminal = LethalCompanyControl.cachedTerminal;
 
             try
             {
@@ -2612,7 +2612,7 @@ namespace ControlValley
                 return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
             }
 
-            Terminal terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
+            Terminal terminal = LethalCompanyControl.cachedTerminal;
 
             try
             {
@@ -3051,7 +3051,7 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                BreakerBox breakerBox = UnityEngine.Object.FindObjectOfType<BreakerBox>();
+                BreakerBox breakerBox = LethalCompanyControl.cachedBreakerBox;
 
                 if (breakerBox == null || breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
@@ -3090,7 +3090,7 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                EnemyAI[] array = UnityEngine.Object.FindObjectsByType<EnemyAI>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                EnemyAI[] array = LethalCompanyControl.cachedEnemies;
 
                 bool found = false;
                 for (int i = 0; i < array.Length; i++)
@@ -3133,7 +3133,7 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                BreakerBox breakerBox = UnityEngine.Object.FindObjectOfType<BreakerBox>();
+                BreakerBox breakerBox = LethalCompanyControl.cachedBreakerBox;
 
                 if (breakerBox == null || !breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
                 else
