@@ -1,3 +1,8 @@
+**1.1.18** :
+```
+Crash report fixes: stop calling Unity FindObjectOfType/FindObjectsByType off the CC request thread (moved to the main-thread ActionQueue; fixes native AV crash on scene changes).
+```
+
 **1.1.17** :
 ```
 Fixes for v80
