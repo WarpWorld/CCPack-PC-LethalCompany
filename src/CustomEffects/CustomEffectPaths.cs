@@ -56,6 +56,11 @@ public static class CustomEffectPaths
         {
             if (_gameName != null) return _gameName;
 
+            //Lethal Company: the assembly keeps the plain "CrowdControl" name so it drops in over existing
+            //installs, which would make the folder (and every effect ID) "CrowdControl". Use the csproj's
+            //GameName instead - the one deliberate difference from the example's copy of this file.
+            if (!string.IsNullOrEmpty(ModVersion.GameName)) return _gameName = ModVersion.GameName;
+
             string name = Assembly.GetExecutingAssembly().GetName().Name ?? "Unknown";
             const string prefix = "CrowdControl.";
             if (name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))

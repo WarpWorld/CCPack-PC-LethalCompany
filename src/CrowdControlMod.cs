@@ -31,7 +31,7 @@ public partial class CrowdControlMod : BaseUnityPlugin
     /// nothing a viewer can buy will appear. See CustomEffect.md.
     /// </para>
     /// </remarks>
-    public const bool CUSTOM_EFFECTS_SUPPORTED = false;
+    public const bool CUSTOM_EFFECTS_SUPPORTED = true;
 
     
     /// <summary>The real-time duration of the current tick, used to advance timed effect countdowns.</summary>
