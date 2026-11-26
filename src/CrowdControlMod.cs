@@ -1,0 +1,342 @@
+using BepInEx;
+using BepinControl;
+using BepInEx.Logging;
+using CrowdControl.Delegates.Effects;
+using System.Reflection;
+using UnityEngine;
+
+namespace CrowdControl;
+
+/// <summary>
+/// The main Crowd Control mod class.
+/// </summary>
+[BepInPlugin(MOD_GUID, MOD_NAME, MOD_VERSION)]
+public partial class CrowdControlMod : BaseUnityPlugin
+{
+    // Mod Details - ALWAYS SET THESE FOR A NEW GAME!
+    // (these must be compile-time constants for the [BepInPlugin] attribute, so they can't live in the
+    // csproj - the DLL name is set separately via the GameName property in BepinExExample.csproj)
+    public const string MOD_GUID = "WarpWorld.CrowdControl"; //unique BepInEx plugin ID - fine to leave as-is since only one Crowd Control mod is installed per game
+    public const string MOD_NAME = "Crowd Control"; //display name shown in the BepInEx log (and LethalConfig)
+    public const string MOD_VERSION = ModVersion.Value; //generated from <Version> in LethalCompany.csproj - the ONE place the version lives
+
+    /// <summary>Whether this mod supports community-written effects loaded from disk.</summary>
+    /// <remarks>
+    /// Opt-in per game, and deliberately a compile-time constant rather than a setting: a streamer
+    /// cannot turn this on, so a mod that has not adopted custom effects will never compile or run
+    /// code from the custom effects folder no matter what ends up in it or in the config file.
+    /// <para>
+    /// Before setting this to true, make sure the game's Crowd Control pack has
+    /// <c>allowCustomEffects</c> set - without it the app rejects the effects the mod registers, and
+    /// nothing a viewer can buy will appear. See CustomEffect.md.
+    /// </para>
+    /// </remarks>
+    public const bool CUSTOM_EFFECTS_SUPPORTED = false;
+
+    
+    /// <summary>The real-time duration of the current tick, used to advance timed effect countdowns.</summary>
+    /// <remarks>
+    /// Dividing by the time scale makes timed effects count down in real time even during slow motion.
+    /// The time scale is checked to avoid Infinity/NaN corrupting effect timers in games that
+    /// run FixedUpdate with the time scale at (or below) zero.
+    /// Change this to use Time.deltaTime if ticking from Update instead of FixedUpdate.
+    /// </remarks>
+    //Lethal Company never pauses (it is multiplayer), but ticking from the runner's Update() with unscaled time
+    //keeps timed effects counting real seconds regardless of the time scale.
+    public static float DeltaTime => Time.unscaledDeltaTime;
+
+    private readonly HarmonyLib.Harmony harmony = new(MOD_GUID);
+
+    /// <summary>The logger for the mod.</summary>
+    public new ManualLogSource Logger => base.Logger;
+
+    /// <summary>The singleton instance of the game mod.</summary>
+    internal static CrowdControlMod Instance { get; private set; } = null!;
+
+    /// <summary>The game state manager object.</summary>
+    public GameStateManager GameStateManager { get; private set; } = null!;
+    
+    /// <summary>The effect class loader.</summary>
+    public EffectLoader EffectLoader { get; private set; } = null!;
+
+    /// <summary>The loader for community-written effects dropped into the custom effects folder.</summary>
+    public CustomEffects.CustomEffectManager CustomEffects { get; private set; } = null!;
+
+    /// <summary>
+    /// Gets a value indicating whether the client is connected.
+    /// </summary>
+    public bool ClientConnected => Client.Connected;
+
+    public NetworkClient Client { get; private set; } = null!;
+    
+    public Scheduler Scheduler { get; private set; } = null!;
+
+    private const double MANUAL_RECONNECT_COOLDOWN_SECONDS = 5.0;
+    private DateTime m_nextManualReconnectAllowedUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// Called when the mod is awakened.
+    /// </summary>
+    void Awake()
+    {
+        Instance = this;
+
+        Logger.LogInfo($"Loaded {MOD_GUID} v{MOD_VERSION}. Patching.");
+        //only the game patches in LethalCompanyControl - exactly the set the mod has always applied
+        harmony.PatchAll(typeof(LethalCompanyControl));
+        LethalCompanyControl.Initialize(Logger);
+
+        UI.ModSettings.Initialize(Config);
+
+        Logger.LogInfo("Initializing Crowd Control");
+
+        try
+        {
+            GameStateManager = new(this);
+            Client = new(this);
+            EffectLoader = new(this, Client);
+            Scheduler = new(this, Client);
+
+            //after the scheduler, so a custom effect that fires on load has somewhere to go
+            CustomEffects = new(this, Client);
+            CustomEffects.LoadAll();
+
+            Logger.LogInfo($"Registered {EffectLoader.Effects.Count} effect codes.");
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Crowd Control Init Error: {e}");
+        }
+
+        Logger.LogInfo("Crowd Control Initialized");
+
+        CreateRunner();
+    }
+
+    internal void OnQuit()
+    {
+        try
+        {
+            CustomEffects?.Dispose();
+            Client?.Stop();
+            Client?.Dispose();
+        }
+        catch {/**/}
+    }
+
+    /// <summary>Called every rendered frame by the runner.</summary>
+    /// <remarks>This function is called on the main game thread. Blocking here may cause lag or crash the game entirely.</remarks>
+    internal void Tick()
+    {
+        if (GameStateManager == null) return; //initialization failed - do nothing rather than throw every tick
+
+        //recompute the game state once per tick (everything else this tick reads the cached value)
+        //and report it if it changed - state changes reach the Crowd Control client within one tick
+        GameStateManager.InvalidateStateCache();
+        GameStateManager.UpdateGameState();
+
+        Scheduler?.Tick();
+
+        //custom effect loading touches Unity through effect constructors, so it happens here rather
+        //than on the file watcher's thread
+        CustomEffects?.Tick();
+    }
+
+    /// <summary>Called every rendered frame by the runner, after <see cref="Tick"/>.</summary>
+    internal void FrameUpdate()
+    {
+        UpdateClientPresence();
+        HandleOverlayToggleHotkey();
+        HandleManualReconnectHotkey();
+    }
+
+    /// <summary>True if the Crowd Control app appears to be running on this machine.</summary>
+    /// <remarks>
+    /// Checked on a timer rather than every frame - it opens a named semaphore and can fall back to
+    /// a process scan, which is far too heavy for OnGUI.
+    /// </remarks>
+    private bool m_clientPresent;
+    private float m_nextClientCheck;
+
+    private const float CLIENT_CHECK_INTERVAL = 5f;
+    private System.Threading.Tasks.Task<bool>? m_clientCheckTask;
+
+    /// <summary>Refreshes whether the Crowd Control app is running, at a sane interval.</summary>
+    /// <remarks>
+    /// While connected the answer is obviously yes. Otherwise the probe (a named semaphore, falling back
+    /// to a full process scan) runs on a worker thread - a process scan on the game thread is a visible hitch.
+    /// </remarks>
+    private void UpdateClientPresence()
+    {
+        if (ClientConnected)
+        {
+            m_clientPresent = true;
+            return;
+        }
+
+        if (m_clientCheckTask != null)
+        {
+            if (!m_clientCheckTask.IsCompleted) return;
+            m_clientPresent = m_clientCheckTask.Status == System.Threading.Tasks.TaskStatus.RanToCompletion && m_clientCheckTask.Result;
+            m_clientCheckTask = null;
+        }
+
+        float now = Time.realtimeSinceStartup;
+        if (now < m_nextClientCheck) return;
+
+        m_nextClientCheck = now + CLIENT_CHECK_INTERVAL;
+        NetworkClient? client = Client;
+        if (client == null) { m_clientPresent = false; return; }
+        m_clientCheckTask = System.Threading.Tasks.Task.Run(() => client.CrowdControlClientFound);
+    }
+
+    /// <summary>Draws the connection indicator and any active timed effects.</summary>
+    internal void DrawGUI()
+    {
+        try { UI.Overlay.Draw(ClientConnected, m_clientPresent); }
+        catch {/* never let drawing break the frame */}
+    }
+
+    /// <summary>F8 hides or shows the mod's on-screen display.</summary>
+    private void HandleOverlayToggleHotkey()
+    {
+        if (!KeyPressed(UnityEngine.InputSystem.Key.F8)) return;
+
+        bool visible = UI.Overlay.Toggle();
+        Logger.LogInfo($"F8 pressed - overlay {(visible ? "shown" : "hidden")}.");
+
+        //forced, so the confirmation is visible even though we may have just turned the UI off
+        if (visible) UI.Overlay.Show("Crowd Control display on (F8)", force: true);
+    }
+
+    private void HandleManualReconnectHotkey()
+    {
+        if (!KeyPressed(UnityEngine.InputSystem.Key.F9))
+            return;
+
+        DateTime now = DateTime.UtcNow;
+        if (now < m_nextManualReconnectAllowedUtc)
+            return;
+
+        m_nextManualReconnectAllowedUtc = now.AddSeconds(MANUAL_RECONNECT_COOLDOWN_SECONDS);
+        Logger.LogInfo("F9 pressed - manual Crowd Control reconnect requested.");
+
+        if (Client?.RequestReconnect() == true)
+        {
+            UI.Overlay.Show("Reconnecting to Crowd Control...", force: true);
+            Logger.LogInfo("Manual Crowd Control reconnect queued.");
+        }
+        else
+        {
+            UI.Overlay.Show("Crowd Control client not found.", force: true);
+            Logger.LogInfo("Manual Crowd Control reconnect skipped because the Crowd Control client was not found.");
+        }
+    }
+
+    /// <summary>
+    /// Displays a message to the player using the game's UI/toast system.
+    /// </summary>
+    /// <remarks>
+    /// Goes to the mod's own overlay (see <see cref="UI.Overlay"/>), which works in any game and
+    /// respects the streamer's opt-out. If your game has a toast, subtitle, or HUD message system of
+    /// its own, call it here as well - a native-looking line in the middle of the screen is easier to
+    /// notice than a corner panel, and the two complement each other.
+    /// </remarks>
+    public void ShowGameUiMessage(string message)
+    {
+        UI.Overlay.Show(message);
+
+        //TODO: optionally also call your game's own toast/subtitle system, e.g. ToastManager.Show(message).
+    }
+
+    /// <summary>Called by Unity when the application gains or loses focus.</summary>
+    /// <remarks>
+    /// This pushes a game state update immediately rather than waiting for the next polling interval,
+    /// which matters because FixedUpdate may stop running entirely while the game is unfocused.
+    /// </remarks>
+    internal void FocusChanged(bool hasFocus)
+    {
+        try
+        {
+            GameStateManager?.InvalidateStateCache(); //the cached state predates the focus change
+            GameStateManager?.UpdateGameState();
+        }
+        catch {/**/}
+    }
+
+    /// <summary>Called by Unity when the application is paused or resumed by the OS.</summary>
+    /// <remarks><inheritdoc cref="OnApplicationFocus" path="/remarks"/></remarks>
+    internal void PauseChanged(bool isPaused)
+    {
+        try
+        {
+            GameStateManager?.InvalidateStateCache(); //the cached state predates the pause change
+            GameStateManager?.UpdateGameState();
+        }
+        catch {/**/}
+    }
+
+    /// <summary>
+    /// Lethal Company destroys the BepInEx manager GameObject - and this plugin component with it - unless the
+    /// player has set HideManagerGameObject, so Update/OnGUI here would never run. The mod is driven from a
+    /// hidden, persistent object of its own instead, which works either way.
+    /// </summary>
+    private void CreateRunner()
+    {
+        GameObject runner = new("CrowdControl.Runner") { hideFlags = HideFlags.HideAndDontSave };
+        DontDestroyOnLoad(runner);
+        runner.AddComponent<Runner>();
+    }
+
+    /// <summary>Reads a key through the Input System, which Lethal Company uses for all of its own input.</summary>
+    private static bool KeyPressed(UnityEngine.InputSystem.Key key)
+    {
+        UnityEngine.InputSystem.Keyboard? keyboard = UnityEngine.InputSystem.Keyboard.current;
+        return keyboard != null && keyboard[key].wasPressedThisFrame;
+    }
+
+    private class Runner : MonoBehaviour
+    {
+        void Update()
+        {
+            CrowdControlMod mod = Instance;
+            if (mod == null) return;
+            mod.Tick();
+            mod.FrameUpdate();
+        }
+
+        void OnGUI() => Instance?.DrawGUI();
+
+        void OnApplicationFocus(bool hasFocus) => Instance?.FocusChanged(hasFocus);
+
+        void OnApplicationPause(bool isPaused) => Instance?.PauseChanged(isPaused);
+
+        void OnApplicationQuit() => Instance?.OnQuit();
+
+        void OnDestroy() => Instance?.OnQuit();
+    }
+
+    private string? _modVersion = null;
+    public string Version
+    {
+        get
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_modVersion)) return _modVersion;
+
+                string ccver = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "ccver"));
+                if (string.IsNullOrEmpty(ccver))
+                    _modVersion = MOD_VERSION;
+                else
+                    _modVersion = ccver;
+                return _modVersion;
+            }
+            catch (Exception e)
+            {
+                Logger.LogInfo($"Error retrieving mod version: {e}");
+                return "0";
+            }
+        }
+    }
+}

@@ -1,4 +1,5 @@
-﻿using System;
+#nullable disable
+using System;
 using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Logging;
@@ -8,7 +9,7 @@ using System.Collections;
 using GameNetcodeStuff;
 using Unity.Netcode;
 using System.Threading;
-using ControlValley;
+using CrowdControl;
 using TerminalApi.Classes;
 using static TerminalApi.TerminalApi;
 using TerminalApi.Events;
@@ -17,19 +18,16 @@ using static UnityEngine.GraphicsBuffer;
 
 namespace BepinControl
 {
-    [BepInPlugin(modGUID, modName, modVersion)]
-    public class LethalCompanyControl : BaseUnityPlugin
+    /// <summary>
+    /// Lethal Company game state, Harmony patches and the multiplayer chat relay. This used to be the
+    /// BepInEx plugin; the plugin is now <see cref="CrowdControlMod"/> (shared with the BepInEx example),
+    /// which calls <see cref="Initialize"/> and patches this class.
+    /// </summary>
+    public class LethalCompanyControl
     {
         // for code diffs: https://1a3.uk/games/lethal-company/diffs/
-        // Mod Details
-        private const string modGUID = "WarpWorld.CrowdControl";
-        private const string modName = "Crowd Control";
-        private const string modVersion = "1.1.17";
-
-        public static string tsVersion = "1.1.17";
+        public static string tsVersion => CrowdControlMod.Instance?.Version ?? CrowdControlMod.MOD_VERSION;
         public static Dictionary<string, (string name, string conn)> version = new Dictionary<string, (string name, string conn)>();
-
-        private readonly Harmony harmony = new Harmony(modGUID);
 
 
         public static Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>> levelEnemySpawns;
@@ -64,8 +62,6 @@ namespace BepinControl
         private static bool hasGUISynced = false;
         internal static bool isHost = false;
 
-        internal static LethalCompanyControl Instance = null;
-        private ControlClient client = null;
 
         public static bool test = false;
         public static uint msgid = 0;
@@ -75,31 +71,10 @@ namespace BepinControl
 
         public static uint floodtime = 0;
 
-        void Awake()
+        /// <summary>Called once by <see cref="CrowdControlMod"/> when the plugin loads.</summary>
+        internal static void Initialize(ManualLogSource logger)
         {
-
-            Instance = this;
-            mls = BepInEx.Logging.Logger.CreateLogSource("Crowd Control");
-            // Plugin startup logic
-            mls.LogInfo($"Loaded {modGUID}. Patching.");
-            harmony.PatchAll(typeof(LethalCompanyControl));
-            mls.LogInfo($"Initializing Crowd Control");
-
-            try
-            {
-                client = new ControlClient();
-                new Thread(new ThreadStart(client.NetworkLoop)).Start();
-                new Thread(new ThreadStart(client.RequestLoop)).Start();
-            }
-            catch (Exception e)
-            {
-                mls.LogInfo($"CC Init Error: {e.ToString()}");
-            }
-
-            mls.LogInfo($"Crowd Control Initialized");
-
-
-            mls = Logger;
+            mls = logger;
             enemyRaritys = new Dictionary<SpawnableEnemyWithRarity, int>();
             levelEnemySpawns = new Dictionary<SelectableLevel, List<SpawnableEnemyWithRarity>>();
             enemyPropCurves = new Dictionary<SpawnableEnemyWithRarity, AnimationCurve>();
@@ -111,7 +86,7 @@ namespace BepinControl
             Events.TerminalBeginUsing += new TerminalEventHandler(OnBeginUsing);
         }
 
-        private void OnBeginUsing(object sender, TerminalEventArgs e)
+        private static void OnBeginUsing(object sender, TerminalEventArgs e)
         {
             HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_vercheck</size>");
         }
@@ -152,14 +127,17 @@ namespace BepinControl
             EnemyAI[] spawnableEnemies2 = Resources.FindObjectsOfTypeAll<EnemyAI>();
             foreach (var enemy in spawnableEnemies2)
             {
-                SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity();
+                SpawnableEnemyWithRarity currEnemy = new SpawnableEnemyWithRarity(enemy.enemyType, 0);
                 currEnemy.enemyType = enemy.enemyType;
                 currEnemy.enemyType.enemyName = enemy.enemyType.enemyName;
                 currEnemy.enemyType.enemyPrefab = enemy.enemyType.enemyPrefab;
                 currEnemy.enemyType.name = enemy.enemyType.name;
                 LethalCompanyControl.mls.LogInfo("Enemy Name: " + enemy.enemyType.name + ", Alternate Name: " + enemy.enemyType.enemyName);//maybe better to scan for .name instead of enemyName, as .name is no spaces, enemyName has spaces.
                 currEnemy.rarity = 0;
-                bool exists = RoundManager.Instance.currentLevel.Enemies.Contains(currEnemy);
+                //match on the EnemyType - Contains() compared against the brand-new wrapper above, never matched, and
+                //re-added every enemy to the level's lists every round
+                SelectableLevel lvl = RoundManager.Instance.currentLevel;
+                bool exists = lvl.Enemies.Exists(x => x.enemyType == enemy.enemyType) || lvl.OutsideEnemies.Exists(x => x.enemyType == enemy.enemyType);
                 if (exists) { }
                 else
                 {
@@ -276,6 +254,45 @@ namespace BepinControl
         }
 
 
+        /// <summary>
+        /// Effect code suffix (spawn_X / cspawn_X) -> the enemy's asset name (EnemyType.name). Matching the display
+        /// name by substring picked the wrong enemy for some codes: "giant" also matches Giant Kiwi, "butler"
+        /// also matches Butler Bees, and Feiopar's display name has no "pum" in it at all (its asset is Puma).
+        /// </summary>
+        internal static readonly Dictionary<string, string> EnemyCodes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["pede"] = "Centipede", ["spider"] = "SandSpider", ["hoard"] = "HoarderBug", ["flower"] = "Flowerman",
+            ["crawl"] = "Crawler", ["blob"] = "Blob", ["spring"] = "SpringMan", ["puff"] = "Puffer",
+            ["dog"] = "MouthDog", ["giant"] = "ForestGiant", ["levi"] = "SandWorm", ["hawk"] = "BaboonHawk",
+            ["girl"] = "DressGirl", ["cracker"] = "Nutcracker", ["radmech"] = "RadMech", ["clay"] = "ClaySurgeon",
+            ["butler"] = "Butler", ["jester"] = "Jester", ["eater"] = "CaveDweller", ["snake"] = "FlowerSnake",
+            ["kiwi"] = "GiantKiwi", ["growths"] = "CadaverGrowths", ["bloom"] = "CadaverBloom", ["bush"] = "BushWolf",
+            ["pum"] = "Puma", ["ray"] = "Stingray",
+        };
+
+        /// <summary>True if the current moon has Vain Shrouds, which a Kidnapper Fox needs or it despawns at once.</summary>
+        internal static bool MoonHasVainShrouds()
+        {
+            try
+            {
+                MoldSpreadManager mold = UnityEngine.Object.FindObjectOfType<MoldSpreadManager>();
+                return mold != null && mold.GetWeeds();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>True if <paramref name="type"/> is the enemy an effect code suffix (or other key) refers to.</summary>
+        /// <remarks>Known codes match the exact asset name; anything else falls back to the old display-name substring match.</remarks>
+        internal static bool IsEnemy(EnemyType type, string key)
+        {
+            if (type == null || string.IsNullOrEmpty(key)) return false;
+            if (EnemyCodes.TryGetValue(key, out string asset)) return string.Equals(type.name, asset, StringComparison.OrdinalIgnoreCase);
+            return type.enemyName != null && type.enemyName.ToLower().Contains(key.ToLower());
+        }
+
         public static Queue<Action> ActionQueue = new Queue<Action>();
 
         // Effect delegates run on the CC request thread, but FindObjectOfType/FindObjectsByType
@@ -303,31 +320,11 @@ namespace BepinControl
             cachedEnemies = UnityEngine.Object.FindObjectsByType<EnemyAI>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         }
 
-        [HarmonyPatch(typeof(GameNetworkManager), "OnApplicationQuit")]
-        public class OnApplicationQuitPatch
-        {
-            static void Prefix()
-            {
-                try
-                {
-                    ControlClient.connect = false;
-                    Instance?.client?.Stop();
-                    mls.LogInfo("ControlClient stopped successfully.");
-                }
-                catch (Exception ex)
-                {
-                    mls.LogError($"Error during application quit: {ex}");
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(RoundManager), "Update")]
         [HarmonyPrefix]
         static void roundUpdate()
         {
-            ControlClient.UpdateReadyState();
-
-            if (CrowdDelegates.givedelay > 0) CrowdDelegates.givedelay--;
+            if (GameActions.givedelay > 0) GameActions.givedelay--;
             if (verwait > 0) verwait--;
 
             refreshSceneCache();
@@ -336,15 +333,6 @@ namespace BepinControl
             {
                 Action action = ActionQueue.Dequeue();
                 action.Invoke();
-            }
-
-            lock (BuffThread.threads)
-            {
-                foreach (var thread in BuffThread.threads)
-                {
-                    if (!thread.paused)
-                        thread.buff.tick();
-                }
             }
 
         }
@@ -423,7 +411,7 @@ namespace BepinControl
                             verwait = 30;
                             playerRef = StartOfRound.Instance.localPlayerController;
 
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_version_{playerRef.playerUsername}_{tsVersion}_{ControlClient.connect}</size>");
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_version_{playerRef.playerUsername}_{tsVersion}_{(CrowdControlMod.Instance?.ClientConnected ?? false)}</size>");
 
                             return false;
                         }
@@ -438,7 +426,7 @@ namespace BepinControl
                                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                                 {
 
-                                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, values[1]))
                                     {
                                         try
                                         {
@@ -456,7 +444,7 @@ namespace BepinControl
                                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                                 {
 
-                                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, values[1]))
                                     {
                                         try
                                         {
@@ -535,7 +523,7 @@ namespace BepinControl
                                         return;
                                     }
 
-                                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, values[1]))
                                     {
                                         try
                                         {
@@ -552,7 +540,7 @@ namespace BepinControl
                                 foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                                 {
 
-                                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(values[1]))
+                                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, values[1]))
                                     {
                                         try
                                         {
@@ -589,7 +577,7 @@ namespace BepinControl
                             float num = tod.lengthOfHours;
                             tod.globalTime += num;
                             tod.timeUntilDeadline -= num;
-                            CrowdDelegates.callFunc(tod, "MoveTimeOfDay", null);
+                            GameActions.callFunc(tod, "MoveTimeOfDay", null);
                             break;
                         }
                     case "remhour":
@@ -599,7 +587,7 @@ namespace BepinControl
                             float num = tod.lengthOfHours;
                             tod.globalTime -= num;
                             tod.timeUntilDeadline += num;
-                            CrowdDelegates.callFunc(tod, "MoveTimeOfDay", null);
+                            GameActions.callFunc(tod, "MoveTimeOfDay", null);
                             break;
                         }
 
@@ -792,7 +780,7 @@ namespace BepinControl
                         {
                             if (!isHost) return true;
 
-                            CrowdDelegates.givedelay = 20;
+                            GameActions.givedelay = 20;
 
                             int give = int.Parse(values[1]);
                             int id = int.Parse(values[2]);
@@ -828,8 +816,8 @@ namespace BepinControl
                             gameObject.GetComponent<GrabbableObject>().fallTime = 0f;
                             gameObject.GetComponent<NetworkObject>().Spawn(false);
 
-                            CrowdDelegates.msgid++;
-                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_give_{give}_{id}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{CrowdDelegates.msgid}</size>");
+                            GameActions.msgid++;
+                            HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_give_{give}_{id}_{gameObject.GetComponent<NetworkObject>().NetworkObjectId}_{GameActions.msgid}</size>");
 
                             break;
                         }
@@ -839,7 +827,7 @@ namespace BepinControl
                             var gameObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[gid].gameObject;
 
                             var enemy = gameObject.GetComponent<MaskedPlayerEnemy>();
-                            CrowdDelegates.setProperty(enemy, "enemyEnabled", true);
+                            GameActions.setProperty(enemy, "enemyEnabled", true);
                             break;
                         }
 
@@ -871,8 +859,8 @@ namespace BepinControl
 
                             var grab = gameObject.GetComponent<GrabbableObject>();
 
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "currentlyGrabbingObject", grab);
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "grabInvalidated", false);
+                            GameActions.setProperty(playerRef, "currentlyGrabbingObject", grab);
+                            GameActions.setProperty(playerRef, "grabInvalidated", false);
 
 
                             NetworkObject networkObject = grab.NetworkObject;
@@ -888,7 +876,7 @@ namespace BepinControl
                             playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
                             playerRef.playerBodyAnimator.ResetTrigger("Throw");
 
-                            ControlValley.CrowdDelegates.callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
+                            GameActions.callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
 
                             playerRef.isGrabbingObjectAnimation = true;
                             playerRef.cursorIcon.enabled = false;
@@ -904,16 +892,16 @@ namespace BepinControl
                                 playerRef.grabObjectAnimationTime = 0.4f;
                             }
 
-                            ControlValley.CrowdDelegates.callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
+                            GameActions.callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
 
-                            Coroutine goc = (Coroutine)ControlValley.CrowdDelegates.getProperty(playerRef, "grabObjectCoroutine");
+                            Coroutine goc = (Coroutine)GameActions.getProperty(playerRef, "grabObjectCoroutine");
 
                             if (goc != null)
                             {
                                 ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
                             }
 
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
+                            GameActions.setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
                         }
                         break;
 
@@ -945,8 +933,8 @@ namespace BepinControl
 
                             var grab = gameObject.GetComponent<GrabbableObject>();
 
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "currentlyGrabbingObject", grab);
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "grabInvalidated", false);
+                            GameActions.setProperty(playerRef, "currentlyGrabbingObject", grab);
+                            GameActions.setProperty(playerRef, "grabInvalidated", false);
 
 
                             NetworkObject networkObject = grab.NetworkObject;
@@ -962,7 +950,7 @@ namespace BepinControl
                             playerRef.playerBodyAnimator.SetBool("cancelHolding", false);
                             playerRef.playerBodyAnimator.ResetTrigger("Throw");
 
-                            ControlValley.CrowdDelegates.callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
+                            GameActions.callFunc(playerRef, "SetSpecialGrabAnimationBool", new System.Object[] { true, null });
 
                             playerRef.isGrabbingObjectAnimation = true;
                             playerRef.cursorIcon.enabled = false;
@@ -978,16 +966,16 @@ namespace BepinControl
                                 playerRef.grabObjectAnimationTime = 0.4f;
                             }
 
-                            ControlValley.CrowdDelegates.callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
+                            GameActions.callFunc(playerRef, "GrabObjectServerRpc", new NetworkObjectReference(networkObject));
 
-                            Coroutine goc = (Coroutine)ControlValley.CrowdDelegates.getProperty(playerRef, "grabObjectCoroutine");
+                            Coroutine goc = (Coroutine)GameActions.getProperty(playerRef, "grabObjectCoroutine");
 
                             if (goc != null)
                             {
                                 ((UnityEngine.MonoBehaviour)playerRef).StopCoroutine(goc);
                             }
 
-                            ControlValley.CrowdDelegates.setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
+                            GameActions.setProperty(playerRef, "grabObjectCoroutine", ((UnityEngine.MonoBehaviour)playerRef).StartCoroutine("GrabObject"));
                         }
                         break;
 
@@ -1120,7 +1108,7 @@ namespace BepinControl
                                 var playerRef = StartOfRound.Instance.localPlayerController;
                                 var randomSeed = new System.Random(StartOfRound.Instance.randomMapSeed + 17 + (int)GameNetworkManager.Instance.localPlayerController.playerClientId);//use the actual seed function the tele uses, avoid invalid tp
                                 Vector3 position = RoundManager.Instance.insideAINodes[randomSeed.Next(0, RoundManager.Instance.insideAINodes.Length)].transform.position;//inside nodes only, but mineshaft counts upstairs, so y check 
-                                Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, randomSeed: randomSeed);
+                                Vector3 inBoxPredictable = RoundManager.Instance.GetRandomNavMeshPositionInBoxPredictable(position, 10f, default(UnityEngine.AI.NavMeshHit), randomSeed);
                                 StartOfRound.Instance.localPlayerController.TeleportPlayer(inBoxPredictable);
                                 playerRef.isInsideFactory = true;playerRef.isInHangarShipRoom = false;playerRef.isInElevator = false;//all bools referring to player, so fine to go on one line as readable.
                             }
@@ -1221,7 +1209,7 @@ namespace BepinControl
                 // spring
                 // puffer
 
-                if (enemy.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()))
+                if (LethalCompanyControl.IsEnemy(enemy.enemyType, enemyName.ToLower()))
                 {
                     try
                     {
@@ -1240,7 +1228,7 @@ namespace BepinControl
                 {
                     foreach (var level in currentStart.levels)
                     {
-                        var enemyRef = level.Enemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()));
+                        var enemyRef = level.Enemies.Find(x => LethalCompanyControl.IsEnemy(x.enemyType, enemyName.ToLower()));
                         if (enemyRef != null)
                         {
                             try
@@ -1263,7 +1251,7 @@ namespace BepinControl
                 foreach (var outsideEnemy in currentLevel.OutsideEnemies)
                 {
                     mls.LogInfo($"outside enemy: {outsideEnemy.enemyType.enemyName}");
-                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()))
+                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enemyName.ToLower()))
                     {
                         try
                         {
@@ -1291,7 +1279,7 @@ namespace BepinControl
                     {
                         foreach (var level in currentStart.levels)
                         {
-                            var enemyRef = level.OutsideEnemies.Find(x => x.enemyType.enemyName.ToLower().Contains(enemyName.ToLower()));
+                            var enemyRef = level.OutsideEnemies.Find(x => LethalCompanyControl.IsEnemy(x.enemyType, enemyName.ToLower()));
                             if (enemyRef != null)
                             {
                                 try

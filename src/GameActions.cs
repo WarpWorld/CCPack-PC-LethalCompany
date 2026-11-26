@@ -1,7 +1,8 @@
-﻿using ControlValley;
+#nullable disable
 using DunGen;
 using GameNetcodeStuff;
 using BepinControl;
+using ConnectorLib.JSON;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,12 @@ using UnityEngine.AI;
 
 
 
-namespace ControlValley
+namespace CrowdControl
 {
-    public delegate CrowdResponse CrowdDelegate(ControlClient client, CrowdRequest req);
 
 
 
-    public class CrowdDelegates
+    public class GameActions
     {
         public static uint msgid = 0;
 
@@ -57,9 +57,9 @@ namespace ControlValley
         }
 
         #region Health
-        public static CrowdResponse HealFull(ControlClient client, CrowdRequest req)
+        public static EffectResponse HealFull(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
 
@@ -68,7 +68,7 @@ namespace ControlValley
                 NetworkManager networkManager = StartOfRound.Instance.NetworkManager;
                 if (networkManager == null || !networkManager.IsListening)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                 }
                 else
                 {
@@ -80,24 +80,24 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse Kill(ControlClient client, CrowdRequest req)
+        public static EffectResponse Kill(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (playerRef.health <= 0 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (playerRef.health <= 0 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -115,16 +115,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse KillCrewmate(ControlClient client, CrowdRequest req)
+        public static EffectResponse KillCrewmate(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -138,14 +138,14 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -156,26 +156,26 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse Damage(ControlClient client, CrowdRequest req)
+        public static EffectResponse Damage(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.OHKO)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.INVUL)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (playerRef.health <= 20 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (playerRef.health <= 20 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -189,16 +189,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse DamageCrew(ControlClient client, CrowdRequest req)
+        public static EffectResponse DamageCrew(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             List<PlayerControllerB> list = new List<PlayerControllerB>();
@@ -213,14 +213,14 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -234,27 +234,27 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse Heal(ControlClient client, CrowdRequest req)
+        public static EffectResponse Heal(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.OHKO)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.INVUL)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             try
             {
 
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (playerRef.health >= 100 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (playerRef.health >= 100 || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
 
@@ -276,17 +276,17 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse HealCrew(ControlClient client, CrowdRequest req)
+        public static EffectResponse HealCrew(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             List<PlayerControllerB> list = new List<PlayerControllerB>();
@@ -301,14 +301,14 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -322,95 +322,91 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
 
-        public static CrowdResponse OHKO(ControlClient client, CrowdRequest req)
+        public static EffectResponse OHKO(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.OHKO)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.INVUL)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.OHKO, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse Invul(ControlClient client, CrowdRequest req)
+        public static EffectResponse Invul(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.OHKO)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.INVUL)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.OHKO)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.INVUL)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.INVUL, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
         #endregion
 
         #region Stamina
-        public static CrowdResponse DrainStamins(ControlClient client, CrowdRequest req)
+        public static EffectResponse DrainStamins(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (playerRef.sprintMeter < 0.1f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.sprintMeter < 0.1f) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             playerRef.sprintMeter = 0;
             playerRef.isExhausted = true;
 
 
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success);
         }
 
-        public static CrowdResponse RestoreStamins(ControlClient client, CrowdRequest req)
+        public static EffectResponse RestoreStamins(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (playerRef.sprintMeter > 0.9f) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.sprintMeter > 0.9f) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             playerRef.sprintMeter = 1.0f;
             playerRef.isExhausted = false;
 
 
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success);
         }
 
-        public static CrowdResponse InfiniteStamina(ControlClient client, CrowdRequest req)
+        public static EffectResponse InfiniteStamina(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.INFSTAM)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.NOSTAM)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.INFSTAM, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse NoStamina(ControlClient client, CrowdRequest req)
+        public static EffectResponse NoStamina(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.INFSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.NOSTAM)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.INFSTAM)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.NOSTAM)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.NOSTAM, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
         #endregion
 
         #region Sounds
-        public static CrowdResponse Footstep(ControlClient client, CrowdRequest req)
+        public static EffectResponse Footstep(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -418,7 +414,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -432,11 +428,11 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         public static void SpawnAndPlayScreech(SpawnableEnemyWithRarity source)
@@ -457,9 +453,9 @@ namespace ControlValley
             UnityEngine.Object.Destroy(obj);
 
         }
-        public static CrowdResponse Screech(ControlClient client, CrowdRequest req)
+        public static EffectResponse Screech(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -467,7 +463,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -478,7 +474,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.OutsideEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "hawk"))
                                 {
                                     try
                                     {
@@ -494,7 +490,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.Enemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "hawk"))
                                 {
                                     try
                                     {
@@ -510,7 +506,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.DaytimeEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("hawk"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "hawk"))
                                 {
                                     try
                                     {
@@ -531,11 +527,11 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         public static void SpawnAndPlayBreathing(SpawnableEnemyWithRarity source)
@@ -556,9 +552,9 @@ namespace ControlValley
             UnityEngine.Object.Destroy(obj);
         }
 
-        public static CrowdResponse Breathing(ControlClient client, CrowdRequest req)
+        public static EffectResponse Breathing(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -566,7 +562,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -577,7 +573,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.OutsideEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "girl"))
                                 {
                                     try
                                     {
@@ -593,7 +589,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.Enemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "girl"))
                                 {
                                     try
                                     {
@@ -609,7 +605,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.DaytimeEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("girl"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "girl"))
                                 {
                                     try
                                     {
@@ -630,11 +626,11 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         public static void SpawnAndPlayBlob(SpawnableEnemyWithRarity source)
@@ -655,9 +651,9 @@ namespace ControlValley
             UnityEngine.Object.Destroy(obj);
         }
 
-        public static CrowdResponse BlobSound(ControlClient client, CrowdRequest req)
+        public static EffectResponse BlobSound(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -665,7 +661,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -676,7 +672,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.OutsideEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "blob"))
                                 {
                                     try
                                     {
@@ -692,7 +688,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.Enemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "blob"))
                                 {
                                     try
                                     {
@@ -708,7 +704,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.DaytimeEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("blob"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "blob"))
                                 {
                                     try
                                     {
@@ -729,193 +725,182 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse HighPitch(ControlClient client, CrowdRequest req)
+        public static EffectResponse HighPitch(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.LOW_PITCH)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HIGH_PITCH)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             LethalCompanyControl.ActionQueue.Enqueue(() =>
             {
                 HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_1.5</size>");
             });
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_PITCH, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse LowPitch(ControlClient client, CrowdRequest req)
+        public static EffectResponse LowPitch(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (BuffThread.isRunning(BuffType.LOW_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_PITCH)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.LOW_PITCH)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HIGH_PITCH)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             LethalCompanyControl.ActionQueue.Enqueue(() =>
             {
                 HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_pitch_0.65</size>");
             });
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_PITCH, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
         #endregion
 
         #region Players
-        public static CrowdResponse HyperMove(ControlClient client, CrowdRequest req)
+        public static EffectResponse HyperMove(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FAST_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.SLOW_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HYPER_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FREEZE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HYPER_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
-        public static CrowdResponse FastJetpack(ControlClient client, CrowdRequest req)
+        public static EffectResponse FastJetpack(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FAST_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.SLOW_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HYPER_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FREEZE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.FASTJETPACK, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse FastMove(ControlClient client, CrowdRequest req)
+        public static EffectResponse FastMove(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FASTJETPACK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FASTJETPACK)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FAST_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.SLOW_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HYPER_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FREEZE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.FAST_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse Drunk(ControlClient client, CrowdRequest req)
+        public static EffectResponse Drunk(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 10;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.DRUNK)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.DRUNK)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.DRUNK, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse SlowMove(ControlClient client, CrowdRequest req)
+        public static EffectResponse SlowMove(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FAST_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.SLOW_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HYPER_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FREEZE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.SLOW_MOVE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse Freeze(ControlClient client, CrowdRequest req)
+        public static EffectResponse Freeze(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FAST_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.SLOW_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HYPER_MOVE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.FREEZE)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FAST_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.SLOW_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HYPER_MOVE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.FREEZE)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.FREEZE, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse UltraJump(ControlClient client, CrowdRequest req)
+        public static EffectResponse UltraJump(EffectRequest req)
         {
 
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.ULTRA_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HIGH_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.LOW_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.ULTRA_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse HighJump(ControlClient client, CrowdRequest req)
+        public static EffectResponse HighJump(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.ULTRA_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HIGH_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.LOW_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.HIGH_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse LowJump(ControlClient client, CrowdRequest req)
+        public static EffectResponse LowJump(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.ULTRA_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.HIGH_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
-            if (BuffThread.isRunning(BuffType.LOW_JUMP)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.ULTRA_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.HIGH_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
+            if (ActiveBuffs.IsRunning(BuffType.LOW_JUMP)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.LOW_JUMP, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
-        public static CrowdResponse Revive(ControlClient client, CrowdRequest req)
+        public static EffectResponse Revive(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -923,7 +908,7 @@ namespace ControlValley
             {
 
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -939,26 +924,26 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TeleportToShip(ControlClient client, CrowdRequest req)
+        public static EffectResponse TeleportToShip(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
             try
             {
 
-                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = EffectStatus.Retry;
                 else
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -972,15 +957,15 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TeleportCrewToShip(ControlClient client, CrowdRequest req)
+        public static EffectResponse TeleportCrewToShip(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -995,14 +980,14 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1016,16 +1001,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TeleportToCrew(ControlClient client, CrowdRequest req)
+        public static EffectResponse TeleportToCrew(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1039,7 +1024,7 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
@@ -1047,7 +1032,7 @@ namespace ControlValley
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1060,16 +1045,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TeleportCrewTo(ControlClient client, CrowdRequest req)
+        public static EffectResponse TeleportCrewTo(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1083,7 +1068,7 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
@@ -1091,7 +1076,7 @@ namespace ControlValley
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1104,26 +1089,26 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse SpawnBody(ControlClient client, CrowdRequest req)
+        public static EffectResponse SpawnBody(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
             try
             {
 
-                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                if (GameNetworkManager.Instance.localPlayerController.isInHangarShipRoom) status = EffectStatus.Retry;
                 else
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1140,16 +1125,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse SpawnCrewBody(ControlClient client, CrowdRequest req)
+        public static EffectResponse SpawnCrewBody(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1163,16 +1148,16 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Could not find Active player to Spawn Crew Body");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "Could not find Active player to Spawn Crew Body");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, StartOfRound.Instance.connectedPlayersAmount)]; //test fixing Crew bodies?
-                if (player.isInHangarShipRoom) status = CrowdResponse.Status.STATUS_RETRY;
+                if (player.isInHangarShipRoom) status = EffectStatus.Retry;
                 else
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1187,23 +1172,23 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse Launch(ControlClient client, CrowdRequest req)
+        public static EffectResponse Launch(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1235,16 +1220,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse InverseTeleport(ControlClient client, CrowdRequest req)
+        public static EffectResponse InverseTeleport(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1252,7 +1237,7 @@ namespace ControlValley
             {
                 if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                 }
                 else
                 {
@@ -1269,16 +1254,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse InverseTeleportCrew(ControlClient client, CrowdRequest req)
+        public static EffectResponse InverseTeleportCrew(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1292,7 +1277,7 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
@@ -1300,7 +1285,7 @@ namespace ControlValley
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1313,20 +1298,20 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
         #endregion
 
         #region Enemies
 
-        public static CrowdResponse Spawn(ControlClient client, CrowdRequest req)
+        public static EffectResponse Spawn(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (playerRef.isPlayerDead) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is Dead");
+            if (playerRef.isPlayerDead) return new EffectResponse(req.ID, EffectStatus.Failure, "Player is Dead");
 
             string[] enteredText = req.code.Split('_');
             if (enteredText.Length == 2)
@@ -1335,8 +1320,12 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "What");
+                return new EffectResponse(req.ID, EffectStatus.Failure, "What");
             }
+            //a Kidnapper Fox (BushWolf) despawns itself on the spot unless the moon has Vain Shrouds, so a viewer
+            //would pay for nothing - refuse it (and get the refund) instead
+            if (enteredText[1] == "bush" && !LethalCompanyControl.MoonHasVainShrouds())
+                return new EffectResponse(req.ID, EffectStatus.Failure, "Kidnapper Foxes only appear on moons with Vain Shrouds");
             bool found = false;
             if (enteredText[1] == "mimic")
             {
@@ -1356,22 +1345,22 @@ namespace ControlValley
                 }
 
                 if (prefab == null)
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                    return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
             }    
             if (enteredText[1] == "landmine" ||enteredText[1] ==  "turretcont" ||enteredText[1] == "spiketrap")
             {
-                if (playerRef.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
+                if (playerRef.isInElevator) return new EffectResponse(req.ID, EffectStatus.Failure, "Player is inside ship");
                 found = true;
             }
             if (!found)
                 foreach (var Enemy in StartOfRound.Instance.currentLevel.Enemies)
                 {
-                    if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester" || enteredText[1] == "cracker")
+                    if (LethalCompanyControl.IsEnemy(Enemy.enemyType, enteredText[1]) || enteredText[1] == "jester" || enteredText[1] == "cracker")
                     {
                         try
                         {
-                            if (!playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                            if (!playerRef.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
                             }
                         catch (Exception e)
                         {
@@ -1385,14 +1374,14 @@ namespace ControlValley
                 {
 
 
-                    if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                    if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                     {
                         found = true;
                         if (enteredText[1] == "giant" || enteredText[1] == "levi" || enteredText[1] == "radmech")
                         {
                             try
                             {
-                                if (playerRef.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                                if (playerRef.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
 
                             }
                             catch (Exception e)
@@ -1402,7 +1391,7 @@ namespace ControlValley
                         }
                     }
                 }
-            if (found == false) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+            if (found == false) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
 
             if (LethalCompanyControl.isHost)
             {
@@ -1468,7 +1457,7 @@ namespace ControlValley
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
 
-                        if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                         {
 
                             try
@@ -1486,7 +1475,7 @@ namespace ControlValley
                     }
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                     {
-                        if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                         {
                             try
                             {
@@ -1517,10 +1506,10 @@ namespace ControlValley
                 }
             }
 
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS, "");
+            return new EffectResponse(req.ID, EffectStatus.Success, "");
         }
 
-        public static CrowdResponse CrewSpawn(ControlClient client, CrowdRequest req)
+        public static EffectResponse CrewSpawn(EffectRequest req)
         {
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1531,8 +1520,12 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "");
+                return new EffectResponse(req.ID, EffectStatus.Failure, "");
             }
+            //a Kidnapper Fox (BushWolf) despawns itself on the spot unless the moon has Vain Shrouds, so a viewer
+            //would pay for nothing - refuse it (and get the refund) instead
+            if (enteredText[1] == "bush" && !LethalCompanyControl.MoonHasVainShrouds())
+                return new EffectResponse(req.ID, EffectStatus.Failure, "Kidnapper Foxes only appear on moons with Vain Shrouds");
 
             List<PlayerControllerB> list = new List<PlayerControllerB>();
 
@@ -1545,7 +1538,7 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             {
@@ -1556,7 +1549,7 @@ namespace ControlValley
 
                 if (enteredText[1] == "landmine" || enteredText[1] == "turretcont" || enteredText[1] == "spiketrap")
                 {
-                    if (player.isInElevator) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE, "Player is inside ship");
+                    if (player.isInElevator) return new EffectResponse(req.ID, EffectStatus.Failure, "Player is inside ship");
                     found = true;
                 }
 
@@ -1566,11 +1559,11 @@ namespace ControlValley
                     {
 
 
-                        if (Enemy.enemyType.enemyName.ToLower().Contains(enteredText[1]) || enteredText[1] == "jester" || enteredText[1] ==  "cracker")
+                        if (LethalCompanyControl.IsEnemy(Enemy.enemyType, enteredText[1]) || enteredText[1] == "jester" || enteredText[1] ==  "cracker")
                         {
                             try
                             {
-                                if (!player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is Inside");
+                                if (!player.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is Inside");
                             }
                             catch (Exception e)
                             {
@@ -1584,7 +1577,7 @@ namespace ControlValley
                 if (!found)
                     foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.OutsideEnemies)
                     {
-                        if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                        if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                         {
                             found = true;
                             LethalCompanyControl.mls.LogInfo("Found Monster: " + enteredText[1]);
@@ -1592,7 +1585,7 @@ namespace ControlValley
                             {
                                 try
                                 {
-                                    if (player.isInsideFactory) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is outside");
+                                    if (player.isInsideFactory) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is outside");
 
                                 }
                                 catch (Exception e)
@@ -1602,7 +1595,7 @@ namespace ControlValley
                             }
                         }
                     }
-                if (!found) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "Player is inside ship");
+                if (!found) return new EffectResponse(req.ID, EffectStatus.Retry, "Player is inside ship");
 
                 if (LethalCompanyControl.isHost)
                 {
@@ -1668,7 +1661,7 @@ namespace ControlValley
 
                                 return;
                             }
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                            if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                             {
                                 try
                                 {
@@ -1685,7 +1678,7 @@ namespace ControlValley
                         foreach (var outsideEnemy in StartOfRound.Instance.currentLevel.Enemies)
                         {
 
-                            if (outsideEnemy.enemyType.enemyName.ToLower().Contains(enteredText[1]))
+                            if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, enteredText[1]))
                             {
                                 try
                                 {
@@ -1711,20 +1704,20 @@ namespace ControlValley
                 }
             }
 
-            return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_SUCCESS, "");
+            return new EffectResponse(req.ID, EffectStatus.Success, "");
         }
         #endregion
 
         #region Items
-        public static CrowdResponse TakeItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse TakeItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1736,16 +1729,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TakeCrewItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse TakeCrewItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -1759,14 +1752,14 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             try
             {
                 var player = list[UnityEngine.Random.Range(0, list.Count)];
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !player.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1778,23 +1771,23 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse DropItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse DropItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1806,23 +1799,23 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse UnchargeItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse UnchargeItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1836,24 +1829,24 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse ChargeItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse ChargeItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = CrowdResponse.Status.STATUS_RETRY;
-                else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge >= 0.96f) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled || playerRef.currentlyHeldObjectServer == null) status = EffectStatus.Retry;
+                else if (!playerRef.currentlyHeldObjectServer.itemProperties.requiresBattery || playerRef.currentlyHeldObjectServer.insertedBattery == null || playerRef.currentlyHeldObjectServer.insertedBattery.charge >= 0.96f) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -1866,16 +1859,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse GiveItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse GiveItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             int give = 0;
 
@@ -1890,13 +1883,13 @@ namespace ControlValley
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                    return new EffectResponse(req.ID, EffectStatus.Failure);
                 }
 
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
             try
             {
@@ -1909,7 +1902,7 @@ namespace ControlValley
                // }
                 if (playerRef.inSpecialInteractAnimation || slot == -1 || givedelay > 0)
                 {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                    return new EffectResponse(req.ID, EffectStatus.Retry, "");
                 }
 
                 
@@ -1921,10 +1914,10 @@ namespace ControlValley
                         msgid++;
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)playerRef.playerClientId}_{msgid}</size>");
                     });
-                    return new CrowdResponse(req.GetReqID(), status, message);
+                    return new EffectResponse(req.ID, status, message);
                 }
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     givedelay = 20;
@@ -1987,16 +1980,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse GiveCrewItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse GiveCrewItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
@@ -2012,12 +2005,12 @@ namespace ControlValley
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                    return new EffectResponse(req.ID, EffectStatus.Failure);
                 }
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
 
@@ -2033,7 +2026,7 @@ namespace ControlValley
 
             if (list.Count <= 0)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                return new EffectResponse(req.ID, EffectStatus.Retry, "");
             }
 
             
@@ -2050,17 +2043,17 @@ namespace ControlValley
                         msgid++;
                         HUDManager.Instance.AddTextToChatOnServer($"<size=0>/cc_giver_{give}_{(int)player.playerClientId}_{msgid}</size>");
                     });
-                    return new CrowdResponse(req.GetReqID(), status, message);
+                    return new EffectResponse(req.ID, status, message);
                 }
 
                 var slot = (int)callAndReturnFunc(player, "FirstEmptyItemSlot", null);
 
                 if (player.inSpecialInteractAnimation || slot == -1)
                 {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+                    return new EffectResponse(req.ID, EffectStatus.Retry, "");
                 }
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2082,16 +2075,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse BuyItem(ControlClient client, CrowdRequest req)
+        public static EffectResponse BuyItem(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
@@ -2107,19 +2100,19 @@ namespace ControlValley
                 }
                 else
                 {
-                    return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                    return new EffectResponse(req.ID, EffectStatus.Failure);
                 }
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
             try
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2140,20 +2133,20 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region VehicleStuff
 
-        public static CrowdResponse BuyCruiser(ControlClient client, CrowdRequest req)
+        public static EffectResponse BuyCruiser(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             int give = 0;
             var playerRef = StartOfRound.Instance.localPlayerController;
@@ -2167,14 +2160,14 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
             try
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2187,17 +2180,17 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
 
-        public static CrowdResponse TurnOnVehicle(ControlClient client, CrowdRequest req)
+        public static EffectResponse TurnOnVehicle(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
             string[] enteredText = req.code.Split('_');
@@ -2208,22 +2201,22 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
             if (!found)
             {
                 try
                 {
-                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (Veh1.currentDriver != playerRef) status = EffectStatus.Retry;
                     else found = true;
                 }
-                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+                catch (Exception e) { status = EffectStatus.Retry; }
             }
             if (found)
             {
                 try
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2243,16 +2236,16 @@ namespace ControlValley
                 }
                 catch (Exception e)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                     LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse SpringChair(ControlClient client, CrowdRequest req)
+        public static EffectResponse SpringChair(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
@@ -2263,22 +2256,22 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
             if (!found)
             {
                 try
                 {
-                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (Veh1.currentDriver != playerRef) status = EffectStatus.Retry;
                     else found = true;
                 }
-                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+                catch (Exception e) { status = EffectStatus.Retry; }
             }
             if (found)
             {
                 try
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2296,16 +2289,16 @@ namespace ControlValley
                 }
                 catch (Exception e)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                     LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse TurnOffEngine(ControlClient client, CrowdRequest req)
+        public static EffectResponse TurnOffEngine(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
@@ -2316,22 +2309,22 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
             if (!found)
             {
                 try
                 {
-                    if (Veh1.currentDriver != playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (Veh1.currentDriver != playerRef) status = EffectStatus.Retry;
                     else found = true;
                 }
-                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+                catch (Exception e) { status = EffectStatus.Retry; }
             }
             if (found)
             {
                 try
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2349,16 +2342,16 @@ namespace ControlValley
                 }
                 catch (Exception e)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                     LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse DestroyVehicle(ControlClient client, CrowdRequest req)
+        public static EffectResponse DestroyVehicle(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
             bool found = false;
@@ -2369,22 +2362,22 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
             if (!found)
             {
                 try
                 {
-                    if (Veh1.currentDriver == playerRef) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (Veh1.currentDriver == playerRef) status = EffectStatus.Retry;
                     else found = true;
                 }
-                catch (Exception e) { status = CrowdResponse.Status.STATUS_RETRY; }
+                catch (Exception e) { status = EffectStatus.Retry; }
             }
             if (found)
             {
                 try
                 {
-                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                    if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                     else
                     {
                         LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2402,19 +2395,19 @@ namespace ControlValley
                 }
                 catch (Exception e)
                 {
-                    status = CrowdResponse.Status.STATUS_RETRY;
+                    status = EffectStatus.Retry;
                     LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
                 }
             }
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region Weather
-        public static CrowdResponse Weather(ControlClient client, CrowdRequest req)
+        public static EffectResponse Weather(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             int give = 0;
 
@@ -2425,19 +2418,19 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
             if (StartOfRound.Instance.currentLevel.currentWeather == (LevelWeatherType)give)
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                return new EffectResponse(req.ID, EffectStatus.Retry);
             }
 
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2523,19 +2516,19 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region Scrap_Money
-        public static CrowdResponse AddCredits(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddCredits(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
 
@@ -2548,7 +2541,7 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
             Terminal terminal = LethalCompanyControl.cachedTerminal;
@@ -2556,10 +2549,10 @@ namespace ControlValley
             try
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
-                if (give > 0 && terminal.groupCredits + give > 99999) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
-                if (give < 0 && terminal.groupCredits + give < 0) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                if (give > 0 && terminal.groupCredits + give > 99999) return new EffectResponse(req.ID, EffectStatus.Retry);
+                if (give < 0 && terminal.groupCredits + give < 0) return new EffectResponse(req.ID, EffectStatus.Retry);
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     if (LethalCompanyControl.isHost)
@@ -2588,15 +2581,15 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
-        public static CrowdResponse AddQuota(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddQuota(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
 
@@ -2609,7 +2602,7 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
             Terminal terminal = LethalCompanyControl.cachedTerminal;
@@ -2618,10 +2611,10 @@ namespace ControlValley
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
-                if (give > 0 && tod.profitQuota + give > 25000) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
-                if (give < 0 && tod.profitQuota + give < 5) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                if (give > 0 && tod.profitQuota + give > 25000) return new EffectResponse(req.ID, EffectStatus.Retry);
+                if (give < 0 && tod.profitQuota + give < 5) return new EffectResponse(req.ID, EffectStatus.Retry);
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2654,16 +2647,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse AddProfit(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddProfit(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
 
@@ -2676,7 +2669,7 @@ namespace ControlValley
             }
             else
             {
-                return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_FAILURE);
+                return new EffectResponse(req.ID, EffectStatus.Failure);
             }
 
 
@@ -2689,12 +2682,12 @@ namespace ControlValley
                 //LethalCompanyControl.mls.LogInfo($"playerref: {playerRef}");
                 //LethalCompanyControl.mls.LogInfo($"TimeOfDay: {tod}");
 
-                if (give > 0 && tod.quotaFulfilled >= tod.profitQuota) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
-                if (give < 0 && tod.quotaFulfilled <= 0) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY);
+                if (give > 0 && tod.quotaFulfilled >= tod.profitQuota) return new EffectResponse(req.ID, EffectStatus.Retry);
+                if (give < 0 && tod.quotaFulfilled <= 0) return new EffectResponse(req.ID, EffectStatus.Retry);
 
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2740,16 +2733,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse AddScrap(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddScrap(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -2758,7 +2751,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2772,19 +2765,19 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region Time
-        public static CrowdResponse AddHour(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddHour(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2792,7 +2785,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     if (LethalCompanyControl.isHost)
@@ -2819,16 +2812,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse RemoveHour(ControlClient client, CrowdRequest req)
+        public static EffectResponse RemoveHour(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2836,7 +2829,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.currentLevel.planetHasTime || tod.globalTime <= tod.lengthOfHours || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.currentLevel.planetHasTime || tod.globalTime <= tod.lengthOfHours || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     if (LethalCompanyControl.isHost)
@@ -2862,16 +2855,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse AddDay(ControlClient client, CrowdRequest req)
+        public static EffectResponse AddDay(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2879,7 +2872,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2897,16 +2890,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse RemoveDay(ControlClient client, CrowdRequest req)
+        public static EffectResponse RemoveDay(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2914,7 +2907,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (TimeOfDay.Instance.timeUntilDeadline <= TimeOfDay.Instance.totalTime || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (TimeOfDay.Instance.timeUntilDeadline <= TimeOfDay.Instance.totalTime || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2932,19 +2925,19 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region Ship
-        public static CrowdResponse CloseDoors(ControlClient client, CrowdRequest req)
+        public static EffectResponse CloseDoors(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2952,7 +2945,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -2968,16 +2961,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse OpenDoors(ControlClient client, CrowdRequest req)
+        public static EffectResponse OpenDoors(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -2985,7 +2978,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.hangarDoorsClosed || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3003,16 +2996,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse ShipLeave(ControlClient client, CrowdRequest req)
+        public static EffectResponse ShipLeave(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -3020,7 +3013,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (TimeOfDay.Instance.votedShipToLeaveEarlyThisRound || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (TimeOfDay.Instance.votedShipToLeaveEarlyThisRound || !StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3033,19 +3026,19 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
 
         #region Misc
-        public static CrowdResponse BreakersOn(ControlClient client, CrowdRequest req)
+        public static EffectResponse BreakersOn(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -3053,7 +3046,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 BreakerBox breakerBox = LethalCompanyControl.cachedBreakerBox;
 
-                if (breakerBox == null || breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (breakerBox == null || breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     if (LethalCompanyControl.isHost)
@@ -3075,16 +3068,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse KillEnemies(ControlClient client, CrowdRequest req)
+        public static EffectResponse KillEnemies(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -3099,7 +3092,7 @@ namespace ControlValley
                         found = true;
                 }
 
-                if (!found || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!found || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3118,16 +3111,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse BreakersOff(ControlClient client, CrowdRequest req)
+        public static EffectResponse BreakersOff(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -3135,7 +3128,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 BreakerBox breakerBox = LethalCompanyControl.cachedBreakerBox;
 
-                if (breakerBox == null || !breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (breakerBox == null || !breakerBox.isPowerOn || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     if (LethalCompanyControl.isHost)
@@ -3157,17 +3150,17 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         #endregion
-        public static CrowdResponse Lightning(ControlClient client, CrowdRequest req)
+        public static EffectResponse Lightning(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
             try
@@ -3175,7 +3168,7 @@ namespace ControlValley
                 var playerRef = StartOfRound.Instance.localPlayerController;
                 var tod = TimeOfDay.Instance;
 
-                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (!StartOfRound.Instance.currentLevel.planetHasTime || StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3193,16 +3186,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse PlayHorn(ControlClient client, CrowdRequest req)
+        public static EffectResponse PlayHorn(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
 
 
@@ -3210,7 +3203,7 @@ namespace ControlValley
             {
                 var playerRef = StartOfRound.Instance.localPlayerController;
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3231,11 +3224,11 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
         public static void SpawnAnMakeWebs(SpawnableEnemyWithRarity source)
@@ -3265,9 +3258,9 @@ namespace ControlValley
             UnityEngine.Object.Destroy(obj);
         }
 
-        public static CrowdResponse CreateWebs(ControlClient client, CrowdRequest req)
+        public static EffectResponse CreateWebs(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -3278,7 +3271,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3289,7 +3282,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.OutsideEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("sand"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "spider"))
                                 {
                                     try
                                     {
@@ -3305,7 +3298,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.Enemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("sand"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "spider"))
                                 {
                                     try
                                     {
@@ -3321,7 +3314,7 @@ namespace ControlValley
                             foreach (var outsideEnemy in level.DaytimeEnemies)
                             {
 
-                                if (outsideEnemy.enemyType.enemyName.ToLower().Contains("sand"))
+                                if (LethalCompanyControl.IsEnemy(outsideEnemy.enemyType, "spider"))
                                 {
                                     try
                                     {
@@ -3342,16 +3335,16 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse Ghost(ControlClient client, CrowdRequest req)
+        public static EffectResponse Ghost(EffectRequest req)
         {
-            CrowdResponse.Status status = CrowdResponse.Status.STATUS_SUCCESS;
+            EffectStatus status = EffectStatus.Success;
             string message = "";
             var playerRef = StartOfRound.Instance.localPlayerController;
 
@@ -3359,7 +3352,7 @@ namespace ControlValley
             {
 
 
-                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = CrowdResponse.Status.STATUS_RETRY;
+                if (StartOfRound.Instance.timeSinceRoundStarted < 2f || !playerRef.playersManager.shipDoorsEnabled) status = EffectStatus.Retry;
                 else
                 {
                     LethalCompanyControl.ActionQueue.Enqueue(() =>
@@ -3369,7 +3362,7 @@ namespace ControlValley
 
                         if (array.Length == 0)
                         {
-                            status = CrowdResponse.Status.STATUS_RETRY;
+                            status = EffectStatus.Retry;
                         }
                         else
                         {
@@ -3386,25 +3379,24 @@ namespace ControlValley
             }
             catch (Exception e)
             {
-                status = CrowdResponse.Status.STATUS_RETRY;
+                status = EffectStatus.Retry;
                 LethalCompanyControl.mls.LogInfo($"Crowd Control Error: {e.ToString()}");
             }
 
-            return new CrowdResponse(req.GetReqID(), status, message);
+            return new EffectResponse(req.ID, status, message);
         }
 
-        public static CrowdResponse NightVision(ControlClient client, CrowdRequest req)
+        public static EffectResponse NightVision(EffectRequest req)
         {
             int dur = 30;
-            if (req.duration > 0) dur = req.duration / 1000;
+            if (req.duration > 0) dur = (int)(req.duration.Value / 1000);
 
             var playerRef = StartOfRound.Instance.localPlayerController;
-            if (LethalCompanyControl.nightVision) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (LethalCompanyControl.nightVision) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            if (BuffThread.isRunning(BuffType.NIGHT_VISION)) return new CrowdResponse(req.GetReqID(), CrowdResponse.Status.STATUS_RETRY, "");
+            if (ActiveBuffs.IsRunning(BuffType.NIGHT_VISION)) return new EffectResponse(req.ID, EffectStatus.Retry, "");
 
-            new Thread(new BuffThread(req.GetReqID(), BuffType.NIGHT_VISION, dur * 1000).Run).Start();
-            return new TimedResponse(req.GetReqID(), dur * 1000, CrowdResponse.Status.STATUS_SUCCESS);
+            return new EffectResponse(req.ID, EffectStatus.Success, ""); // TimedGameEffect applies the buff
         }
 
         public static void setProperty(System.Object a, string prop, System.Object val)
@@ -3437,8 +3429,23 @@ namespace ControlValley
 
 
             var p = f.GetType().GetMethod(func, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-            p.Invoke(f, vals);
+            InvokeWithDefaults(p, f, vals);
 
+        }
+
+        /// <summary>
+        /// Invokes a game method found by name, filling in any trailing optional parameters with their defaults.
+        /// Reflection does not apply C# default arguments, so when the game adds an optional parameter (v81 added
+        /// one to PlayerControllerB.FirstEmptyItemSlot) a call made with the old argument count throws
+        /// TargetParameterCountException - which broke every Give Item effect on v81.
+        /// </summary>
+        private static System.Object InvokeWithDefaults(MethodInfo p, System.Object target, System.Object[] vals)
+        {
+            vals = vals ?? new System.Object[0];
+            ParameterInfo[] ps = p.GetParameters();
+            if (vals.Length < ps.Length && ps.Skip(vals.Length).All(x => x.IsOptional))
+                vals = vals.Concat(ps.Skip(vals.Length).Select(x => x.DefaultValue is DBNull ? null : x.DefaultValue)).ToArray();
+            return p.Invoke(target, vals);
         }
 
         public static void callFunc(System.Object a, string func, System.Object val)
@@ -3449,7 +3456,7 @@ namespace ControlValley
         public static void callFunc(System.Object a, string func, System.Object[] vals)
         {
             var p = a.GetType().GetMethod(func, BindingFlags.Instance | BindingFlags.NonPublic);
-            p.Invoke(a, vals);
+            InvokeWithDefaults(p, a, vals);
 
         }
 
@@ -3461,7 +3468,7 @@ namespace ControlValley
         public static System.Object callAndReturnFunc(System.Object a, string func, System.Object[] vals)
         {
             var p = a.GetType().GetMethod(func, BindingFlags.Instance | BindingFlags.NonPublic);
-            return p.Invoke(a, vals);
+            return InvokeWithDefaults(p, a, vals);
 
         }
 

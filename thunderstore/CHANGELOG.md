@@ -1,3 +1,18 @@
+**1.2.0** :
+```
+Fixes for v81, and the mod now runs on the current Crowd Control plugin framework.
+- Effects relayed through chat (every effect for non-host players; Spawn Body, Revive, Doors, Quota, Weather and more for hosts) failed with MissingMethodException because the chat command handler could not load.
+- Kill / Kill Crewmate failed (KillPlayer signature changed), and enemy spawn patching failed at round start.
+- Give Item effects always retried on v81 (FirstEmptyItemSlot gained a parameter).
+- New v80 creatures can be spawned: Cadaver Growths, Cadaver Bloom, Kidnapper Fox, Feiopar and Stingray (also at crewmates). Kidnapper Fox is refused on moons without Vain Shrouds, where it would vanish at once.
+- Spawn Forest Giant no longer sometimes spawns a Giant Kiwi, and Spawn Butler no longer matches Butler Bees.
+- Give Weed Killer and Weather - Cloudy work (their effect IDs never matched the mod).
+- New: on-screen Crowd Control overlay with connection status and active timed effects (F8 toggles it), F9 reconnects.
+- Timed effects pause and resume cleanly and report their remaining time to Crowd Control.
+- The startup log shows the real mod version (1.1.18 still reported 1.1.17).
+- Requires ConnectorLib.JSON.dll next to CrowdControl.dll (included).
+```
+
 **1.1.18** :
 ```
 Crash report fixes: stop calling Unity FindObjectOfType/FindObjectsByType off the CC request thread (moved to the main-thread ActionQueue; fixes native AV crash on scene changes).

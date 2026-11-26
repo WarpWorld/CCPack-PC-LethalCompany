@@ -1,11 +1,12 @@
-﻿using BepinControl;
+#nullable disable
+using BepinControl;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using UnityEngine;
 
-namespace ControlValley
+namespace CrowdControl
 {
     public enum BuffType
     {
@@ -280,150 +281,22 @@ namespace ControlValley
             }
         }
     }
-    public class BuffThread
+    /// <summary>
+    /// The buffs currently applied, for the "is X already running" prechecks in GameActions.
+    /// Replaces the old BuffThread list: the scheduler now owns the countdown, pause/resume and
+    /// finish, and TimedGameEffect applies/reverts/ticks the <see cref="Buff"/> itself.
+    /// </summary>
+    public static class ActiveBuffs
     {
-        public static List<BuffThread> threads = new List<BuffThread>();
+        private static readonly List<Buff> s_active = new List<Buff>();
 
-        public readonly Buff buff;
-        public int duration;
-        public int remain;
-        public int id;
-        public bool paused;
-
-        public static bool isRunning(BuffType t)
+        public static bool IsRunning(BuffType t)
         {
-            foreach (var thread in threads)
-            {
-                if (thread.buff.type == t) return true;
-            }
-            return false;
+            lock (s_active) return s_active.Exists(b => b.type == t);
         }
 
+        internal static void Add(Buff b) { lock (s_active) s_active.Add(b); }
 
-        public static void tick()
-        {
-            foreach (var thread in threads)
-            {
-                if (!thread.paused)
-                    thread.buff.tick();
-            }
-        }
-        public static void addTime(int duration)
-        {
-            try
-            {
-                lock (threads)
-                {
-                    foreach (var thread in threads)
-                    {
-                        Interlocked.Add(ref thread.duration, duration+5);
-                        if (!thread.paused)
-                        {
-                            int time = Volatile.Read(ref thread.remain);
-                            new TimedResponse(thread.id, time, CrowdResponse.Status.STATUS_PAUSE).Send(ControlClient.Socket);
-                            thread.paused = true;
-                        }
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                LethalCompanyControl.mls.LogInfo(e.ToString());
-            }
-        }
-
-        public static void tickTime(int duration)
-        {
-            try
-            {
-                lock (threads)
-                {
-                    foreach (var thread in threads)
-                    {
-                        int time = Volatile.Read(ref thread.remain);
-                        time -= duration;
-                        if (time < 0) time = 0;
-                        Volatile.Write(ref thread.remain, time);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                LethalCompanyControl.mls.LogInfo(e.ToString());
-            }
-        }
-
-        public static void unPause()
-        {
-            try
-            {
-                lock (threads)
-                {
-                    foreach (var thread in threads)
-                    {
-                        if (thread.paused)
-                        {
-                            int time = Volatile.Read(ref thread.remain);
-                            new TimedResponse(thread.id, time, CrowdResponse.Status.STATUS_RESUME).Send(ControlClient.Socket);
-                            thread.paused = false;
-                        }
-                    }
-                }
-            }
-            catch(Exception e)
-            {
-                LethalCompanyControl.mls.LogInfo(e.ToString());
-            }
-        }    
-        
-        public BuffThread(int id, BuffType buff, int duration)
-        {
-            this.buff = new Buff(buff);
-            this.duration = duration;
-            this.remain = duration;
-            this.id = id;
-            paused = false;
-
-            try
-            {
-                lock (threads)
-                {
-                    threads.Add(this);
-                }
-            }
-            catch (Exception e)
-            {
-                LethalCompanyControl.mls.LogInfo(e.ToString());
-            }
-        }
-
-        public void Run()
-        {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            
-            buff.addBuff(duration);
-
-            try
-            {
-                int time = Volatile.Read(ref duration); ;
-                while (time > 0)
-                {
-                    Interlocked.Add(ref duration, -time);
-                    Thread.Sleep(time);
-
-                    time = Volatile.Read(ref duration);
-                }
-                buff.removeBuff();
-                lock (threads)
-                {
-                    threads.Remove(this);
-                }
-                new TimedResponse(id, 0, CrowdResponse.Status.STATUS_STOP).Send(ControlClient.Socket);
-            }
-            catch (Exception e)
-            {
-                LethalCompanyControl.mls.LogInfo(e.ToString());
-            }
-        }
+        internal static void Remove(Buff b) { lock (s_active) s_active.Remove(b); }
     }
 }
