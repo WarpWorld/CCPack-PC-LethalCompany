@@ -7,7 +7,7 @@
     <!-- The ONE place the mod version lives. Everything else (BepInPlugin, AssemblyVersion, logs, the
          version the Crowd Control app asks for, /ccversion, ccver files, thunderstore/manifest.json)
          is generated from it at build time. -->
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
 
     <RootNamespace>CrowdControl</RootNamespace>
     <!-- Kept as "CrowdControl" (rather than CrowdControl.$(GameName)) so the new build drops in over the

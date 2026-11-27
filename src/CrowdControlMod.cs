@@ -300,7 +300,7 @@ public partial class CrowdControlMod : BaseUnityPlugin
         void Update()
         {
             CrowdControlMod mod = Instance;
-            if (mod == null) return;
+            if (ReferenceEquals(mod, null)) return;
             mod.Tick();
             mod.FrameUpdate();
         }

@@ -1,0 +1,37 @@
+[config]
+schemaVersion = "0.0.1"
+
+[package]
+namespace = "CrowdControl"
+name = "CrowdControl_LethalCompany"
+versionNumber = "1.2.1"
+description = "Crowd Control is a mod that allows your livestream viewers on any platform to interact with your game. Twitch, YouTube, TikTok and more!"
+websiteUrl = "https://crowdcontrol.live/"
+containsNsfwContent = false
+
+[package.dependencies]
+"BepInEx-BepInExPack" = "5.4.2100"
+"NotAtomicBomb-TerminalApi" = "1.5.6"
+
+[build]
+icon = "./icon.png"
+readme = "./README.md"
+outdir = "./build"
+
+[[build.copy]]
+source = "./BepInEx"
+target = "BepInEx"
+
+[[build.copy]]
+source = "./CHANGELOG.md"
+target = "CHANGELOG.md"
+
+[[build.copy]]
+source = "./ccver"
+target = "ccver"
+
+[publish]
+repository = "https://thunderstore.io"
+communities = [ "lethal-company", ]
+[publish.categories]
+lethal-company = [ "mods" ]
