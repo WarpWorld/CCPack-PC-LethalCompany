@@ -1,3 +1,13 @@
+**1.2.2** :
+```
+Removed custom effects support and the bundled C# compiler. The mod is CrowdControl.dll and ConnectorLib.JSON.dll only.
+```
+
+**1.2.1** :
+```
+Fixed effects and the overlay not running when the BepInEx manager object is destroyed.
+```
+
 **1.2.0** :
 ```
 Fixes for v81, and the mod now runs on the current Crowd Control plugin framework.
@@ -10,8 +20,7 @@ Fixes for v81, and the mod now runs on the current Crowd Control plugin framewor
 - New: on-screen Crowd Control overlay with connection status and active timed effects (F8 toggles it), F9 reconnects.
 - Timed effects pause and resume cleanly and report their remaining time to Crowd Control.
 - The startup log shows the real mod version (1.1.18 still reported 1.1.17).
-- New: custom effects. Community-written effects placed in %APPDATA%\CrowdControl-Apps\CustomEffects\LethalCompany are compiled and loaded by the mod (turn off with AllowCustomEffects in the mod config).
-- Requires ConnectorLib.JSON.dll next to CrowdControl.dll (included), plus the bundled C# compiler files for custom effects.
+- Requires ConnectorLib.JSON.dll next to CrowdControl.dll (included).
 ```
 
 **1.1.18** :

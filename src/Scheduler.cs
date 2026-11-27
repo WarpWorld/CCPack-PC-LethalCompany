@@ -153,8 +153,6 @@ public class Scheduler(CrowdControlMod mod, NetworkClient networkClient)
             case RequestType.EffectStart when (request is EffectRequest er):
                 {
                     er.code ??= string.Empty;
-                    //custom effects arrive as a purchase of the dispatch template they were cloned
-                    //from, so the code alone is not enough to identify what to run
                     if (!m_mod.EffectLoader.TryResolve(er, out Effect effect))
                     {
                         m_networkClient.Send(new EffectResponse(er.id, EffectStatus.Unavailable, StandardErrors.EffectUnknown));
@@ -233,14 +231,8 @@ public class Scheduler(CrowdControlMod mod, NetworkClient networkClient)
                 if (timed.State is not (TimedEffectState.EffectState.Running or TimedEffectState.EffectState.Paused))
                     continue;
 
-                //a custom effect's code is the shared dispatch template, so its own name has to be
-                //looked up or every custom countdown would carry the same label
-                CustomEffects.CustomEffectManager? custom = CrowdControlMod.Instance?.CustomEffects;
-                if ((custom == null) || !custom.TryGetDisplayName(state.Request, out string label))
-                    label = UI.EffectNames.Pretty(state.Request.code);
-
                 list.Add(new UI.Overlay.ActiveEffect(
-                    label,
+                    UI.EffectNames.Pretty(state.Request.code),
                     (float)timed.TimeRemaining,
                     (float)timed.Duration,
                     timed.State == TimedEffectState.EffectState.Paused));

@@ -4,7 +4,7 @@ schemaVersion = "0.0.1"
 [package]
 namespace = "CrowdControl"
 name = "CrowdControl_LethalCompany"
-versionNumber = "1.2.1"
+versionNumber = "1.2.2"
 description = "Crowd Control is a mod that allows your livestream viewers on any platform to interact with your game. Twitch, YouTube, TikTok and more!"
 websiteUrl = "https://crowdcontrol.live/"
 containsNsfwContent = false

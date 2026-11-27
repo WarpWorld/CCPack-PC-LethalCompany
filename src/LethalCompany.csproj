@@ -7,7 +7,7 @@
     <!-- The ONE place the mod version lives. Everything else (BepInPlugin, AssemblyVersion, logs, the
          version the Crowd Control app asks for, /ccversion, ccver files, thunderstore/manifest.json)
          is generated from it at build time. -->
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
 
     <RootNamespace>CrowdControl</RootNamespace>
     <!-- Kept as "CrowdControl" (rather than CrowdControl.$(GameName)) so the new build drops in over the
@@ -18,12 +18,6 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-
-    <!-- Custom (community) effects are enabled for this game (CUSTOM_EFFECTS_SUPPORTED is true), so the ~14MB
-         Roslyn compiler ships in the plugin folder and effects can be dropped in as .cs files. The pack still
-         needs allowCustomEffects before viewers can buy them. Build with -p:IncludeCustomEffectCompiler=false
-         to leave the compiler out (effects then have to be prebuilt DLLs). -->
-    <IncludeCustomEffectCompiler Condition="'$(IncludeCustomEffectCompiler)' == ''">true</IncludeCustomEffectCompiler>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,9 +32,6 @@
          in the game. -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0">
-      <ExcludeAssets Condition="'$(IncludeCustomEffectCompiler)' == 'false'">runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
 
@@ -83,7 +74,7 @@
       <ModVersionLine Include="[assembly: System.Reflection.AssemblyVersion(&quot;$(Version)&quot;)]" />
       <ModVersionLine Include="[assembly: System.Reflection.AssemblyFileVersion(&quot;$(Version)&quot;)]" />
       <ModVersionLine Include="[assembly: System.Reflection.AssemblyInformationalVersion(&quot;$(Version)&quot;)]" />
-      <ModVersionLine Include="internal static class ModVersion { public const string Value = &quot;$(Version)&quot;%3B public const string GameName = &quot;$(GameName)&quot;%3B }" />
+      <ModVersionLine Include="internal static class ModVersion { public const string Value = &quot;$(Version)&quot;%3B }" />
     </ItemGroup>
     <WriteLinesToFile File="$(ModVersionFile)" Lines="@(ModVersionLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
     <ItemGroup>
@@ -117,14 +108,9 @@
     <ItemGroup>
       <StageDir Include="$(RepoRoot)/mod/BepInEx/plugins;$(RepoRoot)/thunderstore/BepInEx/plugins" />
       <StageFile Include="$(TargetPath);$(TargetDir)ConnectorLib.JSON.dll" />
-      <!-- Roslyn and the libraries it needs that the game does not already have. -->
-      <CompilerFile Include="Microsoft.CodeAnalysis.dll;Microsoft.CodeAnalysis.CSharp.dll;System.Collections.Immutable.dll;System.Reflection.Metadata.dll;System.Runtime.CompilerServices.Unsafe.dll;System.Text.Encoding.CodePages.dll;System.Threading.Tasks.Extensions.dll" />
-      <StageFile Include="@(CompilerFile->'$(TargetDir)%(Identity)')" Condition="'$(IncludeCustomEffectCompiler)' != 'false'" />
-      <StaleCompilerFile Include="$(RepoRoot)/mod/BepInEx/plugins/%(CompilerFile.Identity);$(RepoRoot)/thunderstore/BepInEx/plugins/%(CompilerFile.Identity)" Condition="'$(IncludeCustomEffectCompiler)' == 'false'" />
       <CcverFile Include="$(RepoRoot)/mod/ccver;$(RepoRoot)/mod/BepInEx/plugins/ccver;$(RepoRoot)/thunderstore/ccver;$(RepoRoot)/thunderstore/BepInEx/plugins/ccver" />
     </ItemGroup>
     <Copy SourceFiles="@(StageFile)" DestinationFolder="%(StageDir.Identity)" />
-    <Delete Files="@(StaleCompilerFile)" />
     <WriteExactText Path="%(CcverFile.Identity)" Text="$(Version)" />
     <WriteExactText Path="$(ManifestPath)" Text="$(ManifestText)" />
   </Target>

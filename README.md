@@ -46,20 +46,6 @@ and active timed effects) and **F9** forces a reconnect. The game host has autho
 multiplayer game, every player should install the same mod, as required by the
 included Thunderstore documentation.
 
-## Custom effects
-
-The mod supports community-written effects. Drop an effect (a `.cs` file or a
-pack folder) into `%APPDATA%\CrowdControl-Apps\CustomEffects\LethalCompany`
-and the mod compiles and loads it; see [CustomEffect.md](CustomEffect.md) for
-how to write one. The C# compiler (the `Microsoft.CodeAnalysis*.dll` and
-`System.*.dll` files next to `CrowdControl.dll`) is only loaded when an effect
-has to be built from source.
-
-Streamers can turn this off with `CustomEffects.AllowCustomEffects` in
-`BepInEx/config/WarpWorld.CrowdControl.cfg`. Viewers can only buy custom
-effects once the Lethal Company pack has `allowCustomEffects` set; until then
-they load and run locally but are not offered in the menu.
-
 ## Troubleshooting
 
 - **The game does not load the plugin:** confirm that `winhttp.dll` is beside
